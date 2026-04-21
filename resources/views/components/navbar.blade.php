@@ -7,6 +7,7 @@
             <a href="/" class="hover:text-orange-400">Beranda</a>
             <a href="#" class="hover:text-orange-400">Layanan</a>
             <a href="#" class="hover:text-orange-400">Tentang Kami</a>
+            <a href="#" class="hover:text-orange-400">Pusat Bantuan</a>
         </div>
         <a href="{{ route('login') }}" class="bg-[#e67e22] hover:bg-[#d35400] px-6 py-2 rounded text-sm font-bold transition">Masuk</a>
     </div>
