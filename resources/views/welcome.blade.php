@@ -17,20 +17,7 @@
 </head>
 <body class="bg-gray-50 font-sans">
 
-    <nav class="bg-[#0f2d50] text-white py-4 shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-6 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <img src="{{ asset('images/logo.png') }}" class="h-10 w-auto object-contain" alt="Logo">
-            </div>
-            <div class="hidden md:flex space-x-8 text-sm font-medium">
-                <a href="#" class="hover:text-orange-400">Beranda</a>
-                <a href="#" class="hover:text-orange-400">Layanan</a>
-                <a href="#" class="hover:text-orange-400">Tentang Kami</a>
-                <a href="#" class="hover:text-orange-400">Pusat Bantuan</a>
-            </div>
-            <a href="{{ route('login') }}" class="bg-[#e67e22] hover:bg-[#d35400] px-6 py-2 rounded text-sm font-bold transition">Masuk</a>
-        </div>
-    </nav>
+    <x-navbar />
 
     <section class="hero-bg text-white py-24 md:py-32">
         <div class="container mx-auto px-6">
@@ -137,54 +124,8 @@
         </div>
     </section>
 
-    <footer class="bg-[#0f2d50] text-gray-300 py-16">
-        <div class="container mx-auto px-6 grid md:grid-cols-4 gap-12 text-sm">
-            <div>
-                <div class="flex items-center space-x-2 mb-6 text-white">
-                    <img src="{{ asset('images/logo.png') }}" class="h-10 w-auto object-contain" alt="Logo">
-                    <span class="text-xl font-bold">Tukang.in</span>
-                </div>
-                <p class="leading-relaxed mb-6 opacity-70">Platform terdepan di Indonesia yang menghubungkan Anda dengan ribuan teknisi berpengalaman untuk berbagai kebutuhan perawatan rumah.</p>
-                <div class="flex space-x-4">
-                    <a href="#" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-orange-500 transition"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-orange-500 transition"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-orange-500 transition"><i class="fab fa-twitter"></i></a>
-                </div>
-            </div>
-            <div>
-                <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-widest">Layanan Utama</h4>
-                <ul class="space-y-3 opacity-70">
-                    <li><a href="#" class="hover:text-orange-400">Perbaikan AC & Pendingin</a></li>
-                    <li><a href="#" class="hover:text-orange-400">Instalasi & Servis Listrik</a></li>
-                    <li><a href="#" class="hover:text-orange-400">Pipa Bocor & Saluran Air</a></li>
-                    <li><a href="#" class="hover:text-orange-400">Renovasi Atap & Plafon</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-widest">Perusahaan</h4>
-                <ul class="space-y-3 opacity-70">
-                    <li><a href="#" class="hover:text-orange-400">Tentang Tukang.in</a></li>
-                    <li><a href="#" class="hover:text-orange-400">Karir & Rekrutmen</a></li>
-                    <li><a href="#" class="hover:text-orange-400">Jadi Mitra Kami</a></li>
-                    <li><a href="#" class="hover:text-orange-400">Blog & Artikel</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-widest">Hubungi Kami</h4>
-                <p class="mb-2 opacity-70">support@tukangin.in</p>
-                <p class="mb-4 opacity-70">0800 1234 5678</p>
-                <p class="opacity-70">Sudirman Central Business District, Jakarta</p>
-            </div>
-        </div>
-        <div class="container mx-auto px-6 mt-16 pt-8 border-t border-white/10 flex flex-col md:row justify-between items-center text-[10px] opacity-50 uppercase tracking-widest">
-            <p>&copy; 2026 Tukang.in. Powered by Handyman Network Indonesia.</p>
-            <div class="flex space-x-6 mt-4 md:mt-0">
-                <a href="#">Syarat & Ketentuan</a>
-                <a href="#">Kebijakan Privasi</a>
-                <a href="#">Cookies</a>
-            </div>
-        </div>
-    </footer>
+    <x-footer />
+
 
 </body>
 </html>
