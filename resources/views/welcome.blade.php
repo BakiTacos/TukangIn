@@ -119,7 +119,7 @@
             </div>
         </div>
     @empty
-        <p class="col-span-3 text-center text-gray-400 py-10">Belum ada mitra teknisi yang tersedia.</p>
+        <p class="col-span-3 text-center text-gray-400 py-10">Belum ada mitsra teknisi yang tersedia.</p>
     @endforelse
 </div>
     </section>
