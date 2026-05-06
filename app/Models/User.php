@@ -41,6 +41,11 @@ class User extends Authenticatable
         return $this->hasMany(Review::class, 'tukang_id');
     }
 
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
+
     public function getAverageRatingAttribute()
     {
         return round($this->reviews()->avg('rating'), 1) ?: 0;

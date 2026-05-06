@@ -55,6 +55,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/my-addresses', [App\Http\Controllers\ProfileController::class, 'address'])
+        ->name('profile.address');
+
+    // Pintu POST: Untuk proses simpan data dari form modal
+    Route::post('/my-addresses', [App\Http\Controllers\ProfileController::class, 'storeAddress'])
+        ->name('profile.address.store');
+
+    Route::put('/my-addresses/{id}', [ProfileController::class, 'updateAddress'])->name('profile.address.update');
+    Route::delete('/my-addresses/{id}', [ProfileController::class, 'destroyAddress'])->name('profile.address.destroy');
 });
 
 require __DIR__.'/auth.php';

@@ -54,7 +54,7 @@
                             </div>
                             <i class="fas fa-chevron-right text-[10px] text-gray-300"></i>
                         </a>
-                        <a href="#" class="flex items-center justify-between p-4 rounded-2xl hover:bg-gray-50 transition group">
+                        <a href="/my-addresses" class="flex items-center justify-between p-4 rounded-2xl hover:bg-gray-50 transition group">
                             <div class="flex items-center gap-4">
                                 <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:text-orange-500 transition">
                                     <i class="fas fa-map-marker-alt text-lg"></i>
@@ -63,19 +63,8 @@
                             </div>
                             <i class="fas fa-chevron-right text-[10px] text-gray-300"></i>
                         </a>
-                        <a href="#" class="flex items-center justify-between p-4 rounded-2xl hover:bg-gray-50 transition group">
-                            <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:text-orange-500 transition">
-                                    <i class="far fa-credit-card text-lg"></i>
-                                </div>
-                                <span class="text-sm font-bold text-gray-700">Metode Pembayaran</span>
-                            </div>
-                            <i class="fas fa-chevron-right text-[10px] text-gray-300"></i>
-                        </a>
                     </div>
                 </div>
-
-                
             </aside>
 
             <!-- Konten Kanan -->
