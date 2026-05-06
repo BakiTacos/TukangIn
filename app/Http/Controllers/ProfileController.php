@@ -21,6 +21,16 @@ class ProfileController extends Controller
         ]);
     }
 
+    public function index()
+    {
+        $user = auth()->user();
+        
+        // Contoh pengambilan data pesanan terakhir (jika sudah ada tabel orders)
+        // $lastOrder = \App\Models\Order::where('user_id', $user->id)->latest()->first();
+
+        return view('profile.index', compact('user'));
+    }
+
     /**
      * Update the user's profile information.
      */

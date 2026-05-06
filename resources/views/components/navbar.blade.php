@@ -29,7 +29,7 @@
                              class="w-8 h-8 rounded-full border border-white/20">
                         
                         <div class="text-left hidden md:block">
-                            <p class="text-[9px] text-gray-400 font-bold leading-none uppercase tracking-tighter">Halo, Partner</p>
+                            <p class="text-[9px] text-gray-400 font-bold leading-none uppercase tracking-tighter">Halo, Pengguna</p>
                             <p class="text-xs text-white font-extrabold truncate max-w-[100px]">{{ Auth::user()->name }}</p>
                         </div>
                         
@@ -47,12 +47,12 @@
                             <i class="fas fa-th-large mr-3 w-4"></i> Dashboard
                         </a>
                         
-                        <a href="#" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
+                        <a href="/my-profile" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
                             <i class="far fa-user-circle mr-3 w-4"></i> Profil Saya
                         </a>
 
                         <a href="#" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
-                            <i class="fas fa-history mr-3 w-4"></i> Riwayat Pesanan
+                            <i class="fas fa-history mr-3 w-4"></i> Pesanan
                         </a>
 
                         <div class="border-t border-gray-50 my-1"></div>
