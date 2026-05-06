@@ -26,11 +26,11 @@
                 <div class="flex gap-4 mt-8 md:mt-0">
                     <div class="bg-white/10 backdrop-blur-md p-4 px-6 rounded-2xl border border-white/10 text-center min-w-[120px]">
                         <p class="text-[10px] text-gray-300 font-bold uppercase tracking-widest mb-1">Total Pesanan</p>
-                        <p class="text-2xl font-black">48</p>
+                        <p class="text-2xl font-black">0</p>
                     </div>
                     <div class="bg-white/10 backdrop-blur-md p-4 px-6 rounded-2xl border border-white/10 text-center min-w-[120px]">
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Poin Loyalitas</p>
-                        <p class="text-2xl font-black text-orange-400">1.250</p>
+                        <p class="text-2xl font-black text-orange-400">0</p>
                     </div>
                 </div>
             </div>
