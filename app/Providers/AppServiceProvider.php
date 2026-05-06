@@ -21,10 +21,14 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-    {
-        // Bagikan 4 layanan secara acak ke view footer
-        \Illuminate\Support\Facades\View::composer('components.footer', function ($view) {
-            $view->with('footerServices', \App\Models\Service::inRandomOrder()->limit(4)->get());
-        });
+{
+    if (config('app.env') === 'production') {
+        \Illuminate\Support\Facades\URL::forceScheme('https');
     }
+    
+    // Query random footer yang tadi
+    \Illuminate\Support\Facades\View::composer('components.footer', function ($view) {
+        $view->with('footerServices', \App\Models\Service::inRandomOrder()->limit(4)->get());
+    });
+}
 }
