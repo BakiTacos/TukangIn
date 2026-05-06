@@ -17,6 +17,10 @@ Route::get('/tukang', [TukangController::class, 'index'])->name('tukang.index');
 
 Route::get('/layanan', [ServiceController::class, 'index'])->name('layanan.index');
 
+Route::get('/tentang-kami', [HomeController::class, 'about'])->name('about');
+
+Route::get('/pusat-bantuan', [HomeController::class, 'help'])->name('help');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

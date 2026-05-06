@@ -18,4 +18,14 @@ class HomeController extends Controller
 
         return view('welcome', compact('tukangs'));
     }
+
+    public function about()
+{
+    return view('about');
+}
+
+public function help()
+{
+    return view('help');
+}
 }

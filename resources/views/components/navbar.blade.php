@@ -9,8 +9,8 @@
         <div class="hidden md:flex space-x-8 text-sm font-medium">
             <a href="/" class="hover:text-orange-400 transition">Beranda</a>
             <a href="/layanan" class="hover:text-orange-400 transition">Layanan</a>
-            <a href="#" class="hover:text-orange-400 transition">Tentang Kami</a>
-            <a href="#" class="hover:text-orange-400 transition">Pusat Bantuan</a>
+            <a href="/tentang-kami" class="hover:text-orange-400 transition">Tentang Kami</a>
+            <a href="/pusat-bantuan" class="hover:text-orange-400 transition">Pusat Bantuan</a>
         </div>
 
         <div class="flex items-center space-x-4">

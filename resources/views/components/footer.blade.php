@@ -23,10 +23,10 @@
                 </ul>
             </div>
             <div>
-                <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-widest">Perusahaan</h4>
+                <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-widest">Akses Cepat</h4>
                 <ul class="space-y-3 opacity-70">
-                    <li><a href="#" class="hover:text-orange-400">Tentang Tukang.in</a></li>
-                    <li><a href="#" class="hover:text-orange-400">Karir & Rekrutmen</a></li>
+                    <li><a href="/tentang-kami" class="hover:text-orange-400">Tentang Tukang.in</a></li>
+                    <li><a href="/pusat-bantuan" class="hover:text-orange-400">Pusat Bantuan</a></li>
                     <li><a href="#" class="hover:text-orange-400">Jadi Mitra Kami</a></li>
                     <li><a href="#" class="hover:text-orange-400">Blog & Artikel</a></li>
                 </ul>
