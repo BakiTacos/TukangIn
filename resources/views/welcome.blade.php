@@ -98,32 +98,30 @@
             <a href="/tukang" class="text-[#0f2d50] font-bold text-sm hover:underline">View All Partners</a>
         </div>
         <div class="grid md:grid-cols-3 gap-6">
-            @foreach($tukangs as $t)
-    <div class="bg-white p-4 rounded-[1.5rem] shadow-sm border border-gray-100 flex items-center space-x-4 hover:shadow-md transition">
-        <!-- Foto Profil dari Supabase Storage atau Placeholder -->
-        <img src="{{ $t->avatar ? asset('storage/' . $t->avatar) : 'https://i.pravatar.cc/150?u=' . $t->id }}" 
-             class="w-16 h-16 rounded-2xl object-cover border border-gray-50">
-        
-        <div class="flex-1">
-            <div class="flex justify-between items-start">
-                <h4 class="font-bold text-[#0f2d50] text-sm">{{ $t->name }}</h4>
-                <span class="text-xs font-bold text-yellow-500">
-                    <i class="fas fa-star text-[10px]"></i> {{ number_format($t->rating, 1) }}
-                </span>
-            </div>
+    @forelse($tukangs as $t)
+        <div class="bg-white p-4 rounded-[1.5rem] shadow-sm border border-gray-100 flex items-center space-x-4 hover:shadow-md transition">
+            <img src="{{ $t->avatar ? asset('storage/' . $t->avatar) : 'https://i.pravatar.cc/150?u=' . $t->id }}" 
+                 class="w-16 h-16 rounded-2xl object-cover border border-gray-50">
             
-            <!-- Mengambil kolom specialty yang sudah kita buat di migrasi -->
-            <p class="text-[10px] text-gray-500 mb-2 font-medium">
-                {{ $t->specialty ?? 'Teknisi Terverifikasi' }}
-            </p>
-            
-            <div class="flex space-x-2">
-                <span class="text-[8px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-lg font-bold uppercase tracking-wider">Verified Partner</span>
+            <div class="flex-1">
+                <div class="flex justify-between items-start">
+                    <h4 class="font-bold text-[#0f2d50] text-sm">{{ $t->name }}</h4>
+                    <span class="text-xs font-bold text-yellow-500">
+                        <i class="fas fa-star text-[10px]"></i> {{ number_format($t->rating, 1) }}
+                    </span>
+                </div>
+                <p class="text-[10px] text-gray-500 mb-2 font-medium">
+                    {{ $t->specialty ?? 'Teknisi Terverifikasi' }}
+                </p>
+                <div class="flex space-x-2">
+                    <span class="text-[8px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-lg font-bold uppercase tracking-wider">Verified Partner</span>
+                </div>
             </div>
         </div>
-    </div>
-    @endforeach
-        </div>
+    @empty
+        <p class="col-span-3 text-center text-gray-400 py-10">Belum ada mitra teknisi yang tersedia.</p>
+    @endforelse
+</div>
     </section>
 
     <x-footer />
