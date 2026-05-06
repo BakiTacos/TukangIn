@@ -83,6 +83,33 @@ class ServiceSeeder extends Seeder
                 'icon' => 'fa-couch',
                 'color' => 'bg-indigo-100 text-indigo-600'
             ],
+            [
+                'title' => 'Pemasangan Lantai / Flooring',
+                'category' => 'Interior',
+                'description' => 'Pemasangan keramik, granit, vinyl, atau parket untuk lantai yang lebih mewah.',
+                'price' => '300.000',
+                'image' => 'flooring.jpg',
+                'icon' => 'fa-th',
+                'color' => 'bg-orange-100 text-orange-600'
+            ],
+            [
+                'title' => 'Perbaikan Atap / Roofing',
+                'category' => 'Konstruksi',
+                'description' => 'Perbaikan atap bocor, penggantian genteng, dan pembersihan talang air.',
+                'price' => '200.000',
+                'image' => 'roofing.jpg',
+                'icon' => 'fa-campground',
+                'color' => 'bg-red-100 text-red-600'
+            ],
+            [
+                'title' => 'Cuci Toren & Tandon',
+                'category' => 'Plumbing',
+                'description' => 'Pembersihan lumut dan kotoran pada tandon air agar air tetap higienis.',
+                'price' => '90.000',
+                'image' => 'toren.jpg',
+                'icon' => 'fa-fill-drip',
+                'color' => 'bg-teal-100 text-teal-600'
+            ],
         ];
 
         foreach ($services as $service) {

@@ -38,4 +38,13 @@ class ServiceController extends Controller
         // 5. Kirim data ke View 'layanan.blade.php'
         return view('layanan', compact('services'));
     }
+
+    public function show($slug)
+    {
+        // Cari layanan berdasarkan slug, jika tidak ada tampilkan 404
+        $service = Service::where('slug', $slug)->firstOrFail();
+
+        // Kirim data ke view detail
+        return view('services.show', compact('service'));
+    }
 }

@@ -44,27 +44,24 @@
             <a href="/layanan" class="text-[#0f2d50] font-bold text-sm hover:underline">View All <i class="fas fa-chevron-right ml-1"></i></a>
         </div>
         <div class="grid grid-cols-4 md:grid-cols-8 gap-6">
-            @php
-                $services = [
-                    ['icon' => 'fa-faucet', 'name' => 'Kebocoran', 'color' => 'bg-blue-100 text-blue-600'],
-                    ['icon' => 'fa-bolt', 'name' => 'Listrik', 'color' => 'bg-yellow-100 text-yellow-600'],
-                    ['icon' => 'fa-hammer', 'name' => 'Konstruksi', 'color' => 'bg-red-100 text-red-600'],
-                    ['icon' => 'fa-paint-roller', 'name' => 'Cat', 'color' => 'bg-purple-100 text-purple-600'],
-                    ['icon' => 'fa-snowflake', 'name' => 'Perawatan AC', 'color' => 'bg-cyan-100 text-cyan-600'],
-                    ['icon' => 'fa-toolbox', 'name' => 'Sewa Alat', 'color' => 'bg-green-100 text-green-600'],
-                    ['icon' => 'fa-toilet', 'name' => 'Toilet', 'color' => 'bg-pink-100 text-pink-600'],
-                    ['icon' => 'fa-th-large', 'name' => 'More', 'color' => 'bg-gray-100 text-gray-600'],
-                ];
-            @endphp
-            @foreach($services as $s)
-            <div class="flex flex-col items-center group cursor-pointer">
-                <div class="{{ $s['color'] }} w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-transform group-hover:-translate-y-2">
-                    <a href=/layanan"><i class="fas {{ $s['icon'] }} text-xl"></i></a>
-                </div>
-                <span class="text-xs font-bold text-gray-700">{{ $s['name'] }}</span>
-            </div>
-            @endforeach
+    @foreach($services as $s)
+    {{-- Sekarang $s adalah Objek, jadi pakai -> sudah benar --}}
+    <a href="{{ route('services.show', $s->slug) }}" class="flex flex-col items-center group cursor-pointer">
+        <div class="{{ $s->color }} w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-transform group-hover:-translate-y-2 shadow-sm">
+            <i class="fas {{ $s->icon }} text-xl"></i>
         </div>
+        <span class="text-[10px] font-bold text-gray-700">{{ $s->title }}</span>
+    </a>
+    @endforeach
+
+    {{-- Tombol More Manual --}}
+    <a href="/layanan" class="flex flex-col items-center group cursor-pointer">
+        <div class="bg-gray-100 text-gray-600 w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-transform group-hover:-translate-y-2">
+            <i class="fas fa-th-large text-xl"></i>
+        </div>
+        <span class="text-[10px] font-bold text-gray-700">More</span>
+    </a>
+</div>
     </section>
 
     <section class="py-16 container mx-auto px-6">

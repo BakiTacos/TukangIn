@@ -15,6 +15,8 @@ Route::get('/dashboard', function () {
 
 Route::get('/tukang', [TukangController::class, 'index'])->name('tukang.index');
 
+Route::get('/layanan/{slug}', [ServiceController::class, 'show'])->name('services.show');
+
 Route::get('/layanan', [ServiceController::class, 'index'])->name('layanan.index');
 
 Route::get('/tentang-kami', [HomeController::class, 'about'])->name('about');
