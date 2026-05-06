@@ -51,4 +51,12 @@ class TukangController extends Controller
         // Kirim data $service juga ke view buat nampilin judul "Pilih Teknisi untuk [Nama Layanan]"
         return view('tukang.pilih', compact('service', 'tukangs'));
     }
+
+    public function show($id)
+{
+    // Mengambil data user dengan role tukang
+    $tukang = \App\Models\User::where('role', 'tukang')->findOrFail($id);
+    
+    return view('tukang.show', compact('tukang'));
+}
 }

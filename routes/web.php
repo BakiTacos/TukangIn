@@ -37,6 +37,8 @@ Route::get('/pusat-bantuan', [HomeController::class, 'help'])->name('help');
 Route::get('/layanan/{slug}/pilih-tukang', [TukangController::class, 'pilihTukang'])
     ->name('services.pilih-tukang');
 
+Route::get('/tukang/{id}', [App\Http\Controllers\TukangController::class, 'show'])->name('tukang.show');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

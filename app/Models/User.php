@@ -29,4 +29,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+        protected $casts = [
+        'skills' => 'array',
+        'schedule' => 'array',
+    ];
 }

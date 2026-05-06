@@ -11,133 +11,322 @@ class TukangSeeder extends Seeder
     public function run(): void 
     {
         $tukangs = [
-            [
-                'name' => 'Budi Santoso', 'email' => 'budi@tukangin.com',
-                'category' => 'AC & Pendingin', 'specialty' => 'Spesialis AC & Pendingin',
-                'rating' => 4.9, 'total_order' => 128, 'avatar' => 'budi.jpg'
-            ],
-            [
-                'name' => 'Agus Kurniawan', 'email' => 'agus@tukangin.com',
-                'category' => 'Listrik', 'specialty' => 'Instalasi Listrik & Panel',
-                'rating' => 4.8, 'total_order' => 94, 'avatar' => 'agus.jpg'
-            ],
-            [
-                'name' => 'Dedi Pratama', 'email' => 'dedi@tukangin.com',
-                'category' => 'Konstruksi', 'specialty' => 'Perbaikan Atap & Genteng',
-                'rating' => 4.7, 'total_order' => 76, 'avatar' => 'dedi.jpg'
-            ],
-            [
-                'name' => 'Rudi Hartono', 'email' => 'rudi@tukangin.com',
-                'category' => 'Finishing', 'specialty' => 'Pengecatan Rumah',
-                'rating' => 4.6, 'total_order' => 65, 'avatar' => 'rudi.jpg'
-            ],
-            [
-                'name' => 'Andi Wijaya', 'email' => 'andi@tukangin.com',
-                'category' => 'Interior', 'specialty' => 'Renovasi Interior',
-                'rating' => 4.9, 'total_order' => 140, 'avatar' => 'andi.jpg'
-            ],
-            [
-                'name' => 'Hendra Gunawan', 'email' => 'hendra@tukangin.com',
-                'category' => 'Interior', 'specialty' => 'Pemasangan Keramik & Lantai',
-                'rating' => 4.5, 'total_order' => 58, 'avatar' => 'hendra.jpg'
-            ],
-            [
-                'name' => 'Joko Susilo', 'email' => 'joko@tukangin.com',
-                'category' => 'Plumbing', 'specialty' => 'Perbaikan Pipa & Plumbing',
-                'rating' => 4.8, 'total_order' => 102, 'avatar' => 'joko.jpg'
-            ],
-            [
-                'name' => 'Fajar Nugroho', 'email' => 'fajar@tukangin.com',
-                'category' => 'Listrik', 'specialty' => 'Servis Kelistrikan Elektronik',
-                'rating' => 4.6, 'total_order' => 73, 'avatar' => 'fajar.jpg'
-            ],
-            [
-                'name' => 'Bayu Saputra', 'email' => 'bayu@tukangin.com',
-                'category' => 'Konstruksi', 'specialty' => 'Pemasangan Kanopi',
-                'rating' => 4.7, 'total_order' => 81, 'avatar' => 'bayu.jpg'
-            ],
-            [
-                'name' => 'Rizky Maulana', 'email' => 'rizky@tukangin.com',
-                'category' => 'AC & Pendingin', 'specialty' => 'Servis Kulkas & Chiller',
-                'rating' => 4.8, 'total_order' => 90, 'avatar' => 'rizky.jpg'
-            ],
-            [
-                'name' => 'Eko Prasetyo', 'email' => 'eko@tukangin.com',
-                'category' => 'Interior', 'specialty' => 'Pemasangan Gypsum',
-                'rating' => 4.5, 'total_order' => 60, 'avatar' => 'eko.jpg'
-            ],
-            [
-                'name' => 'Tono Suharto', 'email' => 'tono@tukangin.com',
-                'category' => 'Konstruksi', 'specialty' => 'Perbaikan Pintu & Jendela',
-                'rating' => 4.6, 'total_order' => 55, 'avatar' => 'tono.jpg'
-            ],
-            [
-                'name' => 'Arif Rahman', 'email' => 'arif@tukangin.com',
-                'category' => 'Listrik', 'specialty' => 'Instalasi CCTV & Keamanan',
-                'rating' => 4.9, 'total_order' => 110, 'avatar' => 'arif.jpg'
-            ],
-            [
-                'name' => 'Yoga Pradana', 'email' => 'yoga@tukangin.com',
-                'category' => 'Interior', 'specialty' => 'Pemasangan Wallpaper',
-                'rating' => 4.4, 'total_order' => 45, 'avatar' => 'yoga.jpg'
-            ],
-            [
-                'name' => 'Slamet Riyadi', 'email' => 'slamet@tukangin.com',
-                'category' => 'Plumbing', 'specialty' => 'Servis Pompa Air',
-                'rating' => 4.7, 'total_order' => 88, 'avatar' => 'slamet.jpg'
-            ],
-            [
-                'name' => 'Wawan Setiawan', 'email' => 'wawan@tukangin.com',
-                'category' => 'Interior', 'specialty' => 'Pembuatan Furniture Custom',
-                'rating' => 4.8, 'total_order' => 97, 'avatar' => 'wawan.jpg'
-            ],
-            [
-                'name' => 'Yusuf Hidayat', 'email' => 'yusuf@tukangin.com',
-                'category' => 'Interior', 'specialty' => 'Perbaikan & Upholstery Sofa',
-                'rating' => 4.5, 'total_order' => 52, 'avatar' => 'yusuf.jpg'
-            ],
-            [
-                'name' => 'Imam Santoso', 'email' => 'imam@tukangin.com',
-                'category' => 'Plumbing', 'specialty' => 'Instalasi Water Heater',
-                'rating' => 4.7, 'total_order' => 69, 'avatar' => 'imam.jpg'
-            ],
-            [
-                'name' => 'Dian Permana', 'email' => 'dian@tukangin.com',
-                'category' => 'AC & Pendingin', 'specialty' => 'Servis AC Mobil',
-                'rating' => 4.6, 'total_order' => 64, 'avatar' => 'dian.jpg'
-            ],
-            [
-                'name' => 'Rangga Saputra', 'email' => 'rangga@tukangin.com',
-                'category' => 'Konstruksi', 'specialty' => 'Pemasangan Baja Ringan',
-                'rating' => 4.8, 'total_order' => 92, 'avatar' => 'rangga.jpg'
-            ],
-            [
-                'name' => 'Kevin Setiawan', 'email' => 'kevin@tukangin.com',
-                'category' => 'Listrik', 'specialty' => 'Smart Home Installation',
-                'rating' => 4.9, 'total_order' => 120, 'avatar' => 'kevin.jpg'
-            ],
-            [
-                'name' => 'Surya Dharma', 'email' => 'surya@tukangin.com',
-                'category' => 'Plumbing', 'specialty' => 'Perbaikan Talang Air',
-                'rating' => 4.5, 'total_order' => 50, 'avatar' => 'surya.jpg'
-            ],
-            // 3 Teknisi Tambahan
-            [
-                'name' => 'Lukman Hakim', 'email' => 'lukman@tukangin.com',
-                'category' => 'Konstruksi', 'specialty' => 'Tukang Las & Teralis Besi',
-                'rating' => 4.7, 'total_order' => 42, 'avatar' => 'lukman.jpg'
-            ],
-            [
-                'name' => 'Reza Pahlevi', 'email' => 'reza@tukangin.com',
-                'category' => 'Plumbing', 'specialty' => 'Cuci Toren & Sterilisasi',
-                'rating' => 4.8, 'total_order' => 115, 'avatar' => 'reza.jpg'
-            ],
-            [
-                'name' => 'Gilang Ramadhan', 'email' => 'gilang@tukangin.com',
-                'category' => 'Sewa Alat', 'specialty' => 'Instruktur & Operator Alat',
-                'rating' => 4.6, 'total_order' => 38, 'avatar' => 'gilang.jpg'
-            ]
-        ];
+
+    // ================= PLUMBING =================
+    [
+        'name' => 'Joko Susilo',
+        'email' => 'joko@tukangin.com',
+        'avatar' => 'joko.jpg',
+        'category' => 'Plumbing',
+        'bio' => 'Spesialis perbaikan pipa bocor dan saluran mampet.',
+        'skills' => ['Perbaikan Pipa', 'Saluran Mampet', 'Instalasi Air'],
+        'price_kunjungan' => 85000,
+        'rating' => 4.8,
+        'total_order' => 102,
+        'schedule' => ['Setiap Hari' => '07:00 - 21:00'],
+        'is_available' => true,
+        'distance_km' => 1.2,
+    ],
+    [
+        'name' => 'Slamet Riyadi',
+        'email' => 'slamet@tukangin.com',
+        'avatar' => 'slamet.jpg',
+        'category' => 'Plumbing',
+        'bio' => 'Ahli servis pompa air dan instalasi air rumah.',
+        'skills' => ['Servis Pompa', 'Instalasi Air', 'Perbaikan Mesin'],
+        'price_kunjungan' => 90000,
+        'rating' => 4.7,
+        'total_order' => 88,
+        'schedule' => ['Setiap Hari' => '07:00 - 19:00'],
+        'is_available' => true,
+        'distance_km' => 2.5,
+    ],
+    [
+        'name' => 'Reza Pahlevi',
+        'email' => 'reza@tukangin.com',
+        'avatar' => 'reza.jpg',
+        'category' => 'Plumbing',
+        'bio' => 'Spesialis cuci toren dan sterilisasi.',
+        'skills' => ['Cuci Toren', 'Sterilisasi', 'Cek Filter'],
+        'price_kunjungan' => 90000,
+        'rating' => 4.8,
+        'total_order' => 115,
+        'schedule' => ['Setiap Hari' => '08:00 - 18:00'],
+        'is_available' => false,
+        'distance_km' => 3.1,
+    ],
+
+    // ================= LISTRIK =================
+    [
+        'name' => 'Agus Kurniawan',
+        'email' => 'agus@tukangin.com',
+        'avatar' => 'agus.jpg',
+        'category' => 'Listrik',
+        'bio' => 'Ahli instalasi listrik dan panel.',
+        'skills' => ['Instalasi Kabel', 'Panel Listrik', 'Pasang Lampu'],
+        'price_kunjungan' => 80000,
+        'rating' => 4.8,
+        'total_order' => 94,
+        'schedule' => ['Senin - Sabtu' => '08:00 - 17:00'],
+        'is_available' => true,
+        'distance_km' => 1.8,
+    ],
+    [
+        'name' => 'Arif Rahman',
+        'email' => 'arif@tukangin.com',
+        'avatar' => 'arif.jpg',
+        'category' => 'Listrik',
+        'bio' => 'Spesialis CCTV dan keamanan rumah.',
+        'skills' => ['CCTV', 'Smart Home', 'Instalasi'],
+        'price_kunjungan' => 100000,
+        'rating' => 4.9,
+        'total_order' => 110,
+        'schedule' => ['Setiap Hari' => '08:00 - 20:00'],
+        'is_available' => true,
+        'distance_km' => 2.0,
+    ],
+    [
+        'name' => 'Kevin Setiawan',
+        'email' => 'kevin@tukangin.com',
+        'avatar' => 'kevin.jpg',
+        'category' => 'Listrik',
+        'bio' => 'Ahli smart home dan automation.',
+        'skills' => ['IoT', 'Automation', 'Smart Lighting'],
+        'price_kunjungan' => 120000,
+        'rating' => 4.9,
+        'total_order' => 120,
+        'schedule' => ['Setiap Hari' => '08:00 - 21:00'],
+        'is_available' => false,
+        'distance_km' => 4.2,
+    ],
+
+    // ================= KONSTRUKSI =================
+    [
+        'name' => 'Dedi Pratama',
+        'email' => 'dedi@tukangin.com',
+        'avatar' => 'dedi.jpg',
+        'category' => 'Konstruksi',
+        'bio' => 'Spesialis perbaikan atap dan genteng.',
+        'skills' => ['Atap', 'Genteng', 'Talang'],
+        'price_kunjungan' => 100000,
+        'rating' => 4.7,
+        'total_order' => 76,
+        'schedule' => ['Senin - Jumat' => '08:00 - 17:00'],
+        'is_available' => true,
+        'distance_km' => 2.3,
+    ],
+    [
+        'name' => 'Bayu Saputra',
+        'email' => 'bayu@tukangin.com',
+        'avatar' => 'bayu.jpg',
+        'category' => 'Konstruksi',
+        'bio' => 'Ahli pemasangan kanopi.',
+        'skills' => ['Kanopi', 'Rangka Besi', 'Finishing'],
+        'price_kunjungan' => 110000,
+        'rating' => 4.7,
+        'total_order' => 81,
+        'schedule' => ['Senin - Sabtu' => '08:00 - 17:00'],
+        'is_available' => true,
+        'distance_km' => 3.0,
+    ],
+    [
+        'name' => 'Rangga Saputra',
+        'email' => 'rangga@tukangin.com',
+        'avatar' => 'rangga.jpg',
+        'category' => 'Konstruksi',
+        'bio' => 'Spesialis baja ringan.',
+        'skills' => ['Baja Ringan', 'Rangka Atap', 'Instalasi'],
+        'price_kunjungan' => 110000,
+        'rating' => 4.8,
+        'total_order' => 92,
+        'schedule' => ['Senin - Sabtu' => '08:00 - 17:00'],
+        'is_available' => false,
+        'distance_km' => 5.1,
+    ],
+
+    // ================= PENGECATAN =================
+    [
+        'name' => 'Rudi Hartono',
+        'email' => 'rudi@tukangin.com',
+        'avatar' => 'rudi.jpg',
+        'category' => 'Pengecatan',
+        'bio' => 'Ahli cat interior dan eksterior.',
+        'skills' => ['Cat Interior', 'Cat Eksterior', 'Finishing'],
+        'price_kunjungan' => 70000,
+        'rating' => 4.6,
+        'total_order' => 65,
+        'schedule' => ['Senin - Sabtu' => '09:00 - 17:00'],
+        'is_available' => true,
+        'distance_km' => 1.5,
+    ],
+    [
+        'name' => 'Ferry Gunawan',
+        'email' => 'ferry@tukangin.com',
+        'avatar' => 'ferry.jpg',
+        'category' => 'Pengecatan',
+        'bio' => 'Spesialis finishing premium.',
+        'skills' => ['Finishing Halus', 'Coating', 'Dinding'],
+        'price_kunjungan' => 90000,
+        'rating' => 4.7,
+        'total_order' => 70,
+        'schedule' => ['Senin - Jumat' => '08:00 - 17:00'],
+        'is_available' => true,
+        'distance_km' => 2.7,
+    ],
+    [
+        'name' => 'Haris Setiawan',
+        'email' => 'haris@tukangin.com',
+        'avatar' => 'haris.jpg',
+        'category' => 'Pengecatan',
+        'bio' => 'Ahli cat dekoratif.',
+        'skills' => ['Texture Wall', 'Dekoratif', 'Cat'],
+        'price_kunjungan' => 95000,
+        'rating' => 4.5,
+        'total_order' => 50,
+        'schedule' => ['Senin - Sabtu' => '09:00 - 17:00'],
+        'is_available' => false,
+        'distance_km' => 3.9,
+    ],
+
+    // ================= AC =================
+    [
+        'name' => 'Budi Santoso',
+        'email' => 'budi@tukangin.com',
+        'avatar' => 'budi.jpg',
+        'category' => 'AC',
+        'bio' => 'Teknisi AC berpengalaman.',
+        'skills' => ['Cuci AC', 'Isi Freon', 'Perbaikan'],
+        'price_kunjungan' => 75000,
+        'rating' => 4.9,
+        'total_order' => 128,
+        'schedule' => ['Senin - Jumat' => '08:00 - 18:00'],
+        'is_available' => true,
+        'distance_km' => 1.1,
+    ],
+    [
+        'name' => 'Rizky Maulana',
+        'email' => 'rizky@tukangin.com',
+        'avatar' => 'rizky.jpg',
+        'category' => 'AC',
+        'bio' => 'Spesialis kulkas dan chiller.',
+        'skills' => ['Servis Kulkas', 'Chiller', 'Freon'],
+        'price_kunjungan' => 80000,
+        'rating' => 4.8,
+        'total_order' => 90,
+        'schedule' => ['Senin - Sabtu' => '09:00 - 17:00'],
+        'is_available' => true,
+        'distance_km' => 2.2,
+    ],
+    [
+        'name' => 'Dian Permana',
+        'email' => 'dian@tukangin.com',
+        'avatar' => 'dian.jpg',
+        'category' => 'AC',
+        'bio' => 'Ahli AC mobil.',
+        'skills' => ['AC Mobil', 'Freon', 'Perbaikan'],
+        'price_kunjungan' => 85000,
+        'rating' => 4.6,
+        'total_order' => 64,
+        'schedule' => ['Senin - Sabtu' => '09:00 - 17:00'],
+        'is_available' => false,
+        'distance_km' => 4.0,
+    ],
+
+    // ================= INTERIOR =================
+    [
+        'name' => 'Andi Wijaya',
+        'email' => 'andi@tukangin.com',
+        'avatar' => 'andi.jpg',
+        'category' => 'Interior',
+        'bio' => 'Ahli renovasi interior.',
+        'skills' => ['Renovasi', 'Layout', 'Furniture'],
+        'price_kunjungan' => 120000,
+        'rating' => 4.9,
+        'total_order' => 140,
+        'schedule' => ['Setiap Hari' => '08:00 - 20:00'],
+        'is_available' => true,
+        'distance_km' => 1.9,
+    ],
+    [
+        'name' => 'Wawan Setiawan',
+        'email' => 'wawan@tukangin.com',
+        'avatar' => 'wawan.jpg',
+        'category' => 'Interior',
+        'bio' => 'Furniture custom.',
+        'skills' => ['Custom Furniture', 'Kayu', 'Interior'],
+        'price_kunjungan' => 130000,
+        'rating' => 4.8,
+        'total_order' => 97,
+        'schedule' => ['Senin - Sabtu'],
+        'is_available' => true,
+        'distance_km' => 2.8,
+    ],
+
+    // ================= FLOORING =================
+    [
+        'name' => 'Hendra Gunawan',
+        'email' => 'hendra@tukangin.com',
+        'avatar' => 'hendra.jpg',
+        'category' => 'Flooring',
+        'bio' => 'Spesialis lantai keramik dan granit.',
+        'skills' => ['Keramik', 'Granit', 'Vinyl'],
+        'price_kunjungan' => 95000,
+        'rating' => 4.5,
+        'total_order' => 58,
+        'schedule' => ['Senin - Sabtu'],
+        'is_available' => true,
+        'distance_km' => 3.2,
+    ],
+
+    // ================= TOILET =================
+    [
+        'name' => 'Imam Santoso',
+        'email' => 'imam@tukangin.com',
+        'avatar' => 'imam.jpg',
+        'category' => 'Toilet',
+        'bio' => 'Ahli instalasi toilet dan water heater.',
+        'skills' => ['Toilet', 'Shower', 'Water Heater'],
+        'price_kunjungan' => 95000,
+        'rating' => 4.7,
+        'total_order' => 69,
+        'schedule' => ['Senin - Sabtu'],
+        'is_available' => true,
+        'distance_km' => 2.6,
+    ],
+
+    // ================= SEWA ALAT =================
+    [
+        'name' => 'Gilang Ramadhan',
+        'email' => 'gilang@tukangin.com',
+        'avatar' => 'gilang.jpg',
+        'category' => 'Sewa Alat',
+        'bio' => 'Operator alat berat.',
+        'skills' => ['Operator', 'Training', 'Setup'],
+        'price_kunjungan' => 110000,
+        'rating' => 4.6,
+        'total_order' => 38,
+        'schedule' => ['Senin - Sabtu'],
+        'is_available' => true,
+        'distance_km' => 3.5,
+    ],
+
+    // ================= ROOFING =================
+    [
+        'name' => 'Surya Dharma',
+        'email' => 'surya@tukangin.com',
+        'avatar' => 'surya.jpg',
+        'category' => 'Roofing',
+        'bio' => 'Ahli perbaikan atap dan talang.',
+        'skills' => ['Atap', 'Talang', 'Drainase'],
+        'price_kunjungan' => 80000,
+        'rating' => 4.5,
+        'total_order' => 50,
+        'schedule' => ['Senin - Sabtu'],
+        'is_available' => true,
+        'distance_km' => 2.9,
+    ],
+
+];
 
         foreach ($tukangs as $t) {
             User::updateOrCreate(

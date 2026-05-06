@@ -73,7 +73,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'title' => 'AC Service',
-                'category' => 'AC & Pendingin',
+                'category' => 'AC',
                 'description' => 'Cuci AC rutin, tambah freon, dan perbaikan unit outdoor.',
                 'price' => '65.000',
                 'image' => 'ac.jpg',
@@ -103,7 +103,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'title' => 'Perbaikan Toilet',
-                'category' => 'Plumbing',
+                'category' => 'Toilet',
                 'description' => 'Service kloset, instalasi shower, dan saluran pembuangan.',
                 'price' => '80.000',
                 'image' => 'toilet.jpg',
@@ -133,7 +133,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'title' => 'Pemasangan Lantai / Flooring',
-                'category' => 'Interior',
+                'category' => 'Flooring',
                 'description' => 'Pemasangan keramik, granit, vinyl, atau parket untuk lantai yang lebih mewah.',
                 'price' => '300.000',
                 'image' => 'flooring.jpg',
@@ -148,7 +148,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'title' => 'Perbaikan Atap / Roofing',
-                'category' => 'Konstruksi',
+                'category' => 'Roofing',
                 'description' => 'Perbaikan atap bocor, penggantian genteng, dan pembersihan talang air.',
                 'price' => '200.000',
                 'image' => 'roofing.jpg',
@@ -163,7 +163,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'title' => 'Cuci Toren & Tandon',
-                'category' => 'Plumbing',
+                'category' => 'Toren',
                 'description' => 'Pembersihan lumut dan kotoran pada tandon air agar air tetap higienis.',
                 'price' => '90.000',
                 'image' => 'toren.jpg',
