@@ -7,11 +7,18 @@ use Illuminate\Http\Request;
 
 class TukangController extends Controller
 {
-    public function index()
-    {
-        // Mengambil user dengan role 'tukang' (asumsi kamu punya kolom role)
-        $tukangs = User::where('role', 'tukang')->paginate(4); 
-        
-        return view('tukang.index', compact('tukangs'));
+    public function index(Request $request)
+{
+    $query = \App\Models\User::where('role', 'tukang');
+
+    // Fitur Search
+    if ($request->filled('search')) {
+        $query->where('name', 'like', '%' . $request->search . '%')
+              ->orWhere('specialty', 'like', '%' . $request->search . '%');
     }
+
+    $tukangs = $query->paginate(6)->withQueryString();
+
+    return view('tukang.index', compact('tukangs'));
+}
 }

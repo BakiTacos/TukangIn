@@ -30,7 +30,7 @@
             </p>
             <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
                 <button class="bg-[#e67e22] hover:bg-[#d35400] text-white px-8 py-3 rounded font-bold transition shadow-lg">Booking Sekarang</button>
-                <button class="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-8 py-3 rounded font-bold border border-white/50 transition">Lihat Layanan</button>
+                <a href="/layanan"><button class="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-8 py-3 rounded font-bold border border-white/50 transition">Lihat Layanan</button></a>
             </div>
         </div>
     </section>
@@ -41,7 +41,7 @@
                 <h2 class="text-2xl font-bold text-gray-800">Services</h2>
                 <p class="text-gray-500">Apa yang kamu butuhkan hari ini?</p>
             </div>
-            <a href="#" class="text-[#0f2d50] font-bold text-sm hover:underline">View All <i class="fas fa-chevron-right ml-1"></i></a>
+            <a href="/layanan" class="text-[#0f2d50] font-bold text-sm hover:underline">View All <i class="fas fa-chevron-right ml-1"></i></a>
         </div>
         <div class="grid grid-cols-4 md:grid-cols-8 gap-6">
             @php
@@ -95,32 +95,34 @@
                 <h2 class="text-2xl font-bold text-gray-800">Top Rated Partners</h2>
                 <p class="text-gray-500">Tukang pilihan dengan rating tertinggi di kota Anda</p>
             </div>
-            <a href="#" class="text-[#0f2d50] font-bold text-sm hover:underline">View All Partners</a>
+            <a href="/tukang" class="text-[#0f2d50] font-bold text-sm hover:underline">View All Partners</a>
         </div>
         <div class="grid md:grid-cols-3 gap-6">
-            @php
-                $partners = [
-                    ['name' => 'Budi High Voltage', 'skill' => 'Specialist: High Voltage Wiring', 'rating' => '4.9', 'img' => 'https://i.pravatar.cc/150?u=1'],
-                    ['name' => 'Sakti Masonry Co.', 'skill' => 'Specialist: Wall Repairs, Tiling', 'rating' => '4.8', 'img' => 'https://i.pravatar.cc/150?u=2'],
-                    ['name' => 'Berkah Masonry', 'skill' => 'Specialist: Renovation, Flooring', 'rating' => '4.8', 'img' => 'https://i.pravatar.cc/150?u=3'],
-                ];
-            @endphp
-            @foreach($partners as $p)
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
-                <img src="{{ $p['img'] }}" class="w-16 h-16 rounded-xl object-cover">
-                <div class="flex-1">
-                    <div class="flex justify-between items-start">
-                        <h4 class="font-bold text-gray-800 text-sm">{{ $p['name'] }}</h4>
-                        <span class="text-xs font-bold text-yellow-500"><i class="fas fa-star"></i> {{ $p['rating'] }}</span>
-                    </div>
-                    <p class="text-[10px] text-gray-500 mb-2">{{ $p['skill'] }}</p>
-                    <div class="flex space-x-2">
-                        <span class="text-[8px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-bold uppercase tracking-tighter">Verified Partner</span>
-                        <span class="text-[8px] bg-orange-50 text-orange-600 px-2 py-0.5 rounded font-bold uppercase tracking-tighter">Premium Partner</span>
-                    </div>
-                </div>
+            @foreach($tukangs as $t)
+    <div class="bg-white p-4 rounded-[1.5rem] shadow-sm border border-gray-100 flex items-center space-x-4 hover:shadow-md transition">
+        <!-- Foto Profil dari Supabase Storage atau Placeholder -->
+        <img src="{{ $t->avatar ? asset('storage/' . $t->avatar) : 'https://i.pravatar.cc/150?u=' . $t->id }}" 
+             class="w-16 h-16 rounded-2xl object-cover border border-gray-50">
+        
+        <div class="flex-1">
+            <div class="flex justify-between items-start">
+                <h4 class="font-bold text-[#0f2d50] text-sm">{{ $t->name }}</h4>
+                <span class="text-xs font-bold text-yellow-500">
+                    <i class="fas fa-star text-[10px]"></i> {{ number_format($t->rating, 1) }}
+                </span>
             </div>
-            @endforeach
+            
+            <!-- Mengambil kolom specialty yang sudah kita buat di migrasi -->
+            <p class="text-[10px] text-gray-500 mb-2 font-medium">
+                {{ $t->specialty ?? 'Teknisi Terverifikasi' }}
+            </p>
+            
+            <div class="flex space-x-2">
+                <span class="text-[8px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-lg font-bold uppercase tracking-wider">Verified Partner</span>
+            </div>
+        </div>
+    </div>
+    @endforeach
         </div>
     </section>
 

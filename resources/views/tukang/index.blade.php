@@ -1,3 +1,4 @@
+
 <x-app-layout>
     <div class="bg-[#0f2d50] pb-32 pt-12">
         <div class="container mx-auto px-6 text-white">
