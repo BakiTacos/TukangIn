@@ -121,14 +121,14 @@
                     <div class="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100">
                         <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-6">Legalitas</h4>
                         <div class="space-y-5">
-                            <a href="#" class="flex justify-between items-center text-sm font-bold text-gray-700 hover:text-orange-500 transition">
+                            <a href="/syarat-ketentuan" class="flex justify-between items-center text-sm font-bold text-gray-700 hover:text-orange-500 transition">
                                 Syarat & Ketentuan <i class="fas fa-external-link-alt text-[10px] text-gray-300"></i>
                             </a>
-                            <a href="#" class="flex justify-between items-center text-sm font-bold text-gray-700 hover:text-orange-500 transition">
+                            <a href="/kebijakan-privasi" class="flex justify-between items-center text-sm font-bold text-gray-700 hover:text-orange-500 transition">
                                 Kebijakan Privasi <i class="fas fa-external-link-alt text-[10px] text-gray-300"></i>
                             </a>
                             <div class="flex justify-between items-center text-sm font-bold text-gray-700">
-                                Versi Aplikasi <span class="bg-gray-100 px-2 py-1 rounded text-[10px] text-gray-400">v2.4.0</span>
+                                Versi Aplikasi <span class="bg-gray-100 px-2 py-1 rounded text-[10px] text-gray-400">v1.0.0</span>
                             </div>
                         </div>
                     </div>

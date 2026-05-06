@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View;
+use App\Models\Service;
 use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,8 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (config('app.env') === 'production') {
-            URL::forceScheme('https');
-        }
+        // Bagikan 4 layanan secara acak ke view footer
+        \Illuminate\Support\Facades\View::composer('components.footer', function ($view) {
+            $view->with('footerServices', \App\Models\Service::inRandomOrder()->limit(4)->get());
+        });
     }
 }

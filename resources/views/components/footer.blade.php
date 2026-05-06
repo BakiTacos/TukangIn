@@ -16,10 +16,13 @@
             <div>
                 <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-widest">Layanan Utama</h4>
                 <ul class="space-y-3 opacity-70">
-                    <li><a href="#" class="hover:text-orange-400">Perbaikan AC & Pendingin</a></li>
-                    <li><a href="#" class="hover:text-orange-400">Instalasi & Servis Listrik</a></li>
-                    <li><a href="#" class="hover:text-orange-400">Pipa Bocor & Saluran Air</a></li>
-                    <li><a href="#" class="hover:text-orange-400">Renovasi Atap & Plafon</a></li>
+                    @foreach($footerServices as $service)
+                        <li>
+                            <a href="{{ route('services.show', $service->slug) }}" class="hover:text-orange-400 transition">
+                                {{ $service->title }}
+                            </a>
+                        </li>
+                    @endforeach
                 </ul>
             </div>
             <div>
@@ -27,8 +30,8 @@
                 <ul class="space-y-3 opacity-70">
                     <li><a href="/tentang-kami" class="hover:text-orange-400">Tentang Tukang.in</a></li>
                     <li><a href="/pusat-bantuan" class="hover:text-orange-400">Pusat Bantuan</a></li>
+                    <li><a href="/layanan" class="hover:text-orange-400">Layanan Kami</a></li>
                     <li><a href="#" class="hover:text-orange-400">Jadi Mitra Kami</a></li>
-                    <li><a href="#" class="hover:text-orange-400">Blog & Artikel</a></li>
                 </ul>
             </div>
             <div>
@@ -41,9 +44,8 @@
         <div class="container mx-auto px-6 mt-16 pt-8 border-t border-white/10 flex flex-col md:row justify-between items-center text-[10px] opacity-50 uppercase tracking-widest">
             <p>&copy; 2026 Tukang.in. Powered by Handyman Network Indonesia.</p>
             <div class="flex space-x-6 mt-4 md:mt-0">
-                <a href="#">Syarat & Ketentuan</a>
-                <a href="#">Kebijakan Privasi</a>
-                <a href="#">Cookies</a>
+                <a href="/syarat-ketentuan">Syarat & Ketentuan</a>
+                <a href="/kebijakan-privasi">Kebijakan Privasi</a>
             </div>
         </div>
     </footer>

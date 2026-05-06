@@ -41,6 +41,16 @@ Route::get('/tukang/{id}', [App\Http\Controllers\TukangController::class, 'show'
 
 Route::get('/my-profile', [ProfileController::class, 'index'])->name('profile.index');
 
+// routes/web.php
+
+Route::get('/syarat-ketentuan', function () {
+    return view('pages.terms');
+})->name('terms');
+
+Route::get('/kebijakan-privasi', function () {
+    return view('pages.privacy');
+})->name('privacy');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

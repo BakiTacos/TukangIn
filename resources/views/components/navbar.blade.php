@@ -43,10 +43,6 @@
                             <span class="text-[11px] font-extrabold text-[#0f2d50] uppercase">{{ Auth::user()->role ?? 'Pelanggan' }}</span>
                         </div>
                         
-                        <a href="{{ url('/dashboard') }}" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
-                            <i class="fas fa-th-large mr-3 w-4"></i> Dashboard
-                        </a>
-                        
                         <a href="/my-profile" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
                             <i class="far fa-user-circle mr-3 w-4"></i> Profil Saya
                         </a>
