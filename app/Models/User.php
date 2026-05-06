@@ -34,4 +34,15 @@ class User extends Authenticatable
         'skills' => 'array',
         'schedule' => 'array',
     ];
+
+    public function reviews()
+    {
+        // Relasi ke model Review menggunakan foreign key 'tukang_id'
+        return $this->hasMany(Review::class, 'tukang_id');
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return round($this->reviews()->avg('rating'), 1) ?: 0;
+    }
 }

@@ -53,10 +53,15 @@ class TukangController extends Controller
     }
 
     public function show($id)
-{
-    // Mengambil data user dengan role tukang
-    $tukang = \App\Models\User::where('role', 'tukang')->findOrFail($id);
-    
-    return view('tukang.show', compact('tukang'));
-}
+    {
+        // Mengambil tukang beserta ulasannya dalam satu query
+        $tukang = \App\Models\User::where('role', 'tukang')
+                    ->with(['reviews' => function($query) {
+                        $query->latest(); // Urutkan ulasan terbaru di atas
+                    }])
+                    ->withCount('reviews') // Menghitung total ulasan otomatis
+                    ->findOrFail($id);
+        
+        return view('tukang.show', compact('tukang'));
+    }
 }

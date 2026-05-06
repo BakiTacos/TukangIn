@@ -110,7 +110,10 @@
                                     <p class="text-xs font-bold text-gray-700">Tersedia Sekarang</p>
                                 </div>
                             </div>
-                            <a href="#" class="bg-[#0f2d50] text-white px-6 py-2.5 rounded-2xl font-bold text-xs hover:bg-orange-500 transition shadow-lg shadow-blue-100">Lihat Profil</a>
+                            <a href="{{ route('tukang.show', $tukang->id) }}" 
+                                class="bg-[#0f2d50] text-white px-6 py-2.5 rounded-2xl font-bold text-xs hover:bg-orange-500 transition shadow-lg shadow-blue-100">
+                                    Lihat Profil
+                                </a>
                         </div>
                     </div>
                     @empty
