@@ -146,7 +146,10 @@
                     </div>
                 </div>
 
-                <button class="w-full bg-[#e67e22] hover:bg-[#d35400] text-white py-4 rounded-2xl font-bold transition shadow-lg">Pesan Sekarang</button>
+                <a href="{{ route('services.pilih-tukang', $service->slug) }}" 
+                    class="block text-center w-full bg-[#e67e22] hover:bg-[#d35400] text-white py-4 rounded-2xl font-bold transition shadow-lg shadow-orange-200 transform hover:-translate-y-1">
+                    Lanjutkan Pilih Teknisi
+                    </a>
             </div>
         </div>
 

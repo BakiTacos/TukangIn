@@ -49,7 +49,7 @@ class ServiceSeeder extends Seeder
                 'image' => 'construction.jpg',
                 'icon' => 'fa-hammer',
                 'color' => 'bg-red-100 text-red-600',
-                'has_capacity' => true,
+                'has_capacity' => false,
                 'inclusions' => [
                     ['icon' => 'fa-hammer', 'title' => 'Renovasi', 'desc' => 'Perbaikan dan pembangunan.'],
                     ['icon' => 'fa-border-all', 'title' => 'Pasang Keramik', 'desc' => 'Pemasangan rapi dan presisi.'],
@@ -64,7 +64,7 @@ class ServiceSeeder extends Seeder
                 'image' => 'painting.jpg',
                 'icon' => 'fa-paint-roller',
                 'color' => 'bg-purple-100 text-purple-600',
-                'has_capacity' => true,
+                'has_capacity' => false,
                 'inclusions' => [
                     ['icon' => 'fa-fill-drip', 'title' => 'Cat Interior', 'desc' => 'Pengecatan dalam ruangan.'],
                     ['icon' => 'fa-home', 'title' => 'Cat Eksterior', 'desc' => 'Pengecatan luar rumah.'],
@@ -79,7 +79,7 @@ class ServiceSeeder extends Seeder
                 'image' => 'ac.jpg',
                 'icon' => 'fa-snowflake',
                 'color' => 'bg-cyan-100 text-cyan-600',
-                'has_capacity' => true,
+                'has_capacity' => false,
                 'inclusions' => [
                     ['icon' => 'fa-wind', 'title' => 'Cuci AC', 'desc' => 'Membersihkan unit indoor.'],
                     ['icon' => 'fa-gas-pump', 'title' => 'Isi Freon', 'desc' => 'Pengisian freon sesuai kebutuhan.'],
@@ -124,7 +124,7 @@ class ServiceSeeder extends Seeder
                 'image' => 'decor.jpg',
                 'icon' => 'fa-couch',
                 'color' => 'bg-indigo-100 text-indigo-600',
-                'has_capacity' => true,
+                'has_capacity' => false,
                 'inclusions' => [
                     ['icon' => 'fa-image', 'title' => 'Wallpaper', 'desc' => 'Pemasangan wallpaper rapi.'],
                     ['icon' => 'fa-window-maximize', 'title' => 'Gorden', 'desc' => 'Pasang gorden sesuai ukuran.'],
@@ -139,7 +139,7 @@ class ServiceSeeder extends Seeder
                 'image' => 'flooring.jpg',
                 'icon' => 'fa-th',
                 'color' => 'bg-orange-100 text-orange-600',
-                'has_capacity' => true,
+                'has_capacity' => false,
                 'inclusions' => [
                     ['icon' => 'fa-border-all', 'title' => 'Pasang Keramik', 'desc' => 'Keramik rapi dan kuat.'],
                     ['icon' => 'fa-layer-group', 'title' => 'Vinyl/Parket', 'desc' => 'Lantai modern elegan.'],
@@ -154,7 +154,7 @@ class ServiceSeeder extends Seeder
                 'image' => 'roofing.jpg',
                 'icon' => 'fa-campground',
                 'color' => 'bg-red-100 text-red-600',
-                'has_capacity' => true,
+                'has_capacity' => false,
                 'inclusions' => [
                     ['icon' => 'fa-home', 'title' => 'Perbaikan Atap', 'desc' => 'Mengatasi kebocoran.'],
                     ['icon' => 'fa-th-large', 'title' => 'Ganti Genteng', 'desc' => 'Penggantian genteng rusak.'],
