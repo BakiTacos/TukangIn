@@ -17,6 +17,12 @@
     {
       "src": "/(.*)",
       "dest": "/api/index.php"
+    },
+    {
+      "scripts": {
+        "post-install": "php artisan migrate --force"
+      }
     }
+    
   ]
 }
