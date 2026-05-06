@@ -11,31 +11,32 @@ class ServiceController extends Controller
     /**
      * Menampilkan daftar layanan dengan fitur search, filter kategori, dan pagination.
      */
-    public function index(Request $request): View
+    public function index(Request $request)
     {
-        // 1. Inisialisasi Query dari Model Service
-        $query = Service::query();
+        $query = \App\Models\Service::query();
 
-        // 2. Logika Pencarian (Search)
-        // Mencari berdasarkan judul atau deskripsi layanan
+        // 1. Logika Pencarian
         if ($request->filled('search')) {
-            $query->where(function($q) use ($request) {
-                $q->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
-            });
+            $query->where('title', 'like', '%' . $request->search . '%')
+                ->orWhere('description', 'like', '%' . $request->search . '%');
         }
 
-        // 3. Logika Filter Kategori
-        // Jika kategori dipilih dan bukan 'Semua', lakukan filter
-        if ($request->filled('category') && $request->category !== 'Semua') {
-            $query->where('category', $request->category);
+        // 2. Logika Sortir Harga
+        if ($request->filled('sort')) {
+            // Kita hilangkan titik dulu di database supaya bisa disortir sebagai angka murni
+            $orderRaw = "CAST(REPLACE(price, '.', '') AS INTEGER)";
+            
+            if ($request->sort === 'murah') {
+                $query->orderByRaw("$orderRaw ASC");
+            } elseif ($request->sort === 'mahal') {
+                $query->orderByRaw("$orderRaw DESC");
+            }
+        } else {
+            $query->latest();
         }
 
-        // 4. Eksekusi Pagination
-        // Menampilkan 8 item per halaman dan mempertahankan parameter URL (search/category)
-        $services = $query->latest()->paginate(8)->withQueryString();
+        $services = $query->paginate(8)->withQueryString();
 
-        // 5. Kirim data ke View 'layanan.blade.php'
         return view('layanan', compact('services'));
     }
 

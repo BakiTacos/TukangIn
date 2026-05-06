@@ -91,9 +91,9 @@
             <div class="relative z-10">
                 <h2 class="text-white text-3xl md:text-5xl font-bold mb-6">Siap Memulai Proyek Konstruksi Anda?</h2>
                 <p class="text-gray-400 mb-10 max-w-2xl mx-auto">Konsultasikan kebutuhan konstruksi Anda dengan tim ahli kami sekarang dan dapatkan penawaran terbaik untuk hunian impian Anda.</p>
-                <button class="bg-[#e67e22] hover:bg-[#d35400] text-white px-10 py-4 rounded-xl font-bold transition shadow-lg text-lg">
+                <a href="/layanan"><button class="bg-[#e67e22] hover:bg-[#d35400] text-white px-10 py-4 rounded-xl font-bold transition shadow-lg text-lg">
                     Pesan Sekarang
-                </button>
+                </button></a>
             </div>
             <!-- Dekoratif Background -->
             <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
@@ -101,53 +101,7 @@
         </div>
     </section>
 
-    <!-- Footer: Sesuai Referensi Gambar -->
-    <footer class="bg-[#0f2d50] text-white pt-20 pb-10 border-t border-white/5">
-        <div class="container mx-auto px-6 grid md:grid-cols-4 gap-12 mb-16">
-            <div class="col-span-1">
-                <img src="{{ asset('images/logo-white.png') }}" class="h-10 mb-6 grayscale brightness-200">
-                <p class="text-gray-400 text-sm leading-relaxed mb-6">Platform terpercaya yang menghubungkan Anda dengan mitra konstruksi profesional untuk segala kebutuhan rumah.</p>
-                <div class="flex space-x-4">
-                    <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-orange-500 transition"><i class="fab fa-facebook-f text-xs"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-orange-500 transition"><i class="fab fa-instagram text-xs"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-orange-500 transition"><i class="fab fa-twitter text-xs"></i></a>
-                </div>
-            </div>
-            <div>
-                <h4 class="font-bold mb-6">Layanan Utama</h4>
-                <ul class="text-gray-400 text-sm space-y-4">
-                    <li><a href="#" class="hover:text-orange-400 transition">Perbaikan AC & Pendingin</a></li>
-                    <li><a href="#" class="hover:text-orange-400 transition">Kelistrikan & Tata Cahaya</a></li>
-                    <li><a href="#" class="hover:text-orange-400 transition">Pengecatan & Dekorasi</a></li>
-                    <li><a href="#" class="hover:text-orange-400 transition">Penyewaan Alat Konstruksi</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="font-bold mb-6">Akses Cepat</h4>
-                <ul class="text-gray-400 text-sm space-y-4">
-                    <li><a href="/tentang-kami" class="hover:text-orange-400 transition">Tentang Tukang.in</a></li>
-                    <li><a href="#" class="hover:text-orange-400 transition">Layanan</a></li>
-                    <li><a href="#" class="hover:text-orange-400 transition">Pusat Bantuan</a></li>
-                    <li><a href="#" class="hover:text-orange-400 transition">Promosi</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="font-bold mb-6">Hubungi Kami</h4>
-                <ul class="text-gray-400 text-sm space-y-4">
-                    <li><i class="fas fa-envelope mr-3 text-orange-400"></i> support@tukang.in</li>
-                    <li><i class="fas fa-phone mr-3 text-orange-400"></i> 0800-1234-5678</li>
-                    <li><i class="fas fa-map-marker-alt mr-3 text-orange-400"></i> Tangerang, Banten, Indonesia</li>
-                </ul>
-            </div>
-        </div>
-        <div class="container mx-auto px-6 pt-10 border-t border-white/5 flex flex-col md:row justify-between items-center text-xs text-gray-500">
-            <p>© 2026 Tukang.in. All rights reserved.</p>
-            <div class="flex space-x-6 mt-4 md:mt-0">
-                <a href="#" class="hover:text-white transition">Syarat & Ketentuan</a>
-                <a href="#" class="hover:text-white transition">Kebijakan Privasi</a>
-            </div>
-        </div>
-    </footer>
+     <x-footer />
 
 </body>
 </html>
