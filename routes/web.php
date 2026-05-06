@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TukangController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -64,6 +65,10 @@ Route::middleware('auth')->group(function () {
 
     Route::put('/my-addresses/{id}', [ProfileController::class, 'updateAddress'])->name('profile.address.update');
     Route::delete('/my-addresses/{id}', [ProfileController::class, 'destroyAddress'])->name('profile.address.destroy');
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 });
 
 require __DIR__.'/auth.php';

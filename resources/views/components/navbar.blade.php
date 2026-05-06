@@ -47,7 +47,7 @@
                             <i class="far fa-user-circle mr-3 w-4"></i> Profil Saya
                         </a>
 
-                        <a href="#" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
+                        <a href="/dashboard" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
                             <i class="fas fa-history mr-3 w-4"></i> Pesanan
                         </a>
 

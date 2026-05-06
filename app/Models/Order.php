@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Order extends Model
+{
+    protected $fillable = [
+        'order_number', 'user_id', 'tukang_id', 'service_id', 
+        'address_id', 'schedule_date', 'status', 'total_cost', 'problem_description'
+    ];
+
+    protected $casts = [
+        'schedule_date' => 'datetime',
+    ];
+
+    // Relasi ke Pelanggan
+    public function user() { return $this->belongsTo(User::class, 'user_id'); }
+    
+    // Relasi ke Tukang
+    public function tukang() { return $this->belongsTo(User::class, 'tukang_id'); }
+    
+    // Relasi ke Layanan
+    public function service() { return $this->belongsTo(Service::class); }
+    
+    // Relasi ke Alamat
+    public function address() { return $this->belongsTo(Address::class); }
+}
