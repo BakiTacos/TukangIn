@@ -40,7 +40,7 @@
                     <div class="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 hidden group-hover:block animate-fade-in-down z-50">
                         <div class="px-4 py-3 border-b border-gray-50 mb-1">
                             <p class="text-[10px] font-bold text-gray-400 uppercase leading-none mb-1">Status Akun</p>
-                            <span class="text-[11px] font-extrabold text-[#0f2d50] uppercase">{{ 'Pelanggan' }}</span>
+                            <span class="text-[11px] font-extrabold text-[#0f2d50] uppercase">{{ 'Pelanggan Reguler' }}</span>
                         </div>
                         
                         <a href="/my-profile" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
