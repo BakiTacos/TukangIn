@@ -29,7 +29,7 @@
                 Temukan teknisi profesional untuk segala kebutuhan perbaikan rumah Anda dengan jaminan hasil terbaik.
             </p>
             <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-                <button class="bg-[#e67e22] hover:bg-[#d35400] text-white px-8 py-3 rounded font-bold transition shadow-lg">Booking Sekarang</button>
+                <a href="/tukang"><button class="bg-[#e67e22] hover:bg-[#d35400] text-white px-8 py-3 rounded font-bold transition shadow-lg">Booking Sekarang</button></a>
                 <a href="/layanan"><button class="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-8 py-3 rounded font-bold border border-white/50 transition">Lihat Layanan</button></a>
             </div>
         </div>
@@ -59,33 +59,11 @@
             @foreach($services as $s)
             <div class="flex flex-col items-center group cursor-pointer">
                 <div class="{{ $s['color'] }} w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-transform group-hover:-translate-y-2">
-                    <i class="fas {{ $s['icon'] }} text-xl"></i>
+                    <a href=/layanan"><i class="fas {{ $s['icon'] }} text-xl"></i></a>
                 </div>
                 <span class="text-xs font-bold text-gray-700">{{ $s['name'] }}</span>
             </div>
             @endforeach
-        </div>
-    </section>
-
-    <section class="py-12 container mx-auto px-6">
-        <h2 class="text-xl font-bold mb-8 flex items-center">Special Offers <span class="ml-2 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded italic">NEW</span></h2>
-        <div class="grid md:grid-cols-2 gap-8">
-            <div class="bg-gradient-to-r from-blue-900 to-blue-700 rounded-3xl p-8 relative overflow-hidden text-white group">
-                <div class="relative z-10">
-                    <h3 class="text-3xl font-bold mb-2">50% OFF</h3>
-                    <p class="text-sm opacity-80 mb-6">Your first AC cleaning service<br>this month!</p>
-                    <button class="bg-[#e67e22] px-6 py-2 rounded-lg text-sm font-bold">Claim Now</button>
-                </div>
-                <img src="https://illustrations.popsy.co/white/home-repair.svg" class="absolute right-0 bottom-0 w-48 opacity-20 group-hover:scale-110 transition">
-            </div>
-            <div class="bg-gradient-to-r from-gray-800 to-black rounded-3xl p-8 relative overflow-hidden text-white group">
-                <div class="relative z-10">
-                    <h3 class="text-3xl font-bold mb-2">BUNDLE</h3>
-                    <p class="text-sm opacity-80 mb-6">Save up to 30% on home<br>maintenance bundles</p>
-                    <button class="bg-white text-gray-900 px-6 py-2 rounded-lg text-sm font-bold">See Deals</button>
-                </div>
-                <img src="https://illustrations.popsy.co/white/construction-worker.svg" class="absolute right-0 bottom-0 w-48 opacity-20 group-hover:scale-110 transition">
-            </div>
         </div>
     </section>
 
