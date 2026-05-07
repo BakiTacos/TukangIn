@@ -27,6 +27,9 @@ class ProfileController extends Controller
         
         // Contoh pengambilan data pesanan terakhir (jika sudah ada tabel orders)
         // $lastOrder = \App\Models\Order::where('user_id', $user->id)->latest()->first();
+        $user = auth()->user()->load(['orders' => function($query) {
+        $query->with('service')->latest()->limit(1);
+    }]);
 
         return view('profile.index', compact('user'));
     }

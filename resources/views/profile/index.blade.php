@@ -74,21 +74,33 @@
                 <div class="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100">
                     <div class="flex justify-between items-center mb-8">
                         <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pesanan Terakhir</h4>
-                        <a href="#" class="text-[10px] font-bold text-orange-500 uppercase tracking-widest hover:underline">Lihat Semua</a>
+                        <a href="{{ route('dashboard') }}" class="text-[10px] font-bold text-orange-500 uppercase tracking-widest hover:underline">Lihat Semua</a>
                     </div>
                     
-                    <div class="bg-gray-50/50 p-6 rounded-[2rem] border border-gray-100 flex items-center justify-between group hover:border-orange-200 transition">
-                        <div class="flex items-center gap-6">
-                            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#0f2d50] shadow-sm">
-                                <i class="fas fa-tools text-xl"></i>
+                    @forelse($user->orders as $order)
+                        <div class="bg-gray-50/50 p-6 rounded-[2rem] border border-gray-100 flex items-center justify-between group hover:border-orange-200 transition">
+                            <div class="flex items-center gap-6">
+                                <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#0f2d50] shadow-sm overflow-hidden">
+                                    {{-- Gunakan icon tools atau image dari service --}}
+                                    <i class="fas fa-tools text-xl"></i>
+                                </div>
+                                <div>
+                                    <h5 class="font-bold text-gray-800">{{ $order->service->title ?? 'Layanan' }}</h5>
+                                    <p class="text-[10px] text-gray-400 font-medium uppercase mt-1">
+                                        {{ $order->schedule_date->translatedFormat('d M Y') }} • 
+                                        <span class="{{ $order->status === 'selesai' ? 'text-green-500' : 'text-orange-500' }}">
+                                            {{ ucfirst($order->status) }}
+                                        </span>
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h5 class="font-bold text-gray-800">Servis AC Split</h5>
-                                <p class="text-[10px] text-gray-400 font-medium uppercase mt-1">12 Okt 2023 • <span class="text-green-500">Selesai</span></p>
-                            </div>
+                            <p class="text-lg font-black text-[#0f2d50]">Rp {{ number_format($order->total_cost, 0, ',', '.') }}</p>
                         </div>
-                        <p class="text-lg font-black text-[#0f2d50]">Rp 150.000</p>
-                    </div>
+                    @empty
+                        <div class="text-center py-6 bg-gray-50/30 rounded-[2rem] border border-dashed border-gray-100">
+                            <p class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Belum ada pesanan</p>
+                        </div>
+                    @endforelse
                 </div>
 
                 <!-- Bantuan & Legalitas -->
