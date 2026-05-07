@@ -153,7 +153,11 @@
                             </div>
 
                             <div class="space-y-3">
-                                <button class="w-full bg-[#e67e22] hover:bg-[#d35400] text-white py-4 rounded-2xl font-bold shadow-lg shadow-orange-200 transition transform hover:-translate-y-1">PESAN SEKARANG</button>
+                                {{-- Masukkan ID Service dan ID Tukang ke dalam array --}}
+                                <a href="{{ route('checkout', ['service' => $service->id, 'tukang' => $tukang->id]) }}" 
+                                class="w-full bg-[#e67e22] hover:bg-[#d35400] text-white py-4 rounded-2xl font-bold shadow-lg shadow-orange-200 transition transform hover:-translate-y-1 block text-center uppercase tracking-widest text-sm">
+                                    PESAN SEKARANG
+                                </a>
                                 <button class="w-full bg-white border-2 border-gray-100 text-gray-600 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-gray-50 transition">
                                     <i class="far fa-comment-dots"></i> Tanya Dulu
                                 </button>

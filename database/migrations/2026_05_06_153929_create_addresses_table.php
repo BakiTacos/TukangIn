@@ -13,14 +13,26 @@ return new class extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relasi ke tabel users
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            
+            // Info Dasar
             $table->string('label'); // Contoh: Rumah, Kantor, Toko
             $table->string('receiver_name');
             $table->string('phone_number');
-            $table->text('full_address');
+
+            // Hierarki Wilayah (Standar Indonesia)
+            $table->string('province');      // Provinsi
+            $table->string('city');          // Kota/Kabupaten
+            $table->string('district');      // Kecamatan
+            $table->string('village');       // Kelurahan/Desa
             $table->string('postal_code', 10);
-            $table->string('note')->nullable(); // Patokan lokasi
-            $table->boolean('is_primary')->default(false); // Penanda alamat utama
+            
+            // Detail Lokasi
+            $table->text('full_address');    // Nama jalan, No Rumah, RT/RW
+            $table->string('note')->nullable(); // Patokan (misal: Depan gerbang putih)
+
+            // Status
+            $table->boolean('is_primary')->default(false); 
             $table->timestamps();
         });
     }

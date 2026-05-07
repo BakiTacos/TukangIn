@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\OrderController;
+
 use App\Http\Controllers\TukangController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ServiceController;
@@ -69,6 +71,33 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+    // Jalur Checkout: /checkout/{service_id}/{tukang_id}
+    Route::get('/checkout/{service}/{tukang}', [OrderController::class, 'checkout'])->name('checkout');
+    
+    // Jalur Simpan Pesanan
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+
+    
+});
+
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    
+    // 1. Menampilkan Halaman Checkout
+    // Kita kirim ID Layanan (service) agar ringkasan harga bisa dinamis
+    Route::get('/checkout/{service}', [OrderController::class, 'checkout'])
+        ->name('checkout');
+
+    // 2. Memproses Booking (Simpan ke Tabel Orders)
+    Route::post('/checkout', [OrderController::class, 'store'])
+        ->name('orders.store');
+
+    // 3. Halaman Konfirmasi Sukses (Opsional tapi Bagus buat UX)
+    Route::get('/order/success/{order}', [OrderController::class, 'success'])
+        ->name('orders.success');
+
+    Route::get('/checkout/{service}/{tukang}', [OrderController::class, 'checkout'])->name('checkout');
 });
 
 require __DIR__.'/auth.php';

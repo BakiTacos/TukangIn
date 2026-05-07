@@ -46,32 +46,28 @@ class ProfileController extends Controller
 
     // app/Http/Controllers/ProfileController.php
     public function storeAddress(Request $request)
-    {
-        $request->validate([
-            'label' => 'required|string|max:50',
-            'receiver_name' => 'required|string|max:255',
-            'phone_number' => 'required|string|max:20',
-            'full_address' => 'required|string',
-            'postal_code' => 'required|string|max:10',
-        ]);
+{
+    $request->validate([
+        'label' => 'required',
+        'receiver_name' => 'required',
+        'phone_number' => 'required',
+        'province' => 'required',
+        'city' => 'required',
+        'district' => 'required',
+        'village' => 'required',
+        'full_address' => 'required',
+        'postal_code' => 'required',
+    ]);
 
-        // Jika user menandai sebagai alamat utama, matikan status 'is_primary' pada alamat lain
-        if ($request->has('is_primary')) {
-            auth()->user()->addresses()->update(['is_primary' => false]);
-        }
-
-        auth()->user()->addresses()->create([
-            'label' => $request->label,
-            'receiver_name' => $request->receiver_name,
-            'phone_number' => $request->phone_number,
-            'full_address' => $request->full_address,
-            'postal_code' => $request->postal_code,
-            'note' => $request->note,
-            'is_primary' => $request->has('is_primary'),
-        ]);
-
-        return back()->with('success', 'Alamat baru berhasil ditambahkan!');
+    // Reset primary lain jika alamat ini diset jadi primary
+    if ($request->has('is_primary')) {
+        auth()->user()->addresses()->update(['is_primary' => false]);
     }
+
+    auth()->user()->addresses()->create($request->all());
+
+    return back()->with('success', 'Alamat berhasil ditambahkan!');
+}
 
     // app/Http/Controllers/ProfileController.php
 

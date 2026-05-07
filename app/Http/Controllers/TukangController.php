@@ -61,7 +61,9 @@ class TukangController extends Controller
                     }])
                     ->withCount('reviews') // Menghitung total ulasan otomatis
                     ->findOrFail($id);
+
+        $service = \App\Models\Service::first(); // Sesuaikan dengan logika bisnis lo
         
-        return view('tukang.show', compact('tukang'));
+        return view('tukang.show', compact('tukang', 'service'));
     }
 }
