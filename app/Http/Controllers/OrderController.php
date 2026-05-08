@@ -7,34 +7,40 @@ use App\Models\User;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
-    // app/Http/Controllers/OrderController.php
 
+// app/Http/Controllers/OrderController.php
+
+    public function show(Order $order)
+    {
+        // Proteksi agar user lain tidak bisa mengintip orderan orang lain
+        if ($order->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Load relasi agar data ter-render dengan lengkap
+        $order->load(['service', 'tukang', 'address']);
+
+        return view('order.show', compact('order'));
+    }
     public function checkout(Service $service, User $tukang)
     {
         $user = Auth::user();
-        
-        // Ambil alamat utama
         $address = $user->addresses()->where('is_primary', true)->first() ?? $user->addresses()->first();
 
-        // 1. Ambil harga layanan dari DB (Otomatis bersih jika sudah pakai Accessor)
-        $serviceFee = $service->price; 
-
-        // 2. AMBIL BIAYA TEKNISI SECARA DINAMIS (BARU & ANTI-BUG DESIMAL)
-        // Kita ambil kolom 'price_kunjungan' dari model $tukang. Jika kosong, beri fallback 75000.
-        $rawPriceKunjungan = $tukang->price_kunjungan;
+        $serviceFee = (int) $service->price; 
         
+        // Ambil tarif kunjungan teknisi secara dinamis
+        $rawPriceKunjungan = $tukang->price_kunjungan;
         $technicianFee = is_string($rawPriceKunjungan) 
             ? (int) str_replace('.', '', $rawPriceKunjungan) 
             : (int) ($rawPriceKunjungan ?? 75000); 
 
-        // 3. Kalkulasi Pajak 5% dari (Biaya Jasa + Biaya Teknisi)
-        $taxRate = 0.05; 
+        $taxRate = 0.02; // Pajak Platform 2%
         $taxAmount = ($serviceFee + $technicianFee) * $taxRate;
-        
-        // Total Pembayaran Akhir
         $totalPayment = $serviceFee + $technicianFee + $taxAmount;
 
         return view('checkout', compact(
@@ -42,7 +48,7 @@ class OrderController extends Controller
             'tukang', 
             'address', 
             'serviceFee', 
-            'technicianFee', // Sekarang nilainya dinamis (misal: 120000)
+            'technicianFee', 
             'taxAmount', 
             'totalPayment'
         ));
@@ -51,22 +57,115 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'service_id' => 'required',
-            'tukang_id' => 'required',
-            'payment_method' => 'required'
+            'service_id' => 'required|exists:services,id',
+            'tukang_id' => 'required|exists:users,id',
+            'address_id' => 'required|exists:addresses,id',
+            'payment_method' => 'required|string',
+            'payment_bank' => 'nullable|string',
+            'promo_code' => 'nullable|string',
         ]);
 
-        // Simpan ke Supabase via Eloquent
-        Order::create([
+        $service = Service::findOrFail($request->service_id);
+        $tukang = User::findOrFail($request->tukang_id);
+
+        $serviceFee = (int) $service->price;
+        $technicianFee = is_string($tukang->price_kunjungan) 
+            ? (int) str_replace('.', '', $tukang->price_kunjungan) 
+            : (int) ($tukang->price_kunjungan ?? 75000);
+            
+        $taxAmount = ($serviceFee + $technicianFee) * 0.02;
+        $baseAmount = $serviceFee + $technicianFee;
+
+        $paymentFee = 0;
+        switch ($request->payment_method) {
+            case 'gopay': $paymentFee = (int) round($baseAmount * 0.02); break;
+            case 'dana': $paymentFee = (int) round($baseAmount * 0.015); break;
+            case 'qris': $paymentFee = (int) round($baseAmount * 0.007); break;
+            case 'bank_transfer': $paymentFee = 4000; break;
+        }
+
+        $promoCode = strtoupper($request->promo_code);
+        $promoDiscount = 0;
+        if ($promoCode === 'NEWUSERDANCE') {
+            $promoDiscount = $baseAmount + $taxAmount; 
+        } elseif ($promoCode === 'NEWUSERKING') {
+            $promoDiscount = (int) round($baseAmount * 0.5); 
+        } elseif ($promoCode === 'NEWUSERKANG') {
+            $promoDiscount = (int) round($baseAmount * 0.2); 
+        }
+
+        $finalTotal = ($baseAmount + $taxAmount + $paymentFee) - $promoDiscount;
+        if ($finalTotal < 0) $finalTotal = 0;
+
+        // SIMPAN DENGAN STATUS 'PENDING'
+        $order = Order::create([
+            'order_number' => 'TKG-' . strtoupper(Str::random(5)) . '-' . date('Ymd'),
             'user_id' => Auth::id(),
-            'service_id' => $request->service_id,
-            'tukang_id' => $request->tukang_id,
+            'service_id' => $service->id,
+            'tukang_id' => $tukang->id,
             'address_id' => $request->address_id,
             'payment_method' => $request->payment_method,
-            'status' => 'pending',
-            'total_cost' => $request->total_payment, // Pastikan dikirim dari form atau hitung ulang
+            'payment_bank' => $request->payment_bank,
+            'payment_fee' => $paymentFee,
+            'promo_code' => $promoCode ?: null,
+            'discount_amount' => $promoDiscount,
+            'total_cost' => $finalTotal,
+            'status' => 'pending', // Set awal pending menunggu simulasi bayar
+            'schedule_date' => now()->addDays(1), 
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Pesanan berhasil dibuat!');
+        // ALAHKAN KE HALAMAN PEMBAYARAN BARU
+        return redirect()->route('orders.payment', $order->id);
+    }
+
+    /**
+     * Menampilkan Halaman Panduan Pembayaran (Mock/Simulasi Midtrans)
+     */
+    public function payment(Order $order)
+    {
+        // Proteksi agar user lain tidak bisa mengintip orderan orang lain
+        if ($order->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Generate Nomor VA Bohongan berdasarkan ID Order & Bank
+        $vaNumber = '';
+        if ($order->payment_method === 'bank_transfer') {
+            $bankCodes = ['bca' => '80777', 'mandiri' => '89022', 'bni' => '8807', 'bri' => '80201'];
+            $prefix = $bankCodes[$order->payment_bank] ?? '80000';
+            $vaNumber = $prefix . str_pad($order->id, 8, '0', STR_PAD_LEFT);
+        }
+
+        return view('order.payment', compact('order', 'vaNumber'));
+    }
+
+    /**
+     * Memproses Simulasi Pembayaran Sukses (POST)
+     */
+    public function simulatePayment(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Ganti 'completed' menjadi 'selesai' agar lolos CHECK Constraint DB lo
+        $order->update(['status' => 'selesai']); 
+
+        return redirect()->route('dashboard')->with('success', 'Pembayaran Berhasil! Pesanan Anda segera dikerjakan.');
+    }
+
+    /**
+ * Membatalkan pesanan secara aman di database
+ */
+    public function cancel(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Ganti 'cancelled' menjadi 'batal' agar lolos CHECK Constraint DB lo
+        $order->update(['status' => 'batal']);
+
+        return redirect()->route('dashboard')->with('info', 'Pemesanan jasa berhasil dibatalkan.');
     }
 }

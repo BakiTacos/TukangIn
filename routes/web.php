@@ -97,7 +97,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/order/success/{order}', [OrderController::class, 'success'])
         ->name('orders.success');
 
+    Route::get('/order/{order}/payment', [OrderController::class, 'payment'])->name('orders.payment');
+    Route::post('/order/{order}/simulate-payment', [OrderController::class, 'simulatePayment'])->name('orders.simulate_payment');
+
     Route::get('/checkout/{service}/{tukang}', [OrderController::class, 'checkout'])->name('checkout');
+
+    // Rute untuk membatalkan pesanan (Mengubah status menjadi 'cancelled')
+    Route::post('/order/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 });
 
 require __DIR__.'/auth.php';
