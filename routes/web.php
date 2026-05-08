@@ -105,6 +105,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Rute untuk membatalkan pesanan (Mengubah status menjadi 'cancelled')
     Route::post('/order/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/order/{order}/complain', [OrderController::class, 'complain'])->name('orders.complain');
 });
 
 require __DIR__.'/auth.php';

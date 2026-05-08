@@ -14,6 +14,8 @@ class OrderController extends Controller
 
 // app/Http/Controllers/OrderController.php
 
+    // app/Http/Controllers/OrderController.php
+
     public function show(Order $order)
     {
         // Proteksi agar user lain tidak bisa mengintip orderan orang lain
@@ -21,10 +23,32 @@ class OrderController extends Controller
             abort(403);
         }
 
-        // Load relasi agar data ter-render dengan lengkap
+        // Eager Load untuk performa database optimal
         $order->load(['service', 'tukang', 'address']);
 
-        return view('order.show', compact('order'));
+        // Hitung rincian biaya secara dinamis untuk invoice
+        $serviceFee = (int) $order->service->price;
+        $technicianFee = is_string($order->tukang->price_kunjungan) 
+            ? (int) str_replace('.', '', $order->tukang->price_kunjungan) 
+            : (int) ($order->tukang->price_kunjungan ?? 75000);
+
+        $taxAmount = ($serviceFee + $technicianFee) * 0.05;
+
+        return view('order.show', compact('order', 'serviceFee', 'technicianFee', 'taxAmount'));
+    }
+
+    // app/Http/Controllers/OrderController.php
+
+    public function complain(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Mengubah status pesanan menjadi dikomplain
+        $order->update(['status' => 'dikomplain']);
+
+        return redirect()->back()->with('warning', 'Komplain Anda telah terdaftar. Laporan sedang ditinjau oleh tim kami.');
     }
     public function checkout(Service $service, User $tukang)
     {
@@ -149,7 +173,7 @@ class OrderController extends Controller
         }
 
         // Ganti 'completed' menjadi 'selesai' agar lolos CHECK Constraint DB lo
-        $order->update(['status' => 'selesai']); 
+        $order->update(['status' => 'pengerjaan']); 
 
         return redirect()->route('dashboard')->with('success', 'Pembayaran Berhasil! Pesanan Anda segera dikerjakan.');
     }

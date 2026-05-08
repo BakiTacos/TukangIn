@@ -14,6 +14,7 @@
             <div class="flex bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100">
                 <button @click="tab = 'semua'" :class="tab === 'semua' ? 'bg-[#fdf6f0] text-orange-500' : 'text-gray-400 hover:text-gray-600'" class="px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200">Semua</button>
                 <button @click="tab = 'pengerjaan'" :class="tab === 'pengerjaan' ? 'bg-[#fdf6f0] text-orange-500' : 'text-gray-400 hover:text-gray-600'" class="px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200">Pengerjaan</button>
+                <button @click="tab = 'dikomplain'" :class="tab === 'dikomplain' ? 'bg-[#fdf6f0] text-orange-500' : 'text-gray-400 hover:text-gray-600'" class="px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200">Dikomplain</button>
                 <button @click="tab = 'selesai'" :class="tab === 'selesai' ? 'bg-[#fdf6f0] text-orange-500' : 'text-gray-400 hover:text-gray-600'" class="px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200">Selesai</button>
             </div>
         </div>
@@ -22,7 +23,7 @@
             
             <div class="lg:w-2/3 space-y-6">
                 @forelse($orders as $order)
-                    <div x-show="tab === 'semua' || (tab === 'pengerjaan' && '{{ $order->status }}' !== 'selesai' && '{{ $order->status }}' !== 'batal') || (tab === 'selesai' && '{{ $order->status }}' === 'selesai')" 
+                    <div x-show="tab === 'semua' || (tab === 'selesai' && '{{ $order->status }}' === 'selesai') || (tab === 'dikomplain' && '{{ $order->status }}' === 'dikomplain') || (tab === 'pengerjaan' && '{{ $order->status }}' === 'pengerjaan')" 
                         x-cloak
                         :class="'{{ $order->status }}' === 'batal' ? 'opacity-60' : ''"
                         class="bg-white rounded-[2.5rem] p-8 shadow-sm border {{ in_array($order->status, ['selesai', 'batal']) ? 'border-gray-100' : 'border-l-8 border-l-orange-500 border-gray-100' }} relative overflow-hidden transition-all">
@@ -48,6 +49,8 @@
                                 <span class="bg-green-50 text-green-600 text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest h-fit self-start border border-green-100">Selesai</span>
                             @elseif($order->status === 'batal')
                                 <span class="bg-red-50 text-red-600 text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest h-fit self-start border border-red-100">Dibatalkan</span>
+                            @elseif($order->status === 'dikomplain')
+                                <span class="bg-red-50 text-red-600 text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest h-fit self-start border border-orange-100">Dikomplain</span>
                             @else
                                 <span class="bg-gray-50 text-gray-400 text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest h-fit self-start border border-gray-100">● {{ ucfirst($order->status) }}</span>
                             @endif

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('address_id')->constrained()->onDelete('cascade'); // Alamat pelanggan
             
             $table->dateTime('schedule_date');
-            $table->enum('status', ['pending', 'pengerjaan', 'selesai', 'batal'])->default('pending');
+            $table->enum('status', ['pending', 'pengerjaan', 'selesai', 'batal', 'dikomplain'])->default('pending');
             $table->integer('total_cost')->default(0);
             $table->text('problem_description')->nullable();
             
