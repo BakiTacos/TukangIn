@@ -30,8 +30,8 @@ class OrderController extends Controller
             ? (int) str_replace('.', '', $rawPriceKunjungan) 
             : (int) ($rawPriceKunjungan ?? 75000); 
 
-        // 3. Kalkulasi Pajak 2% dari (Biaya Jasa + Biaya Teknisi)
-        $taxRate = 0.02; 
+        // 3. Kalkulasi Pajak 5% dari (Biaya Jasa + Biaya Teknisi)
+        $taxRate = 0.05; 
         $taxAmount = ($serviceFee + $technicianFee) * $taxRate;
         
         // Total Pembayaran Akhir

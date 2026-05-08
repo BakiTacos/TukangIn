@@ -102,7 +102,7 @@
                             <p class="font-bold text-[#0f2d50]">Rp {{ number_format($technicianFee, 0, ',', '.') }}</p>
                         </div>
                         <div class="flex justify-between">
-                            <p class="text-gray-400">Pajak Platform (2%)</p>
+                            <p class="text-gray-400">Pajak Platform (5%)</p>
                             <p class="font-bold text-[#0f2d50]">Rp {{ number_format($taxAmount, 0, ',', '.') }}</p>
                         </div>
                     </div>
