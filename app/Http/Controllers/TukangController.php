@@ -52,18 +52,34 @@ class TukangController extends Controller
         return view('tukang.pilih', compact('service', 'tukangs'));
     }
 
-    public function show($id)
+    // app/Http/Controllers/TukangController.php
+
+    public function show($id, Request $request)
     {
-        // Mengambil tukang beserta ulasannya dalam satu query
+        // Mengambil tukang, ulasan, serta layanan yang sesuai dengan kategori tukang tersebut
         $tukang = \App\Models\User::where('role', 'tukang')
-                    ->with(['reviews' => function($query) {
-                        $query->latest(); // Urutkan ulasan terbaru di atas
-                    }])
+                    ->with([
+                        'reviews' => function($query) {
+                            $query->latest(); // Urutkan ulasan terbaru
+                        },
+                        'services' // Eager load layanan berdasarkan kesamaan kategori (BARU)
+                    ])
                     ->withCount('reviews') // Menghitung total ulasan otomatis
                     ->findOrFail($id);
 
-        $service = \App\Models\Service::first(); // Sesuaikan dengan logika bisnis lo
+        // KUNCI UTAMA: Dropdown hanya menampilkan layanan yang dikuasai tukang ini
+        $availableServices = $tukang->services; 
+
+        $serviceId = $request->query('service_id');
         
-        return view('tukang.show', compact('tukang', 'service'));
+        // Cari layanan dari parameter, pastikan kategorinya cocok dengan si tukang
+        $service = null;
+        if ($serviceId) {
+            $service = \App\Models\Service::where('id', $serviceId)
+                        ->where('category', $tukang->category)
+                        ->first();
+        }
+        
+        return view('tukang.show', compact('tukang', 'service', 'availableServices'));
     }
 }

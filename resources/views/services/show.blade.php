@@ -136,13 +136,9 @@
                         <span>Biaya Layanan</span>
                         <span>Rp {{ number_format($cleanPrice, 0, ',', '.') }}</span>
                     </div>
-                    <div class="flex justify-between text-xs text-gray-500">
-                        <span>Biaya Admin</span>
-                        <span>Rp 5.000</span>
-                    </div>
                     <div class="flex justify-between font-bold text-sm pt-2">
                         <span>Total Pembayaran</span>
-                        <span class="text-[#e67e22]">Rp {{ number_format($cleanPrice + 5000, 0, ',', '.') }}</span>
+                        <span class="text-[#e67e22]">Rp {{ number_format($cleanPrice, 0, ',', '.') }}</span>
                     </div>
                 </div>
 

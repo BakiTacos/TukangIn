@@ -10,19 +10,31 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
+    // app/Http/Controllers/OrderController.php
+
     public function checkout(Service $service, User $tukang)
     {
         $user = Auth::user();
         
-        // Ambil alamat utama (Primary)
+        // Ambil alamat utama
         $address = $user->addresses()->where('is_primary', true)->first() ?? $user->addresses()->first();
 
-        // LOGIKA BIAYA DINAMIS
-        $serviceFee = $service->price; // Misal: 100.000 dari DB
-        $technicianFee = 85000;       // Biaya jasa teknisi (Ferry)
+        // 1. Ambil harga layanan dari DB (Otomatis bersih jika sudah pakai Accessor)
+        $serviceFee = $service->price; 
+
+        // 2. AMBIL BIAYA TEKNISI SECARA DINAMIS (BARU & ANTI-BUG DESIMAL)
+        // Kita ambil kolom 'price_kunjungan' dari model $tukang. Jika kosong, beri fallback 75000.
+        $rawPriceKunjungan = $tukang->price_kunjungan;
         
-        $taxRate = 0.02; // 2%
+        $technicianFee = is_string($rawPriceKunjungan) 
+            ? (int) str_replace('.', '', $rawPriceKunjungan) 
+            : (int) ($rawPriceKunjungan ?? 75000); 
+
+        // 3. Kalkulasi Pajak 2% dari (Biaya Jasa + Biaya Teknisi)
+        $taxRate = 0.02; 
         $taxAmount = ($serviceFee + $technicianFee) * $taxRate;
+        
+        // Total Pembayaran Akhir
         $totalPayment = $serviceFee + $technicianFee + $taxAmount;
 
         return view('checkout', compact(
@@ -30,7 +42,7 @@ class OrderController extends Controller
             'tukang', 
             'address', 
             'serviceFee', 
-            'technicianFee', 
+            'technicianFee', // Sekarang nilainya dinamis (misal: 120000)
             'taxAmount', 
             'totalPayment'
         ));

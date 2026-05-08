@@ -55,4 +55,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class);
     }
+
+    public function services()
+    {
+        return $this->hasMany(Service::class, 'category', 'category');
+    }
+
+    public function getPriceKunjunganAttribute($value)
+    {
+        if (is_string($value)) {
+            return (int) str_replace('.', '', $value);
+        }
+        return (int) $value;
+    }
 }

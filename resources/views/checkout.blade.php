@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="container mx-auto px-6 py-12" x-data="{ paymentMethod: 'bnpl' }">
+    <div class="container mx-auto px-6 py-12" x-data="{ paymentMethod: 'bnpl', selectedAddressId: '{{ $address->id ?? '' }}' }">
         
         <nav class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-10">
             <span class="hover:text-orange-500 cursor-pointer">Secure Checkout</span> 
@@ -29,14 +29,41 @@
                     </div>
                 </div>
 
-                <div class="bg-gray-50 p-6 rounded-3xl border border-gray-100">
-                    <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Lokasi Pengerjaan</h4>
-                    <div class="flex items-center gap-4">
-                        <i class="fas fa-map-marker-alt text-orange-500"></i>
-                        <p class="text-xs text-gray-600 font-medium">
-                            {{ $address->full_address ?? 'Alamat belum diatur' }}, {{ $address->city ?? '' }}
-                        </p>
+                <div class="bg-gray-50 p-8 rounded-3xl border border-gray-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Lokasi Pengerjaan</h4>
+                            <p class="text-[10px] text-gray-400 mt-1">Pilih alamat lokasi pemasangan atau perbaikan rumah Anda</p>
+                        </div>
+                        <a href="{{ route('profile.address') }}" class="text-[10px] font-bold text-orange-500 uppercase tracking-widest hover:underline flex items-center gap-1">
+                            <i class="fas fa-plus"></i> Tambah / Kelola Alamat
+                        </a>
                     </div>
+
+                    @if(auth()->user()->addresses->isNotEmpty())
+                        <div class="relative">
+                            <select x-model="selectedAddressId" class="w-full bg-white border border-gray-100 rounded-2xl py-4 px-5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-orange-500 focus:border-transparent appearance-none cursor-pointer">
+                                @foreach(auth()->user()->addresses as $addr)
+                                    <option value="{{ $addr->id }}">
+                                        [{{ $addr->label }}] {{ $addr->receiver_name }} — {{ $addr->full_address }}, {{ $addr->city }} ({{ $addr->postal_code }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-gray-400">
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </div>
+                        </div>
+                    @else
+                        <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-red-50 p-4 rounded-2xl border border-red-100">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-exclamation-circle text-red-500"></i>
+                                <p class="text-xs font-bold text-red-600">Anda belum mendaftarkan alamat pengerjaan.</p>
+                            </div>
+                            <a href="{{ route('profile.address') }}" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-wider transition">
+                                Tambah Alamat Sekarang
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -50,7 +77,7 @@
                         </div>
                         <div>
                             <h3 class="font-bold text-[#0f2d50] text-lg">{{ $service->title }}</h3>
-                            <p class="text-[10px] text-gray-400 uppercase tracking-wider">{{ $service->category->name ?? 'Maintenance' }}</p>
+                            <p class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">{{ $service->category ?? 'Maintenance' }}</p>
                         </div>
                     </div>
 
@@ -92,7 +119,7 @@
                         @csrf
                         <input type="hidden" name="service_id" value="{{ $service->id }}">
                         <input type="hidden" name="tukang_id" value="{{ $tukang->id }}">
-                        <input type="hidden" name="address_id" value="{{ $address->id ?? '' }}">
+                        <input type="hidden" name="address_id" :value="selectedAddressId">
                         <input type="hidden" name="payment_method" :value="paymentMethod">
                         <input type="hidden" name="total_payment" value="{{ $totalPayment }}">
                         

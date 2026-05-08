@@ -101,7 +101,7 @@
                             </div>
                             <!-- CTA Utama: Lanjut ke Konfirmasi/Checkout -->
                             {{-- CARA BENAR --}}
-                            <a href="{{ route('tukang.show', $tukang->id) }}" 
+                            <a href="{{ route('tukang.show', $tukang->id) }}?service_id={{ $service->id }}" 
                             class="block text-center w-full bg-[#0f2d50] text-white py-3 rounded-2xl font-bold text-sm hover:bg-orange-500 transition shadow-lg shadow-blue-100">
                                 Lihat Profil & Pilih
                             </a>
