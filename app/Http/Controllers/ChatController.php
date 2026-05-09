@@ -83,18 +83,20 @@ class ChatController extends Controller
      */
     public function store(Request $request, User $tukang)
     {
-        // Validasi ketat: Pesan boleh kosong jika ada gambar yang diunggah
         $request->validate([
             'message' => 'nullable|required_without:image|string|max:1000',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:1024', // max 1024 KB (1MB)
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:1024', // Max 1MB
         ]);
 
         $userId = Auth::id();
         $imagePath = null;
 
-        // Proses upload gambar jika ada
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('chats', 'public');
+            // 1. Upload langsung ke Cloud Supabase Storage melalui disk 'supabase'
+            $path = $request->file('image')->store('chats', 'supabase');
+            
+            // 2. Dapatkan URL Publik absolut langsung dari Supabase
+            $imagePath = Storage::disk('supabase')->url($path);
         }
 
         $message = Message::create([
@@ -102,7 +104,7 @@ class ChatController extends Controller
             'tukang_id' => $tukang->id,
             'sender_id' => $userId,
             'message' => $request->message ?? '',
-            'image_path' => $imagePath,
+            'image_path' => $imagePath, // <--- Sekarang menyimpan URL penuh cloud (misal: https://...)
             'is_read' => false
         ]);
 

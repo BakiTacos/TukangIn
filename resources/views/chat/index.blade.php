@@ -244,9 +244,9 @@
                                             
                                             <template x-if="msg.image_path">
                                                 <div class="mb-2.5 max-w-xs rounded-2xl overflow-hidden border border-gray-100 shadow-sm cursor-pointer">
-                                                    <img :src="'{{ asset('storage') }}/' + msg.image_path" 
-                                                         class="w-full h-auto object-cover hover:opacity-90 transition-opacity"
-                                                         @click="window.open('{{ asset('storage') }}/' + msg.image_path, '_blank')">
+                                                    <img :src="msg.image_path.startsWith('http') ? msg.image_path : '{{ asset('storage') }}/' + msg.image_path" 
+                                                        class="w-full h-auto object-cover hover:opacity-90 transition-opacity"
+                                                        @click="window.open(msg.image_path.startsWith('http') ? msg.image_path : '{{ asset('storage') }}/' + msg.image_path, '_blank')">
                                                 </div>
                                             </template>
 
