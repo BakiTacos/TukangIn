@@ -15,6 +15,7 @@ class Order extends Model
         // DAFTARKAN KEDUA KOLOM BARU INI (BARU)
         'cancel_reason',
         'cancel_description',
+        
     ];
 
     protected $casts = [

@@ -205,9 +205,10 @@
                                     PILIH LAYANAN DULU
                                 </button>
                                 
-                                <button class="w-full bg-white border-2 border-gray-100 text-gray-600 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-gray-50 transition text-sm">
+                                <a href="{{ route('chats.show', $tukang->id) }}" 
+                                class="border border-gray-200 hover:bg-orange-50 hover:border-orange-200 text-gray-600 hover:text-orange-500 p-4 rounded-2xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
                                     <i class="far fa-comment-dots"></i> Tanya Dulu
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>

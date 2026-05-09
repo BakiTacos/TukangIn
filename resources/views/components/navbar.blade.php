@@ -51,6 +51,10 @@
                             <i class="fas fa-history mr-3 w-4"></i> Pesanan
                         </a>
 
+                        <a href="{{ route('chats.index') }}" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
+                            <i class="fas fa-comments mr-3 w-4"></i> Chat
+                        </a>
+
                         <div class="border-t border-gray-50 my-1"></div>
 
                         <!-- Tombol Keluar (Method POST) -->

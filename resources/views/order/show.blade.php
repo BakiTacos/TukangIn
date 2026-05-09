@@ -48,7 +48,7 @@
                             <div>
                                 <h4 class="text-sm font-black uppercase tracking-wider">Pemesanan Ditangguhkan (Dikomplain)</h4>
                                 <p class="text-xs text-purple-500 leading-relaxed mt-1">
-                                    Anda telah mengajukan komplain resmi untuk pengerjaan dari teknisi <strong>{{ $order->tukang->name ?? 'Teknisi' }}</strong>. Tim investigasi **AMARTA** sedang memverifikasi laporan ini. Dana transaksi Anda aman dan ditangguhkan dari pencairan sampai masalah selesai. Kami akan menghubungi Anda dalam 1x24 jam.
+                                    Anda telah mengajukan komplain resmi untuk pengerjaan dari teknisi <strong>{{ $order->tukang->name ?? 'Teknisi' }}</strong>. Tim investigasi TUKANG.IN sedang memverifikasi laporan ini. Dana transaksi Anda aman dan ditangguhkan dari pencairan sampai masalah selesai. Kami akan menghubungi Anda dalam 1x24 jam.
                                 </p>
                                 <div class="mt-4 pt-4 border-t border-purple-100 text-xs space-y-1 text-purple-700">
                                     <p><strong>Alasan:</strong> {{ $order->complaint_reason }}</p>
@@ -290,11 +290,7 @@
                                 </button>
                             @endif
 
-                            <a href="https://wa.me/6281234567890?text=Halo%20Amarta%20Care,%20saya%20ingin%20bertanya%20mengenai%20status%20pesanan%20{{ $order->order_number }}" 
-                               target="_blank"
-                               class="w-full bg-white border-2 border-gray-100 text-gray-600 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-gray-50 transition text-xs uppercase tracking-wider">
-                                <i class="fab fa-whatsapp text-green-500 text-sm"></i> Hubungi Amarta Care
-                            </a>
+                            
                         </div>
                     </div>
 

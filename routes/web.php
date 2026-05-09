@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ChatController;
 
 // Rute untuk Login
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -79,7 +80,19 @@ Route::middleware('auth')->group(function () {
     // Jalur Simpan Pesanan
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 
-    
+    // routes/web.php (Di dalam Route::middleware(['auth'])->group(...))
+
+// 1. Rute Inbox Utama (Membuka halaman chat terpadu kosong)
+    Route::get('/chats', [ChatController::class, 'index'])->name('chats.index');
+
+    // 2. Rute Buka Chat Spesifik (Membuka halaman chat terpadu langsung dengan chat teknisi terbuka)
+    // Kita arahkan ke method 'index' agar tetap menggunakan satu halaman split-pane terpadu
+    Route::get('/chats/{tukang}', [ChatController::class, 'index'])->name('chats.show');
+
+    // 3. Rute Aksi Kirim Pesan & Polling Real-time
+    Route::post('/chats/{tukang}', [ChatController::class, 'store'])->name('chats.store');
+    Route::get('/chats/{tukang}/messages', [ChatController::class, 'getMessages'])->name('chats.messages');
+        
 });
 
 
