@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ReviewController;
 
 // Rute untuk Login
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -106,6 +107,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/order/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/order/{order}/complain', [OrderController::class, 'complain'])->name('orders.complain');
+
+    // routes/web.php (Di dalam Route::middleware(['auth'])->group(...))
+    Route::get('/orders/{order}/review', [ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/orders/{order}/review', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
 require __DIR__.'/auth.php';

@@ -1,8 +1,5 @@
-
-<style>
-    [x-cloak] { display: none !important; }
-</style><x-app-layout>
-    <div class="container mx-auto px-6 py-12" x-data="{ tab: 'semua' }">
+<x-app-layout>
+    <div class="container mx-auto px-6 py-12">
         
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
             <div>
@@ -12,10 +9,22 @@
             </div>
             
             <div class="flex bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100">
-                <button @click="tab = 'semua'" :class="tab === 'semua' ? 'bg-[#fdf6f0] text-orange-500' : 'text-gray-400 hover:text-gray-600'" class="px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200">Semua</button>
-                <button @click="tab = 'pengerjaan'" :class="tab === 'pengerjaan' ? 'bg-[#fdf6f0] text-orange-500' : 'text-gray-400 hover:text-gray-600'" class="px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200">Pengerjaan</button>
-                <button @click="tab = 'dikomplain'" :class="tab === 'dikomplain' ? 'bg-[#fdf6f0] text-orange-500' : 'text-gray-400 hover:text-gray-600'" class="px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200">Dikomplain</button>
-                <button @click="tab = 'selesai'" :class="tab === 'selesai' ? 'bg-[#fdf6f0] text-orange-500' : 'text-gray-400 hover:text-gray-600'" class="px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200">Selesai</button>
+                <a href="{{ route('dashboard', ['tab' => 'semua']) }}" 
+                   class="px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ $currentTab === 'semua' ? 'bg-[#fdf6f0] text-orange-500' : 'text-gray-400 hover:text-gray-600' }}">
+                    Semua
+                </a>
+                <a href="{{ route('dashboard', ['tab' => 'pengerjaan']) }}" 
+                   class="px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ $currentTab === 'pengerjaan' ? 'bg-[#fdf6f0] text-orange-500' : 'text-gray-400 hover:text-gray-600' }}">
+                    Pengerjaan
+                </a>
+                <a href="{{ route('dashboard', ['tab' => 'dikomplain']) }}" 
+                   class="px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ $currentTab === 'dikomplain' ? 'bg-[#fdf6f0] text-orange-500' : 'text-gray-400 hover:text-gray-600' }}">
+                    Dikomplain
+                </a>
+                <a href="{{ route('dashboard', ['tab' => 'selesai']) }}" 
+                   class="px-6 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ $currentTab === 'selesai' ? 'bg-[#fdf6f0] text-orange-500' : 'text-gray-400 hover:text-gray-600' }}">
+                    Selesai
+                </a>
             </div>
         </div>
 
@@ -23,10 +32,7 @@
             
             <div class="lg:w-2/3 space-y-6">
                 @forelse($orders as $order)
-                    <div x-show="tab === 'semua' || (tab === 'selesai' && '{{ $order->status }}' === 'selesai') || (tab === 'dikomplain' && '{{ $order->status }}' === 'dikomplain') || (tab === 'pengerjaan' && '{{ $order->status }}' === 'pengerjaan')" 
-                        x-cloak
-                        :class="'{{ $order->status }}' === 'batal' ? 'opacity-60' : ''"
-                        class="bg-white rounded-[2.5rem] p-8 shadow-sm border {{ in_array($order->status, ['selesai', 'batal']) ? 'border-gray-100' : 'border-l-8 border-l-orange-500 border-gray-100' }} relative overflow-hidden transition-all">
+                    <div class="bg-white rounded-[2.5rem] p-8 shadow-sm border {{ in_array($order->status, ['selesai', 'batal']) ? 'border-gray-100' : 'border-l-8 border-l-orange-500 border-gray-100' }} relative overflow-hidden transition-all {{ $order->status === 'batal' ? 'opacity-60' : '' }}">
                         
                         <div class="flex flex-col md:flex-row justify-between gap-6">
                             <div class="flex gap-6">
@@ -50,9 +56,7 @@
                             @elseif($order->status === 'batal')
                                 <span class="bg-red-50 text-red-600 text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest h-fit self-start border border-red-100">Dibatalkan</span>
                             @elseif($order->status === 'dikomplain')
-                                <span class="bg-red-50 text-red-600 text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest h-fit self-start border border-orange-100">Dikomplain</span>
-                            @else
-                                <span class="bg-gray-50 text-gray-400 text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest h-fit self-start border border-gray-100">● {{ ucfirst($order->status) }}</span>
+                                <span class="bg-purple-50 text-purple-600 text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest h-fit self-start border border-purple-100">Dikomplain</span>
                             @endif
                         </div>
 
@@ -87,16 +91,27 @@
                             @endif
 
                             @if($order->status === 'selesai')
-                                <button class="px-8 bg-white border-2 border-[#fdf6f0] text-orange-500 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition">Beri Ulasan</button>
+                                @if($order->review)
+                                    <span class="px-8 bg-gray-50 text-gray-400 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest cursor-default border border-gray-100">Sudah Diulas</span>
+                                @else
+                                    <a href="{{ route('reviews.create', $order->id) }}" 
+                                    class="px-8 bg-white border-2 border-[#fdf6f0] text-orange-500 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-orange-500 hover:text-white transition flex items-center justify-center">
+                                        Beri Ulasan
+                                    </a>
+                                @endif
                             @endif
                         </div>
                     </div>
                 @empty
                     <div class="text-center py-20 bg-white rounded-[2.5rem] border-2 border-dashed border-gray-100">
                         <h3 class="text-lg font-bold text-gray-400">Belum Ada Pesanan</h3>
-                        <p class="text-xs text-gray-300 mt-2">Anda belum memiliki riwayat pesanan layanan.</p>
+                        <p class="text-xs text-gray-300 mt-2">Tidak ditemukan riwayat pesanan layanan pada kategori ini.</p>
                     </div>
                 @endforelse
+
+                <div class="mt-10 px-2">
+                    {{ $orders->links() }}
+                </div>
             </div>
 
             <div class="lg:w-1/3 space-y-6">
@@ -107,7 +122,6 @@
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Pesanan Bulan Ini</p>
                                 <p class="text-2xl font-black">{{ $totalPesananBulanIni }}</p>
                             </div>
-                            
                             <div class="flex justify-between items-center">
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Pengeluaran</p>
                                 <p class="text-xl font-black text-orange-400">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</p>

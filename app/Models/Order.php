@@ -8,12 +8,25 @@ class Order extends Model
 {
     protected $fillable = [
         'order_number', 'user_id', 'tukang_id', 'service_id', 
-        'address_id', 'schedule_date', 'status', 'total_cost', 'problem_description'
+        'address_id', 'schedule_date', 'status', 'total_cost', 'problem_description',
+        // TAMBAHKAN DUA KOLOM INI AGAR BISA DISIMPAN VIA MASS ASSIGNMENT
+        'complaint_reason',
+        'complaint_description',
+        // DAFTARKAN KEDUA KOLOM BARU INI (BARU)
+        'cancel_reason',
+        'cancel_description',
     ];
 
     protected $casts = [
         'schedule_date' => 'datetime',
     ];
+
+    // app/Models/Order.php
+
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
 
     // Relasi ke Pelanggan
     public function user() { return $this->belongsTo(User::class, 'user_id'); }

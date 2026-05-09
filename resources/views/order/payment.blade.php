@@ -1,35 +1,61 @@
+@php
+    // 1. Ambil batas akhir pembayaran (created_at + 24 jam)
+    $expiryTime = $order->created_at->addHours(24);
+    
+    // 2. Hitung selisih sisa detik, paksa casting ke (int) bulat murni di PHP
+    $remainingSeconds = (int) max(0, now()->diffInSeconds($expiryTime, false));
+@endphp
+
 <x-app-layout>
     <div class="container mx-auto px-6 py-12 max-w-2xl" 
-         x-data="{ 
+     x-data="{ 
             copied: false,
             showCancelModal: false,
-            countdown: '23:59:59',
+            // Paksa konversi ke integer murni saat mendarat di JavaScript
+            remainingSeconds: Math.floor({{ $remainingSeconds }}), 
+            countdown: '00:00:00',
+            
             copyToClipboard(text) {
                 navigator.clipboard.writeText(text);
                 this.copied = true;
                 setTimeout(() => this.copied = false, 2000);
-            }
-         }"
-         x-init="
-            // 1. Timer Hitung Mundur 24 Jam
-            let seconds = 86400; 
-            setInterval(() => {
-                seconds--;
-                let h = Math.floor(seconds / 3600);
-                let m = Math.floor((seconds % 3600) / 60);
-                let s = seconds % 60;
-                countdown = [h, m, s].map(v => v < 10 ? '0' + v : v).join(':');
-            }, 1000);
+            },
 
-            // 2. Intersepsi Tombol Back Browser (Anti-Back Bypass)
-            window.history.pushState(null, null, window.location.href);
-            window.addEventListener('popstate', () => {
-                // Masukkan kembali state agar browser tidak benar-benar keluar halaman
+            // Fungsi format dibikin antipeluru dari angka desimal / koma float
+            formatTime() {
+                // Saring kembali agar totalSeconds benar-benar bilangan bulat murni
+                let totalSeconds = Math.floor(this.remainingSeconds);
+                if (totalSeconds <= 0) {
+                    return '00:00:00';
+                }
+                let h = Math.floor(totalSeconds / 3600);
+                let m = Math.floor((totalSeconds % 3600) / 60);
+                let s = totalSeconds % 60; // Sekarang s dijamin bulat murni!
+                return [h, m, s].map(v => v < 10 ? '0' + v : v).join(':');
+            },
+
+            init() {
+                this.countdown = this.formatTime();
+
+                let timer = setInterval(() => {
+                    if (this.remainingSeconds <= 0) {
+                        clearInterval(timer);
+                        this.countdown = '00:00:00';
+                        window.location.reload();
+                        return;
+                    }
+                    // Kurangi sisa detik dan pastikan nilainya tetap integer
+                    this.remainingSeconds = Math.floor(this.remainingSeconds) - 1;
+                    this.countdown = this.formatTime();
+                }, 1000);
+
                 window.history.pushState(null, null, window.location.href);
-                // Trigger pop-up peringatan pembatalan
-                showCancelModal = true;
-            });
-         }">
+                window.addEventListener('popstate', () => {
+                    window.history.pushState(null, null, window.location.href);
+                    this.showCancelModal = true;
+                });
+            }
+     }">
         
         <div class="text-center mb-10">
             <div class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4 text-orange-500 text-2xl">

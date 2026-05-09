@@ -23,6 +23,10 @@ return new class extends Migration
             $table->enum('status', ['pending', 'pengerjaan', 'selesai', 'batal', 'dikomplain'])->default('pending');
             $table->integer('total_cost')->default(0);
             $table->text('problem_description')->nullable();
+            $table->string('complaint_reason')->nullable();
+            $table->string('complaint_description', 256)->nullable();
+            $table->string('cancel_reason')->nullable();
+            $table->string('cancel_description', 256)->nullable(); 
             
             $table->timestamps();
         });

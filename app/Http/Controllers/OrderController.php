@@ -24,7 +24,7 @@ class OrderController extends Controller
         }
 
         // Eager Load untuk performa database optimal
-        $order->load(['service', 'tukang', 'address']);
+        $order->load(['service', 'tukang', 'address', 'review']);
 
         // Hitung rincian biaya secara dinamis untuk invoice
         $serviceFee = (int) $order->service->price;
@@ -39,14 +39,26 @@ class OrderController extends Controller
 
     // app/Http/Controllers/OrderController.php
 
-    public function complain(Order $order)
+    // app/Http/Controllers/OrderController.php
+
+    public function complain(Request $request, Order $order)
     {
         if ($order->user_id !== Auth::id()) {
             abort(403);
         }
 
-        // Mengubah status pesanan menjadi dikomplain
-        $order->update(['status' => 'dikomplain']);
+        // Validasi ketat: Alasan wajib diisi, deskripsi maksimal 256 karakter
+        $request->validate([
+            'complaint_reason' => 'required|string|max:255',
+            'complaint_description' => 'required|string|max:256',
+        ]);
+
+        // Update status dan simpan detail komplain ke database Supabase
+        $order->update([
+            'status' => 'dikomplain',
+            'complaint_reason' => $request->complaint_reason,
+            'complaint_description' => $request->complaint_description,
+        ]);
 
         return redirect()->back()->with('warning', 'Komplain Anda telah terdaftar. Laporan sedang ditinjau oleh tim kami.');
     }
@@ -181,14 +193,43 @@ class OrderController extends Controller
     /**
  * Membatalkan pesanan secara aman di database
  */
-    public function cancel(Order $order)
+   // app/Http/Controllers/OrderController.php
+
+/**
+ * Membatalkan pesanan secara aman di database dengan pengaman 12 jam
+ */
+    // app/Http/Controllers/OrderController.php
+
+/**
+ * Membatalkan pesanan secara aman di database dengan alasan wajib
+ */
+    public function cancel(Request $request, Order $order)
     {
         if ($order->user_id !== Auth::id()) {
             abort(403);
         }
 
-        // Ganti 'cancelled' menjadi 'batal' agar lolos CHECK Constraint DB lo
-        $order->update(['status' => 'batal']);
+        // PENGAMAN 12 JAM: Cek jika statusnya sudah masuk 'pengerjaan'
+        if ($order->status === 'pengerjaan') {
+            if ($order->created_at->lt(now()->subHours(12))) {
+                return redirect()->back()->with('error', 'Batas waktu pembatalan 12 jam untuk pesanan ini telah habis.');
+            }
+        } elseif ($order->status !== 'pending') {
+            return redirect()->back()->with('error', 'Pesanan ini tidak dapat dibatalkan.');
+        }
+
+        // Validasi input alasan & deskripsi pembatalan secara ketat
+        $request->validate([
+            'cancel_reason' => 'required|string|max:255',
+            'cancel_description' => 'required|string|max:256',
+        ]);
+
+        // Update status menjadi 'batal' beserta detail alasan pembatalan
+        $order->update([
+            'status' => 'batal',
+            'cancel_reason' => $request->cancel_reason,
+            'cancel_description' => $request->cancel_description,
+        ]);
 
         return redirect()->route('dashboard')->with('info', 'Pemesanan jasa berhasil dibatalkan.');
     }
