@@ -81,6 +81,8 @@ class ChatController extends Controller
     /**
      * Kirim Pesan Baru (Ajax)
      */
+    // app/Http/Controllers/ChatController.php
+
     public function store(Request $request, User $tukang)
     {
         $request->validate([
@@ -92,11 +94,18 @@ class ChatController extends Controller
         $imagePath = null;
 
         if ($request->hasFile('image')) {
-            // 1. Upload langsung ke Cloud Supabase Storage melalui disk 'supabase'
+            // 1. Upload file menggunakan driver S3 ke Supabase
             $path = $request->file('image')->store('chats', 'supabase');
+
+            // 2. Ekstrak HOST secara otomatis dari SUPABASE_ENDPOINT untuk memintas bug cache config
+            $endpoint = env('SUPABASE_ENDPOINT'); // e.g., https://xxxx.supabase.co/storage/v1/s3
+            $parsedUrl = parse_url($endpoint);
+            $host = $parsedUrl['host'] ?? ''; // Menghasilkan: xxxx.supabase.co
             
-            // 2. Dapatkan URL Publik absolut langsung dari Supabase
-            $imagePath = Storage::disk('supabase')->url($path);
+            $bucket = env('SUPABASE_BUCKET', 'amarta-uploads');
+
+            // 3. Susun URL CDN Publik secara manual (100% Antipeluru & Bebas 403)
+            $imagePath = "https://{$host}/storage/v1/object/public/{$bucket}/{$path}";
         }
 
         $message = Message::create([
@@ -104,7 +113,7 @@ class ChatController extends Controller
             'tukang_id' => $tukang->id,
             'sender_id' => $userId,
             'message' => $request->message ?? '',
-            'image_path' => $imagePath, // <--- Sekarang menyimpan URL penuh cloud (misal: https://...)
+            'image_path' => $imagePath, // Menyimpan URL CDN Publik langsung ke DB
             'is_read' => false
         ]);
 
