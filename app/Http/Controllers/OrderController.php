@@ -91,68 +91,90 @@ class OrderController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'service_id' => 'required|exists:services,id',
-            'tukang_id' => 'required|exists:users,id',
-            'address_id' => 'required|exists:addresses,id',
-            'payment_method' => 'required|string',
-            'payment_bank' => 'nullable|string',
-            'promo_code' => 'nullable|string',
-        ]);
+{
+    $request->validate([
+        'service_id' => 'required|exists:services,id',
+        'tukang_id' => 'required|exists:users,id',
+        'address_id' => 'required|exists:addresses,id',
+        'payment_method' => 'required|string',
+        'payment_bank' => 'nullable|string',
+        'promo_code' => 'nullable|string',
+    ]);
 
-        $service = Service::findOrFail($request->service_id);
-        $tukang = User::findOrFail($request->tukang_id);
+    $service = Service::findOrFail($request->service_id);
+    $tukang = User::findOrFail($request->tukang_id);
 
-        $serviceFee = (int) $service->price;
-        $technicianFee = is_string($tukang->price_kunjungan) 
-            ? (int) str_replace('.', '', $tukang->price_kunjungan) 
-            : (int) ($tukang->price_kunjungan ?? 75000);
-            
-        $taxAmount = ($serviceFee + $technicianFee) * 0.02;
-        $baseAmount = $serviceFee + $technicianFee;
+    // 1. Ambil Nilai Mentah Biaya Layanan & Teknisi
+    $serviceFee = (int) $service->price;
+    $technicianFee = is_string($tukang->price_kunjungan) 
+        ? (int) str_replace('.', '', $tukang->price_kunjungan) 
+        : (int) ($tukang->price_kunjungan ?? 75000);
+        
+    $baseAmount = $serviceFee + $technicianFee; // Subtotal (Rp 280.000)
 
-        $paymentFee = 0;
-        switch ($request->payment_method) {
-            case 'gopay': $paymentFee = (int) round($baseAmount * 0.02); break;
-            case 'dana': $paymentFee = (int) round($baseAmount * 0.015); break;
-            case 'qris': $paymentFee = (int) round($baseAmount * 0.007); break;
-            case 'bank_transfer': $paymentFee = 4000; break;
-        }
+    // 2. FIX: Ubah Pajak Platform dari 2% menjadi 5% agar presisi dengan UI Amarta
+    $taxAmount = (int) round($baseAmount * 0.05); // Menghasilkan Rp 14.000
 
-        $promoCode = strtoupper($request->promo_code);
-        $promoDiscount = 0;
-        if ($promoCode === 'NEWUSERDANCE') {
-            $promoDiscount = $baseAmount + $taxAmount; 
-        } elseif ($promoCode === 'NEWUSERKING') {
-            $promoDiscount = (int) round($baseAmount * 0.5); 
-        } elseif ($promoCode === 'NEWUSERKANG') {
-            $promoDiscount = (int) round($baseAmount * 0.2); 
-        }
-
-        $finalTotal = ($baseAmount + $taxAmount + $paymentFee) - $promoDiscount;
-        if ($finalTotal < 0) $finalTotal = 0;
-
-        // SIMPAN DENGAN STATUS 'PENDING'
-        $order = Order::create([
-            'order_number' => 'TKG-' . strtoupper(Str::random(5)) . '-' . date('Ymd'),
-            'user_id' => Auth::id(),
-            'service_id' => $service->id,
-            'tukang_id' => $tukang->id,
-            'address_id' => $request->address_id,
-            'payment_method' => $request->payment_method,
-            'payment_bank' => $request->payment_bank,
-            'payment_fee' => $paymentFee,
-            'promo_code' => $promoCode ?: null,
-            'discount_amount' => $promoDiscount,
-            'total_cost' => $finalTotal,
-            'status' => 'pending', // Set awal pending menunggu simulasi bayar
-            'schedule_date' => now()->addDays(1), 
-        ]);
-
-        // ALAHKAN KE HALAMAN PEMBAYARAN BARU
-        return redirect()->route('orders.payment', $order->id);
+    // 3. Hitung Biaya Admin Metode Pembayaran secara Aman
+    $paymentFee = 0;
+    switch ($request->payment_method) {
+        case 'gopay': 
+            $paymentFee = (int) round($baseAmount * 0.02); // Rp 5.600
+            break;
+        case 'dana': 
+            $paymentFee = (int) round($baseAmount * 0.015); 
+            break;
+        case 'qris': 
+            $paymentFee = (int) round($baseAmount * 0.007); 
+            break;
+        case 'bank_transfer': 
+            $paymentFee = 4000; 
+            break;
     }
+
+    // 4. Hitung Potongan Diskon Promo
+    $promoCode = strtoupper($request->promo_code);
+    $promoDiscount = 0;
+    if ($promoCode === 'NEWUSERDANCE') {
+        $promoDiscount = $baseAmount + $taxAmount; 
+    } elseif ($promoCode === 'NEWUSERKING') {
+        $promoDiscount = (int) round($baseAmount * 0.5); 
+    } elseif ($promoCode === 'NEWUSERKANG') {
+        $promoDiscount = (int) round($baseAmount * 0.2); // Rp 56.000
+    }
+
+    // 5. Total Pembayaran Akhir yang Sah
+    $finalTotal = ($baseAmount + $taxAmount + $paymentFee) - $promoDiscount;
+    if ($finalTotal < 0) {
+        $finalTotal = 0;
+    }
+
+    // 6. SIMPAN SNAPSHOT HARGA SECARA LENGKAP KE SUPABASE
+    $order = Order::create([
+    'order_number' => 'TKG-' . strtoupper(Str::random(5)) . '-' . date('Ymd'),
+    'user_id' => Auth::id(),
+    'service_id' => $service->id,
+    'tukang_id' => $tukang->id,
+    'address_id' => $request->address_id,
+    'payment_method' => $request->payment_method,
+    'payment_bank' => $request->payment_bank,
+    
+    // MEMASUKKAN SNAPSHOT HARGA YANG DIKUNCI KE KOLOM SUPABASE YANG BENAR
+    'service_fee' => $serviceFee,       // <--- Menyimpan Biaya Layanan (Rp 150.000)
+    'technician_fee' => $technicianFee,  // <--- Menyimpan Biaya Teknisi (Rp 120.000)
+    'tax_amount' => $taxAmount,          // <--- Pajak Platform 5% (Rp 13.500)
+    'platform_fee' => $paymentFee,       // <--- UBAH KEY MENJADI 'platform_fee' (Menyimpan Admin Fee)
+    
+    'promo_code' => $promoCode ?: null,
+    'discount_amount' => $promoDiscount,
+    'total_cost' => $finalTotal,
+    'status' => 'pending', 
+    'schedule_date' => now()->addDays(1), 
+]);
+
+    // ALAHKAN KE HALAMAN PEMBAYARAN BARU
+    return redirect()->route('orders.payment', $order->id);
+}
 
     /**
      * Menampilkan Halaman Panduan Pembayaran (Mock/Simulasi Midtrans)

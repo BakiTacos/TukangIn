@@ -6,7 +6,11 @@
             selectedAddressId: '{{ $address->id ?? '' }}',
             serviceFee: {{ $serviceFee }},
             technicianFee: {{ $technicianFee }},
-            platformTax: {{ $taxAmount }},
+
+            // 1. Menghitung Pajak Platform murni 5% dari Subtotal (Layanan + Teknisi)
+            get platformTax() {
+                return Math.round((this.serviceFee + this.technicianFee) * 0.05);
+            },
 
             // State Voucher
             promoCode: '',
@@ -14,7 +18,7 @@
             promoDiscount: 0,
             promoError: '',
 
-            // 1. Menghitung Biaya Transaksi secara Real-time
+            // 2. Menghitung Biaya Transaksi secara Real-time berdasarkan Metode Pembayaran
             get paymentFee() {
                 let base = this.serviceFee + this.technicianFee;
                 if (this.paymentMethod === 'gopay') {
@@ -29,7 +33,7 @@
                 return 0;
             },
 
-            // 2. Fungsi Terapkan Voucher secara Instan
+            // 3. Fungsi Terapkan Voucher secara Instan
             applyPromo() {
                 let code = this.promoCode.trim().toUpperCase();
                 let base = this.serviceFee + this.technicianFee;
@@ -44,7 +48,7 @@
                     this.promoError = '';
                 } else if (code === 'NEWUSERKANG') {
                     this.appliedPromo = 'NEWUSERKANG';
-                    this.promoDiscount = Math.round(base * 0.2); // Diskon 20%
+                    this.promoDiscount = Math.round(base * 0.2); // Diskon 20% (Rp 56.000)
                     this.promoError = '';
                 } else {
                     this.promoError = 'Kode voucher tidak valid!';
@@ -53,7 +57,7 @@
                 }
             },
 
-            // 3. Fungsi Batalkan Voucher
+            // 4. Fungsi Batalkan Voucher
             removePromo() {
                 this.appliedPromo = '';
                 this.promoCode = '';
@@ -61,7 +65,7 @@
                 this.promoError = '';
             },
 
-            // 4. Menghitung Total Pembayaran Akhir
+            // 5. Menghitung Total Pembayaran Akhir
             get totalPayment() {
                 let total = this.serviceFee + this.technicianFee + this.platformTax + this.paymentFee - this.promoDiscount;
                 return total < 0 ? 0 : total;
@@ -145,7 +149,8 @@
                          x-transition:enter="transition ease-out duration-300"
                          x-transition:enter-start="opacity-0 transform -translate-y-4"
                          x-transition:enter-end="opacity-100 transform translate-y-0"
-                         class="mt-6 p-6 bg-gray-50 rounded-3xl border border-gray-150 space-y-4">
+                         class="mt-6 p-6 bg-gray-50 rounded-3xl border border-gray-150 space-y-4"
+                         x-cloak>
                         <label class="block text-[10px] font-bold uppercase text-gray-400 tracking-wider">Pilih Bank Virtual Account</label>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                             <div @click="selectedBank = 'bca'" :class="selectedBank === 'bca' ? 'border-orange-500 bg-orange-50/30' : 'border-gray-200 bg-white'" class="border-2 p-4 rounded-2xl cursor-pointer text-center transition hover:shadow-sm">
@@ -245,7 +250,7 @@
                                     Apply
                                 </button>
                                 <button type="button" x-show="appliedPromo !== ''" @click="removePromo()"
-                                        class="bg-red-50 hover:bg-red-100 text-red-500 px-4 py-2 rounded-xl font-extrabold text-[10px] tracking-wider transition uppercase">
+                                        class="bg-red-50 hover:bg-red-100 text-red-500 px-4 py-2 rounded-xl font-extrabold text-[10px] tracking-wider transition uppercase" x-cloak>
                                     Batal
                                 </button>
                             </div>
@@ -259,21 +264,21 @@
                     <div class="space-y-4 border-t border-gray-50 pt-6 mb-6 text-sm">
                         <div class="flex justify-between items-center">
                             <p class="text-gray-400">Biaya Layanan</p>
-                            <p class="font-bold text-[#0f2d50]">Rp {{ number_format($serviceFee, 0, ',', '.') }}</p>
+                            <p class="font-bold text-[#0f2d50]" x-text="formatRupiah(serviceFee)"></p>
                         </div>
                         <div class="flex justify-between items-center">
                             <p class="text-gray-400">Biaya Teknisi</p>
-                            <p class="font-bold text-[#0f2d50]">Rp {{ number_format($technicianFee, 0, ',', '.') }}</p>
+                            <p class="font-bold text-[#0f2d50]" x-text="formatRupiah(technicianFee)"></p>
                         </div>
                         <div class="flex justify-between items-center">
                             <p class="text-gray-400">Pajak Platform (5%)</p>
-                            <p class="font-bold text-[#0f2d50]">Rp {{ number_format($taxAmount, 0, ',', '.') }}</p>
+                            <p class="font-bold text-[#0f2d50]" x-text="formatRupiah(platformTax)"></p>
                         </div>
                         <div class="flex justify-between items-center text-orange-600 font-medium">
                             <p>Biaya Admin (<span class="uppercase font-bold" x-text="paymentMethod === 'bank_transfer' ? selectedBank + ' VA' : paymentMethod"></span>)</p>
                             <p class="font-bold" x-text="formatRupiah(paymentFee)"></p>
                         </div>
-                        <div class="flex justify-between items-center text-green-600 font-medium" x-show="promoDiscount > 0">
+                        <div class="flex justify-between items-center text-green-600 font-medium" x-show="promoDiscount > 0" x-cloak>
                             <p>Diskon Voucher (<span x-text="appliedPromo"></span>)</p>
                             <p class="font-bold" x-text="'- ' + formatRupiah(promoDiscount)"></p>
                         </div>
@@ -284,7 +289,9 @@
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Payment</p>
                             <p class="text-2xl font-black text-[#0f2d50]" x-text="formatRupiah(totalPayment)"></p>
                         </div>
-                        <span class="bg-green-50 text-green-600 text-[9px] font-bold px-3 py-1.5 rounded-lg border border-green-100 uppercase">Promo Applied</span>
+                        <span x-show="promoDiscount > 0" class="bg-green-50 text-green-600 text-[9px] font-bold px-3 py-1.5 rounded-lg border border-green-100 uppercase" x-cloak>
+                            Promo Applied
+                        </span>
                     </div>
 
                     <form action="{{ route('orders.store') }}" method="POST">
@@ -292,9 +299,17 @@
                         <input type="hidden" name="service_id" value="{{ $service->id }}">
                         <input type="hidden" name="tukang_id" value="{{ $tukang->id }}">
                         <input type="hidden" name="address_id" :value="selectedAddressId">
+                        
                         <input type="hidden" name="payment_method" :value="paymentMethod">
                         <input type="hidden" name="payment_bank" :value="paymentMethod === 'bank_transfer' ? selectedBank : ''">
                         <input type="hidden" name="promo_code" :value="appliedPromo">
+                        
+                        <input type="hidden" name="service_fee" :value="serviceFee">
+                        <input type="hidden" name="technician_fee" :value="technicianFee">
+                        <input type="hidden" name="tax_amount" :value="platformTax">
+                        <input type="hidden" name="payment_fee" :value="paymentFee">
+                        <input type="hidden" name="discount_amount" :value="promoDiscount">
+                        <input type="hidden" name="total_cost" :value="totalPayment">
                         
                         <button type="submit" 
                                 :disabled="!selectedAddressId"

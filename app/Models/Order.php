@@ -7,16 +7,25 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     protected $fillable = [
-        'order_number', 'user_id', 'tukang_id', 'service_id', 
-        'address_id', 'schedule_date', 'status', 'total_cost', 'problem_description',
-        // TAMBAHKAN DUA KOLOM INI AGAR BISA DISIMPAN VIA MASS ASSIGNMENT
-        'complaint_reason',
-        'complaint_description',
-        // DAFTARKAN KEDUA KOLOM BARU INI (BARU)
-        'cancel_reason',
-        'cancel_description',
-        
-    ];
+    'order_number',
+    'user_id',
+    'service_id',
+    'tukang_id',
+    'address_id',
+    'payment_method',
+    'payment_bank',
+    'promo_code',
+    'discount_amount',
+    'total_cost',
+    'status',
+    'schedule_date',
+    
+    // SESUAIKAN TIGA SNAPSHOT INI DENGAN KOLOM SUPABASE KAMU:
+    'service_fee',
+    'technician_fee',
+    'tax_amount',
+    'platform_fee', // <--- UBAH DARI 'payment_fee' MENJADI 'platform_fee'
+];
 
     protected $casts = [
         'schedule_date' => 'datetime',
