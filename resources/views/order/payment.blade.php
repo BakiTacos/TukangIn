@@ -135,7 +135,7 @@
                     </div>
                     <div class="flex gap-3">
                         <span class="w-5 h-5 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center font-bold shrink-0 text-[10px]">3</span>
-                        <p>Simpan bukti transfer dan transaksi Anda akan otomatis dikonfirmasi oleh sistem **AMARTA**.</p>
+                        <p>Simpan bukti transfer dan transaksi Anda akan otomatis dikonfirmasi oleh sistem TUKANGIN.</p>
                     </div>
                 </div>
             </div>

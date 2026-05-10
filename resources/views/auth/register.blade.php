@@ -83,14 +83,7 @@
                     <div class="flex-grow border-t border-gray-100"></div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <button class="flex items-center justify-center gap-3 py-3 border border-gray-100 rounded-2xl text-sm font-bold hover:bg-gray-50 transition-all">
-                        <img src="https://www.svgrepo.com/show/355037/google.svg" class="w-5 h-5"> Google
-                    </button>
-                    <button class="flex items-center justify-center gap-3 py-3 border border-gray-100 rounded-2xl text-sm font-bold hover:bg-gray-50 transition-all">
-                        <i class="fab fa-facebook text-blue-600 text-lg"></i> Facebook
-                    </button>
-                </div>
+                
 
                 <p class="mt-12 text-center text-sm text-gray-400">
                     Sudah punya akun? 

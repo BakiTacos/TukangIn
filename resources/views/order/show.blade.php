@@ -201,7 +201,7 @@
                                 <p class="font-bold text-[#0f2d50]">Rp {{ number_format($technicianFee, 0, ',', '.') }}</p>
                             </div>
                             <div class="flex justify-between items-center">
-                                <p class="text-gray-400">Pajak Platform (2%)</p>
+                                <p class="text-gray-400">Pajak Platform (5%)</p>
                                 <p class="font-bold text-[#0f2d50]">Rp {{ number_format($taxAmount, 0, ',', '.') }}</p>
                             </div>
                             
@@ -294,17 +294,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-[#0f2d50] rounded-[2.5rem] p-8 text-white shadow-sm flex items-center justify-between">
-                        <div>
-                            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Metode Pembayaran</p>
-                            <h4 class="font-extrabold uppercase tracking-wider text-sm">
-                                {{ $order->payment_method === 'bank_transfer' ? ($order->payment_bank . ' Virtual Account') : $order->payment_method }}
-                            </h4>
-                        </div>
-                        <div class="text-3xl text-white/20">
-                            <i class="fas {{ $order->payment_method === 'bank_transfer' ? 'fa-university' : 'fa-wallet' }}"></i>
-                        </div>
-                    </div>
+                    
                    
                 </div>
             </div>

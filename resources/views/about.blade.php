@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tentang Kami - Tukang.in</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<x-app-layout>
     <style>
         .hero-gradient {
             background: linear-gradient(rgba(15, 45, 80, 0.85), rgba(15, 45, 80, 0.85)), 
@@ -14,10 +7,7 @@
             background-position: center;
         }
     </style>
-</head>
 <body class="bg-white font-sans text-[#0f2d50]">
-
-    <x-navbar />
 
     <!-- Hero Section: Terinspirasi Header Utama -->
     <section class="hero-gradient text-white py-28">
@@ -101,7 +91,9 @@
         </div>
     </section>
 
-     <x-footer />
+</div>
+</x-app-layout>
 
-</body>
-</html>
+<style>
+    [x-cloak] { display: none !important; }
+</style>

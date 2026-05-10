@@ -57,18 +57,6 @@
                         <span class="mx-4 text-xs text-gray-400 uppercase tracking-widest">Atau masuk dengan</span>
                         <div class="flex-grow border-t border-gray-100"></div>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <button type="button" class="flex items-center justify-center py-3 border border-gray-200 rounded-2xl hover:bg-gray-50 transition">
-                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5 mr-3">
-                            <span class="text-sm font-bold text-gray-700">Google</span>
-                        </button>
-                        <button type="button" class="flex items-center justify-center py-3 border border-gray-200 rounded-2xl hover:bg-gray-50 transition">
-                            <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" class="w-5 h-5 mr-3">
-                            <span class="text-sm font-bold text-gray-700">Facebook</span>
-                        </button>
-                    </div>
-
                     <p class="text-center text-sm text-gray-500 mt-8">
                         Belum punya akun? <a href="{{ route('register') }}" class="text-blue-600 font-bold hover:underline">Daftar Sekarang</a>
                     </p>
