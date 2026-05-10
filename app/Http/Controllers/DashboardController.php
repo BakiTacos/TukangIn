@@ -3,19 +3,67 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $userId = Auth::id();
-        
-        // 1. Ambil parameter tab dari URL (default: 'semua')
+        $user = Auth::user();
+        $userId = $user->id;
+
+        // =========================================================================
+        // GERBANG 1: ALUR KERJA KHUSUS MITRA TEKNISI (TUKANG)
+        // =========================================================================
+        // app/Http/Controllers/DashboardController.php
+
+if ($user->role === 'tukang') {
+    $totalEarnings = Order::where('tukang_id', $userId)
+        ->where('status', 'selesai')
+        ->sum('technician_fee');
+
+    $activeJobs = Order::where('tukang_id', $userId)
+        ->where('status', 'pengerjaan')
+        ->with(['service', 'user', 'address'])
+        ->latest()
+        ->get();
+    $activeJobsCount = $activeJobs->count();
+
+    // SINKRONISASI TIMEZONE: Gabungkan filter agar kompatibel dengan local & server Supabase
+    $incomingOrders = Order::where('tukang_id', $userId)
+        ->where('status', 'pending')
+        ->where(function($q) {
+            $q->where('created_at', '>=', now('Asia/Jakarta')->subHours(24))
+              ->orWhere('created_at', '>=', now('UTC')->subHours(24))
+              ->orWhere('created_at', '>=', now()->subHours(24));
+        })
+        ->with(['service', 'user', 'address'])
+        ->latest()
+        ->get();
+
+    $jobHistory = Order::where('tukang_id', $userId)
+        ->whereIn('status', ['selesai', 'batal', 'dikomplain'])
+        ->with(['service', 'user', 'address', 'review'])
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();
+
+    return view('tukang.dashboard', compact(
+        'totalEarnings', 
+        'activeJobs', 
+        'activeJobsCount', 
+        'incomingOrders', 
+        'jobHistory'
+    ));
+}
+
+        // =========================================================================
+        // GERBANG 2: ALUR KERJA KHUSUS PELANGGAN REGULER (USER)
+        // =========================================================================
         $currentTab = $request->query('tab', 'semua');
 
-        // 2. ON-THE-FLY TRIGGER: Sapu bersih order pending > 24 jam
         Order::where('user_id', $userId)
             ->where('status', 'pending')
             ->where('created_at', '<', now()->subHours(24))
@@ -25,11 +73,8 @@ class DashboardController extends Controller
                 'cancel_description' => 'Sistem otomatis membatalkan pesanan karena pembayaran tidak diselesaikan dalam batas waktu 24 jam.'
             ]);
 
-        // 3. Bangun query dasar
-        $query = Order::where('user_id', $userId)
-            ->with(['service', 'tukang', 'address']);
+        $query = Order::where('user_id', $userId);
 
-        // 4. Filter status di tingkat database berdasarkan tab aktif
         if ($currentTab === 'pengerjaan') {
             $query->whereIn('status', ['pending', 'pengerjaan']);
         } elseif ($currentTab === 'dikomplain') {
@@ -38,10 +83,11 @@ class DashboardController extends Controller
             $query->where('status', 'selesai');
         }
 
-        // 5. Paginate dengan tetap membawa query string di link "Next" dan "Previous"
-        $orders = $query->latest()->paginate(5)->withQueryString();
+        $orders = $query->with(['service', 'tukang', 'address', 'review'])
+            ->latest()
+            ->paginate(5)
+            ->withQueryString();
 
-        // 6. Hitung statistik global (tidak terpengaruh oleh tab aktif)
         $totalPesananBulanIni = Order::where('user_id', $userId)
             ->where('status', 'selesai')
             ->whereMonth('created_at', now()->month)
@@ -51,13 +97,23 @@ class DashboardController extends Controller
             ->where('status', 'selesai')
             ->sum('total_cost');
 
-        $orders = $query->with(['service', 'tukang', 'address', 'review'])->latest()->paginate(5)->withQueryString();
+        return view('dashboard', compact('orders', 'totalPesananBulanIni', 'totalPengeluaran', 'currentTab'));
+    }
 
-        return view('dashboard', compact(
-            'orders', 
-            'totalPesananBulanIni', 
-            'totalPengeluaran',
-            'currentTab'
-        ));
+    // =========================================================================
+    // METHOD BARU: TOGGLE STATUS IS_AVAILABLE TUKANG (AJAX API)
+    // =========================================================================
+    public function toggleAvailability(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Balikkan nilai boolean saat ini (True -> False / False -> True)
+        $user->is_available = !$user->is_available;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'is_available' => $user->is_available
+        ]);
     }
 }

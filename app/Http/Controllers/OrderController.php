@@ -18,9 +18,10 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
+        $user = Auth::user();
         // Proteksi agar user lain tidak bisa mengintip orderan orang lain
-        if ($order->user_id !== Auth::id()) {
-            abort(403);
+        if ((int)$order->user_id !== (int)$user->id && (int)$order->tukang_id !== (int)$user->id) {
+        abort(403, 'Anda tidak memiliki hak akses untuk melihat rincian pesanan ini.');
         }
 
         // Eager Load untuk performa database optimal

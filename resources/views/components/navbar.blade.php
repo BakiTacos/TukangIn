@@ -35,20 +35,33 @@
                         <div class="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 hidden group-hover:block animate-fade-in-down z-50 text-gray-750">
                             <div class="px-4 py-3 border-b border-gray-50 mb-1 text-left">
                                 <p class="text-[10px] font-bold text-gray-400 uppercase leading-none mb-1">Status Akun</p>
-                                <span class="text-[11px] font-extrabold text-[#0f2d50] uppercase">Pelanggan Reguler</span>
+                                <span class="text-[11px] font-extrabold text-[#0f2d50] uppercase">
+                                    {{ Auth::user()->role === 'tukang' ? 'Mitra Teknisi' : 'Pelanggan Reguler' }}
+                                </span>
                             </div>
                             
-                            <a href="/my-profile" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
-                                <i class="far fa-user-circle mr-3 w-4"></i> Profil Saya
-                            </a>
+                            @if(Auth::user()->role === 'tukang')
+                                <a href="/dashboard" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
+                                    <i class="fas fa-briefcase mr-3 w-4"></i> Dashboard Kerja
+                                </a>
 
-                            <a href="/dashboard" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
-                                <i class="fas fa-history mr-3 w-4"></i> Pesanan
-                            </a>
+                                <a href="{{ route('chats.index') }}" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
+                                    <i class="fas fa-comments mr-3 w-4"></i> Chat Pelanggan
+                                </a>
+                            
+                            @else
+                                <a href="/my-profile" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
+                                    <i class="far fa-user-circle mr-3 w-4"></i> Profil Saya
+                                </a>
 
-                            <a href="{{ route('chats.index') }}" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
-                                <i class="fas fa-comments mr-3 w-4"></i> Chat
-                            </a>
+                                <a href="/dashboard" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
+                                    <i class="fas fa-history mr-3 w-4"></i> Pesanan
+                                </a>
+
+                                <a href="{{ route('chats.index') }}" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
+                                    <i class="fas fa-comments mr-3 w-4"></i> Chat
+                                </a>
+                            @endif
 
                             <div class="border-t border-gray-50 my-1"></div>
 
@@ -111,23 +124,36 @@
                          alt="{{ Auth::user()->name }}" 
                          class="w-10 h-10 rounded-full border border-white/20">
                     <div>
-                        <p class="text-[9px] text-gray-450 font-bold leading-none uppercase tracking-wider">Status Akun</p>
-                        <p class="text-xs text-white font-extrabold mt-1">Pelanggan Reguler</p>
+                        <p class="text-[9px] text-gray-400 font-bold leading-none uppercase tracking-wider">Status Akun</p>
+                        <p class="text-xs text-white font-extrabold mt-1">
+                            {{ Auth::user()->role === 'tukang' ? 'Mitra Teknisi' : 'Pelanggan Reguler' }}
+                        </p>
                     </div>
                 </div>
 
                 <div class="flex flex-col space-y-3 pl-2">
-                    <a href="/my-profile" class="flex items-center text-xs font-bold text-gray-300 hover:text-orange-400 transition py-1">
-                        <i class="far fa-user-circle mr-3.5 w-4 text-center"></i> Profil Saya
-                    </a>
+                    @if(Auth::user()->role === 'tukang')
+                        <a href="/dashboard" class="flex items-center text-xs font-bold text-gray-300 hover:text-orange-400 transition py-1">
+                            <i class="fas fa-briefcase mr-3.5 w-4 text-center"></i> Dashboard Kerja
+                        </a>
 
-                    <a href="/dashboard" class="flex items-center text-xs font-bold text-gray-300 hover:text-orange-400 transition py-1">
-                        <i class="fas fa-history mr-3.5 w-4 text-center"></i> Pesanan
-                    </a>
+                        <a href="{{ route('chats.index') }}" class="flex items-center text-xs font-bold text-gray-300 hover:text-orange-400 transition py-1">
+                            <i class="fas fa-comments mr-3.5 w-4 text-center"></i> Chat Pelanggan
+                        </a>
+                    
+                    @else
+                        <a href="/my-profile" class="flex items-center text-xs font-bold text-gray-300 hover:text-orange-400 transition py-1">
+                            <i class="far fa-user-circle mr-3.5 w-4 text-center"></i> Profil Saya
+                        </a>
 
-                    <a href="{{ route('chats.index') }}" class="flex items-center text-xs font-bold text-gray-300 hover:text-orange-400 transition py-1">
-                        <i class="fas fa-comments mr-3.5 w-4 text-center"></i> Chat
-                    </a>
+                        <a href="/dashboard" class="flex items-center text-xs font-bold text-gray-300 hover:text-orange-400 transition py-1">
+                            <i class="fas fa-history mr-3.5 w-4 text-center"></i> Pesanan
+                        </a>
+
+                        <a href="{{ route('chats.index') }}" class="flex items-center text-xs font-bold text-gray-300 hover:text-orange-400 transition py-1">
+                            <i class="fas fa-comments mr-3.5 w-4 text-center"></i> Chat
+                        </a>
+                    @endif
 
                     <form method="POST" action="{{ route('logout') }}" class="pt-2">
                         @csrf

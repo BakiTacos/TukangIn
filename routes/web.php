@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\TukangOrderController;
 
 // Rute untuk Login
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -21,6 +22,23 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // Rute untuk Register
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
+
+// Rute Sementara untuk Login Instan sebagai Dian (Hapus jika sudah masuk tahap production!)
+Route::get('/bypass-wawan', function () {
+    $user = \App\Models\User::where('email', 'wawan@tukangin.com')->first();
+    
+    if ($user) {
+        // Pastikan rolenya sudah diset ke 'tukang'
+        $user->update(['role' => 'tukang']);
+        
+        // bypass login langsung ke session browser
+        Auth::login($user);
+        
+        return redirect('/dashboard')->with('success', 'Bypass Login Sukses! Halo Wawan!');
+    }
+    
+    return 'Gagal bypass: Akun dian@tukangin.com tidak ditemukan di database!';
+});
 
 // HANYA ADA SATU RUTE UNTUK '/'
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -92,6 +110,13 @@ Route::middleware('auth')->group(function () {
     // 3. Rute Aksi Kirim Pesan & Polling Real-time
     Route::post('/chats/{tukang}', [ChatController::class, 'store'])->name('chats.store');
     Route::get('/chats/{tukang}/messages', [ChatController::class, 'getMessages'])->name('chats.messages');
+
+    Route::post('/tukang/orders/{id}/accept', [TukangOrderController::class, 'accept'])->name('tukang.orders.accept');
+    Route::post('/tukang/orders/{id}/complete', [TukangOrderController::class, 'complete'])->name('tukang.orders.complete');
+    Route::post('/tukang/orders/{id}/cancel', [TukangOrderController::class, 'cancel'])->name('tukang.orders.cancel');
+
+    Route::post('/tukang/toggle-availability', [DashboardController::class, 'toggleAvailability'])
+         ->name('tukang.toggle-availability');
         
 });
 

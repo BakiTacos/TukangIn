@@ -94,7 +94,7 @@
             </button>
         </div>
 
-        <form action="{{ route('orders.cancel', $order->id) }}" method="POST" class="space-y-6">
+        <form action="{{ Auth::user()->role === 'tukang' ? route('tukang.orders.cancel', $order->id) : route('orders.cancel', $order->id) }}" method="POST" class="space-y-6">
             @csrf
             
             <div class="space-y-2">
