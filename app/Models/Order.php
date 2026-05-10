@@ -25,6 +25,7 @@ class Order extends Model
     'technician_fee',
     'tax_amount',
     'platform_fee', // <--- UBAH DARI 'payment_fee' MENJADI 'platform_fee'
+    'completion_photo',
 ];
 
     protected $casts = [

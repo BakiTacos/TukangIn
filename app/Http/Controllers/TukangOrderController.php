@@ -26,19 +26,32 @@ class TukangOrderController extends Controller
     }
 
     // 2. Aksi Selesaikan Pekerjaan (Pengerjaan -> Selesai)
-    public function complete($id)
-    {
-        $order = Order::findOrFail($id);
+    // app/Http/Controllers/TukangOrderController.php
 
-        if ((int)$order->tukang_id !== (int)Auth::id()) {
-            return redirect()->back()->with('error', 'Anda tidak berwenang menyelesaikan pekerjaan ini.');
-        }
+public function complete(Request $request, $id)
+{
+    // 1. Validasi wajib mengunggah foto bukti penyelesaian
+    $request->validate([
+        'completion_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048' // Batasi maks 2MB
+    ]);
 
-        $order->status = 'selesai';
-        $order->save();
+    $order = Order::findOrFail($id);
 
-        return redirect()->back()->with('success', "Kerja bagus! Order {$order->order_number} telah dinyatakan selesai.");
+    if ((int)$order->tukang_id !== (int)Auth::id()) {
+        return redirect()->back()->with('error', 'Anda tidak memiliki hak akses.');
     }
+
+    // 2. Simpan file foto bukti ke folder storage public/completion_photos
+    if ($request->hasFile('completion_photo')) {
+        $path = $request->file('completion_photo')->store('completion_photos', 'public');
+        $order->completion_photo = $path;
+    }
+
+    $order->status = 'selesai';
+    $order->save();
+
+    return redirect()->back()->with('success', "Kerja bagus! Order #{$order->order_number} berhasil diselesaikan.");
+}
 
     public function cancel(Request $request, $id)
     {

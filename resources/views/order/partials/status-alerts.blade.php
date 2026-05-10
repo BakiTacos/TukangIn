@@ -32,6 +32,7 @@
                 </div>
             </div>
         </div>
+
     @elseif($order->status === 'batal')
         <div class="bg-red-50 border border-red-100 p-6 rounded-3xl flex flex-col gap-4 text-red-600">
             <div class="flex items-start gap-4">
@@ -48,5 +49,16 @@
                 </div>
             @endif
         </div>
+
+    @elseif($order->status === 'selesai' && $order->completion_photo)
+        <div class="p-6 bg-green-50 rounded-3xl border border-green-150 text-green-700">
+            <p class="text-[10px] font-bold uppercase tracking-widest mb-3 flex items-center gap-2">
+                <i class="fas fa-camera text-sm"></i> Foto Bukti Hasil Pekerjaan Mitra
+            </p>
+            <div class="w-full max-h-80 rounded-2xl overflow-hidden border border-green-100 shadow-sm bg-white">
+                <img src="{{ asset('storage/' . $order->completion_photo) }}" class="w-full h-auto max-h-80 object-contain mx-auto" alt="Bukti Pengerjaan">
+            </div>
+        </div>
     @endif
+    
 </div>

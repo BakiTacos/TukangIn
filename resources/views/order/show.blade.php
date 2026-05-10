@@ -3,10 +3,12 @@
          x-data="{ 
             showComplainModal: false,
             showCancelModal: false,
+            showComplainModal: false,
             complaintReason: '',
             complaintDescription: '',
             cancelReason: '',
-            cancelDescription: ''
+            cancelDescription: '',
+            completePhoto: ''
          }">
         
         <nav class="flex justify-between items-center mb-10">
