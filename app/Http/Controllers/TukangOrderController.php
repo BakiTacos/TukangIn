@@ -34,6 +34,7 @@ public function complete(Request $request, $id)
     $request->validate([
         'completion_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048' // Batasi maks 2MB
     ]);
+    
 
     $order = Order::findOrFail($id);
 
@@ -66,11 +67,10 @@ public function complete(Request $request, $id)
             return redirect()->back()->with('error', 'Anda tidak memiliki hak akses.');
         }
 
-        $order->update([
-            'status' => 'batal',
-            'cancel_reason' => $request->cancel_reason,
-            'cancel_description' => $request->cancel_description . ' (Dibatalkan oleh Teknisi)',
-        ]);
+        $order->status = 'batal';
+        $order->cancel_reason = $request->cancel_reason;
+        $order->cancel_description = $request->cancel_description . ' (Dibatalkan oleh Teknisi)';
+        $order->save();
 
         return redirect()->route('dashboard')->with('success', "Order #{$order->order_number} berhasil ditolak/dibatalkan.");
     }

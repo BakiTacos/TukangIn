@@ -26,6 +26,11 @@ class Order extends Model
     'tax_amount',
     'platform_fee', // <--- UBAH DARI 'payment_fee' MENJADI 'platform_fee'
     'completion_photo',
+
+    'cancel_reason',
+    'cancel_description',
+    'complaint_reason',
+    'complaint_description',
 ];
 
     protected $casts = [
