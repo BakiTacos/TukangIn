@@ -31,7 +31,7 @@
                             class="w-full bg-gray-50 border border-gray-150 rounded-2xl py-4 px-5 text-xs font-bold text-gray-700 focus:ring-2 focus:ring-orange-500 focus:border-transparent appearance-none cursor-pointer">
                         <option value="">-- Pilih Alasan Pembatalan --</option>
                         
-                        @if(Auth::user()->role === 'tukang')
+                        @if(Auth::user()?->role === 'tukang')
                             <option value="Kendala cuaca ekstrem / Hujan badai">Kendala cuaca ekstrem / Hujan badai</option>
                             <option value="Peralatan kerja mengalami kerusakan mendadak">Peralatan kerja mengalami kerusakan mendadak</option>
                             <option value="Kendala transportasi / Ban bocor di perjalanan">Kendala transportasi / Ban bocor di jalan</option>
@@ -81,7 +81,7 @@
     </div>
 </div>
 
-@if(Auth::user()->role === 'tukang')
+@if(Auth::user()?->role === 'tukang')
 <div x-show="showCompleteModal" 
      class="fixed inset-0 z-50 flex items-center justify-center bg-[#0f2d50]/40 backdrop-blur-sm"
      x-transition:enter="transition ease-out duration-300"
@@ -147,7 +147,7 @@
 </div>
 @endif
 
-@if(Auth::user()->role !== 'tukang')
+@if(Auth::user()?->role !== 'tukang')
 <div x-show="showComplainModal" 
      class="fixed inset-0 z-50 flex items-center justify-center bg-[#0f2d50]/40 backdrop-blur-sm"
      x-transition:enter="transition ease-out duration-300"
