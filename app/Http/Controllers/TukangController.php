@@ -71,16 +71,19 @@ class TukangController extends Controller
         $tukangs = $query->paginate(6)->withQueryString();
 
         // Data dropdown lokasi master
-        $provinces = Province::orderBy('name', 'asc')->pluck('name');
-        $cities = [];
-        if ($request->filled('province')) {
-            $provinceModel = Province::where('name', $request->province)->first();
-            if ($provinceModel) {
-                $cities = $provinceModel->cities()->orderBy('name', 'asc')->pluck('name');
-            }
+        $provinces = \App\Models\Province::orderBy('name', 'asc')->pluck('name');
+
+        // ⚡ SOLUSI VERCEL: Kumpulkan seluruh kota berdasarkan provinsinya langsung ke array PHP
+        $rawCitiesMap = [];
+        $dbProvinces = \App\Models\Province::with('cities')->get();
+        foreach ($dbProvinces as $prov) {
+            $rawCitiesMap[$prov->name] = $prov->cities->sortBy('name')->pluck('name')->toArray();
         }
 
-        return view('tukang.index', compact('tukangs', 'provinces', 'cities'));
+        // Ubah menjadi format JSON yang aman dimasukkan ke dalam atribut Alpine.js
+        $citiesJson = json_encode($rawCitiesMap);
+
+        return view('tukang.index', compact('tukangs', 'provinces', 'citiesJson'));
     }
 
     // 2. HALAMAN PILIH TUKANG SETELAH PILIH LAYANAN (DENGAN TOGGLE OFFLINE)
@@ -132,16 +135,19 @@ class TukangController extends Controller
                          ->paginate(6)
                          ->withQueryString();
 
-        $provinces = Province::orderBy('name', 'asc')->pluck('name');
-        $cities = [];
-        if ($request->filled('province')) {
-            $provinceModel = Province::where('name', $request->province)->first();
-            if ($provinceModel) {
-                $cities = $provinceModel->cities()->orderBy('name', 'asc')->pluck('name');
-            }
+        $provinces = \App\Models\Province::orderBy('name', 'asc')->pluck('name');
+
+        // ⚡ SOLUSI VERCEL: Kumpulkan seluruh kota berdasarkan provinsinya langsung ke array PHP
+        $rawCitiesMap = [];
+        $dbProvinces = \App\Models\Province::with('cities')->get();
+        foreach ($dbProvinces as $prov) {
+            $rawCitiesMap[$prov->name] = $prov->cities->sortBy('name')->pluck('name')->toArray();
         }
 
-        return view('tukang.pilih', compact('service', 'tukangs', 'provinces', 'cities'));
+        // Ubah menjadi format JSON yang aman dimasukkan ke dalam atribut Alpine.js
+        $citiesJson = json_encode($rawCitiesMap);
+
+        return view('tukang.pilih', compact('service', 'tukangs', 'provinces', 'citiesJson'));
     }
 
     // 3. HALAMAN DETAIL PROFIL TUKANG (Tetap Aman)
