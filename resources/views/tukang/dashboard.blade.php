@@ -61,37 +61,54 @@
             <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-6">
-                <div class="w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-xl shrink-0">
-                    <i class="fas fa-wallet"></i>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Pendapatan</p>
-                    <h3 class="text-2xl font-black text-[#0f2d50] mt-1">Rp {{ number_format($totalEarnings, 0, ',', '.') }}</h3>
-                </div>
-            </div>
-
-            <div class="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-6">
-                <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl shrink-0">
-                    <i class="fas fa-spinner animate-spin"></i>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pekerjaan Sedang Berjalan</p>
-                    <h3 class="text-2xl font-black text-[#0f2d50] mt-1">{{ $activeJobsCount }} Pekerjaan</h3>
-                </div>
-            </div>
-
-            <div class="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-6">
-                <div class="w-14 h-14 bg-yellow-50 text-yellow-500 rounded-2xl flex items-center justify-center text-xl shrink-0">
-                    <i class="fas fa-star"></i>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Penilaian Anda</p>
-                    <h3 class="text-2xl font-black text-[#0f2d50] mt-1">4.9 <span class="text-xs text-gray-400 font-bold">/ 5.0</span></h3>
-                </div>
-            </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+    
+    <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
+        <div class="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-lg shrink-0">
+            <i class="fas fa-wallet"></i>
         </div>
+        <div>
+            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Total Pendapatan</p>
+            <h3 class="text-xl font-black text-[#0f2d50] mt-1">Rp {{ number_format($totalEarnings, 0, ',', '.') }}</h3>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
+        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-lg shrink-0">
+            <i class="fas fa-spinner animate-spin"></i>
+        </div>
+        <div>
+            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Aktif Berjalan</p>
+            <h3 class="text-xl font-black text-[#0f2d50] mt-1">{{ $activeJobsCount }} Pekerjaan</h3>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
+        <div class="w-12 h-12 bg-yellow-50 text-yellow-500 rounded-2xl flex items-center justify-center text-lg shrink-0">
+            <i class="fas fa-star"></i>
+        </div>
+        <div>
+            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Rating Anda</p>
+            <h3 class="text-xl font-black text-[#0f2d50] mt-1">
+                ★ {{ auth()->user()->reviews_avg_rating ? number_format(auth()->user()->reviews_avg_rating, 1) : '5.0' }}
+                <span class="text-[10px] text-gray-400 font-bold">/ 5.0</span>
+            </h3>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
+        <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center text-lg shrink-0">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div>
+            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Proyek Selesai</p>
+            <h3 class="text-xl font-black text-[#0f2d50] mt-1">
+                {{ auth()->user()->completed_orders_count ?? 0 }} <span class="text-[10px] text-gray-400 font-bold">Transaksi</span>
+            </h3>
+        </div>
+    </div>
+
+</div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
             

@@ -96,9 +96,13 @@
                                         <span class="text-[9px] font-bold text-orange-500 uppercase tracking-widest">{{ $tukang->category }}</span>
                                         <h4 class="font-bold text-gray-800 text-lg">{{ $tukang->name }}</h4>
                                         <p class="text-[11px] font-bold text-yellow-500">
-                                            <i class="fas fa-star mr-1"></i> {{ $tukang->rating }} 
-                                            <span class="text-gray-400 font-normal ml-1">({{ $tukang->total_order }} Order Selesai)</span>
-                                        </p>
+    <i class="fas fa-star mr-1"></i> 
+    {{ $tukang->reviews_avg_rating ? number_format($tukang->reviews_avg_rating, 1) : '5.0' }} 
+    
+    <span class="text-gray-400 font-normal ml-1">
+        ({{ $tukang->completed_orders_count }} Order Selesai)
+    </span>
+</p>
                                     </div>
                                 </div>
                                 <button class="text-gray-200 hover:text-red-500 transition"><i class="fas fa-heart"></i></button>

@@ -14,6 +14,11 @@ class DashboardController extends Controller
         $user = Auth::user();
         $userId = $user->id;
 
+        if ($user->role === 'tukang') {
+        $user->loadCount('completedOrders'); // menghasilkan completed_orders_count
+        $user->loadAvg('reviews', 'rating');  // menghasilkan reviews_avg_rating
+    }
+
         // =========================================================================
         // GERBANG 1: ALUR KERJA KHUSUS MITRA TEKNISI (TUKANG)
         // =========================================================================
@@ -47,7 +52,7 @@ if ($user->role === 'tukang') {
         ->whereIn('status', ['selesai', 'batal', 'dikomplain'])
         ->with(['service', 'user', 'address', 'review'])
         ->latest()
-        ->paginate(10)
+        ->paginate(5)
         ->withQueryString();
 
     return view('tukang.dashboard', compact(

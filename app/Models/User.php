@@ -35,11 +35,11 @@ class User extends Authenticatable
         'schedule' => 'array',
     ];
 
-    public function reviews()
-    {
-        // Relasi ke model Review menggunakan foreign key 'tukang_id'
-        return $this->hasMany(Review::class, 'tukang_id');
-    }
+public function reviews()
+{
+    // Review terhubung ke User (Tukang) lewat perantara model Order
+    return $this->hasManyThrough(Review::class, Order::class, 'tukang_id', 'order_id');
+}
 
     public function addresses()
     {
@@ -52,9 +52,14 @@ class User extends Authenticatable
     }
 
     public function orders()
-    {
-        return $this->hasMany(Order::class);
-    }
+{
+    return $this->hasMany(Order::class, 'tukang_id');
+}
+
+public function completedOrders()
+{
+    return $this->hasMany(Order::class, 'tukang_id')->where('status', 'selesai');
+}
 
     public function services()
     {

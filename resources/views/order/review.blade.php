@@ -59,7 +59,7 @@
                         :disabled="rating === 0"
                         :class="rating === 0 ? 'opacity-50 cursor-not-allowed hover:transform-none' : ''"
                         class="w-full bg-green-500 hover:bg-green-600 text-white py-5 rounded-2xl font-bold text-xs uppercase tracking-widest transition shadow-lg shadow-green-500/20 transform hover:-translate-y-1 block text-center">
-                    Kirim Ulasan Resmi
+                    Kirim Ulasan
                 </button>
             </form>
         </div>

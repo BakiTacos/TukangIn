@@ -39,9 +39,13 @@
                         <div class="grid grid-cols-3 gap-4 border-t pt-6 text-center">
                             <div>
                                 <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Rating</p>
-                                <p class="text-lg font-bold text-gray-800">
-                                    <i class="fas fa-star text-yellow-500 mr-1"></i>{{ $tukang->rating ?? '5.0' }} 
-                                    <span class="text-[10px] text-gray-400 font-normal block md:inline">({{ $tukang->reviews_count ?? rand(50,200) }} Ulasan)</span>
+                                <p class="text-[11px] font-bold text-yellow-500">
+                                    <i class="fas fa-star mr-1"></i> 
+                                    {{ $tukang->reviews_avg_rating ? number_format($tukang->reviews_avg_rating, 1) : '5.0' }} 
+                                    
+                                    <span class="text-gray-400 font-normal ml-1">
+                                        ({{ $tukang->completed_orders_count }} Order Selesai)
+                                    </span>
                                 </p>
                             </div>
                             <div>
