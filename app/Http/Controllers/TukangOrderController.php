@@ -29,30 +29,41 @@ class TukangOrderController extends Controller
     // app/Http/Controllers/TukangOrderController.php
 
 public function complete(Request $request, $id)
-{
-    // 1. Validasi wajib mengunggah foto bukti penyelesaian
-    $request->validate([
-        'completion_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048' // Batasi maks 2MB
-    ]);
-    
+    {
+        // 1. Validasi super ketat: File wajib ada, tipe gambar, maks 2MB (2048 KB)
+        $request->validate([
+            'completion_photo' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
 
-    $order = Order::findOrFail($id);
+        // 2. Ambil data order dari Supabase
+        $order = Order::findOrFail($id);
 
-    if ((int)$order->tukang_id !== (int)Auth::id()) {
-        return redirect()->back()->with('error', 'Anda tidak memiliki hak akses.');
+        // 3. Proteksi Keamanan: Pastikan hanya Tukang yang ditugaskan yang bisa menyelesaikan
+        if ((int)$order->tukang_id !== (int)Auth::id()) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki hak akses untuk menyelesaikan order ini.');
+        }
+
+        // 4. Proses Upload ke Supabase Storage via disk 's3-completion'
+        if ($request->hasFile('completion_photo')) {
+            
+            // Hapus foto lama di Supabase jika ada (menghindari tumpukan sampah storage)
+            if ($order->completion_photo) {
+                Storage::disk('s3-completion')->delete($order->completion_photo);
+            }
+
+            // Simpan foto baru ke folder 'completion_photos' di dalam bucket 'tukangin-completion'
+            $path = $request->file('completion_photo')->store('completion_photos', 's3-completion');
+            
+            // Simpan path relatif ke database
+            $order->completion_photo = $path;
+        }
+
+        // 5. Ubah status order menjadi 'selesai' dan simpan perubahan
+        $order->status = 'selesai';
+        $order->save();
+
+        return redirect()->back()->with('success', "Kerja bagus! Order #{$order->order_number} berhasil diselesaikan dan foto bukti telah diunggah.");
     }
-
-    // 2. Simpan file foto bukti ke folder storage public/completion_photos
-    if ($request->hasFile('completion_photo')) {
-        $path = $request->file('completion_photo')->store('completion_photos', 'public');
-        $order->completion_photo = $path;
-    }
-
-    $order->status = 'selesai';
-    $order->save();
-
-    return redirect()->back()->with('success', "Kerja bagus! Order #{$order->order_number} berhasil diselesaikan.");
-}
 
     public function cancel(Request $request, $id)
     {

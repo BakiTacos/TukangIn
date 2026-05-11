@@ -60,6 +60,18 @@ return [
             'report' => false,
         ],
 
+        's3-completion' => [
+            'driver' => 's3',
+            'key' => env('COMPLETION_SUPABASE_ACCESS_KEY_ID'),
+            'secret' => env('COMPLETION_SUPABASE_SECRET_ACCESS_KEY'),
+            'region' => env('COMPLETION_SUPABASE_REGION'),
+            'bucket' => env('COMPLETION_SUPABASE_BUCKET', 'tukangin-completion'),
+            'endpoint' => env('COMPLETION_SUPABASE_ENDPOINT'),
+            'url' => env('COMPLETION_SUPABASE_PUBLIC_URL'),
+            'use_path_style_endpoint' => true, // Wajib bernilai true untuk Supabase Storage S3
+            'throw' => false,
+        ],
+
         'supabase' => [
             'driver' => 's3',
             'key' => env('SUPABASE_ACCESS_KEY_ID'),

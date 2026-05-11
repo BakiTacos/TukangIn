@@ -4,6 +4,7 @@
             showComplainModal: false,
             showCancelModal: false,
             showComplainModal: false,
+            showCompleteModal: false,
             complaintReason: '',
             complaintDescription: '',
             cancelReason: '',

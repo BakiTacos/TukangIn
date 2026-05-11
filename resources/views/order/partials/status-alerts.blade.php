@@ -56,7 +56,7 @@
                 <i class="fas fa-camera text-sm"></i> Foto Bukti Hasil Pekerjaan Mitra
             </p>
             <div class="w-full max-h-80 rounded-2xl overflow-hidden border border-green-100 shadow-sm bg-white">
-                <img src="{{ asset('storage/' . $order->completion_photo) }}" class="w-full h-auto max-h-80 object-contain mx-auto" alt="Bukti Pengerjaan">
+                <img src="{{ Storage::disk('s3-completion')->url($order->completion_photo) }}" class="w-full h-auto max-h-80 object-contain mx-auto" alt="Bukti Pengerjaan">
             </div>
         </div>
     @endif
