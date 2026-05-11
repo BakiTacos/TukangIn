@@ -23,6 +23,8 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
+Route::get('/api/cities', [TukangController::class, 'getCitiesApi'])->name('api.cities');
+
 // Rute Sementara untuk Login Instan sebagai Dian (Hapus jika sudah masuk tahap production!)
 Route::get('/bypass-wawan', function () {
     $user = \App\Models\User::where('email', 'wawan@tukangin.com')->first();

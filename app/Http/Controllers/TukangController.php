@@ -4,48 +4,57 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Service;
+use App\Models\Province; // ⚡ IMPOR MODEL MASTER PROVINSI
+use App\Models\City;     // ⚡ IMPOR MODEL MASTER KOTA
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class TukangController extends Controller
 {
-    // 1. HALAMAN DAFTAR TUKANG UMUM
+    // 1. HALAMAN DAFTAR TUKANG UMUM (DENGAN FILTER LOKASI MASTER)
     public function index(Request $request)
     {       
-        $query = \App\Models\User::where('role', 'tukang');
+        $query = User::where('role', 'tukang');
 
-        // Filter 1: Tombol manual ketersediaan tukang wajib ON (Tersedia)
+        // Filter 1: Tombol manual ketersediaan wajib ON
         $query->where('is_available', true);
 
-        // ⚡ Filter 2: KETERSEDIAAN JADWAL HARI INI (DINAMIS)
-        $todayNumber = Carbon::now('Asia/Jakarta')->dayOfWeekIso; // Mengembalikan angka 1 (Senin) - 7 (Minggu)
+        // Filter 2: Ketersediaan Jadwal & Jam Kerja Hari Ini (Dinamis)
+        $todayNumber = Carbon::now('Asia/Jakarta')->dayOfWeekIso;
         $daysMap = [
             1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 
             5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
         ];
         $todayIndo = $daysMap[$todayNumber];
-
-        // Ambil waktu jam menit detik saat ini (Format HH:MM:SS) berdasarkan Zona Jakarta
         $currentTime = Carbon::now('Asia/Jakarta')->format('H:i:s');
 
         $query->whereHas('schedules', function($q) use ($todayIndo, $currentTime) {
             $q->where('day', $todayIndo)
               ->where('is_active', true)
-              // ⚡ SOLUSI: Menggunakan whereTime agar dicast dengan sempurna oleh PostgreSQL Supabase
               ->whereTime('start_time', '<=', $currentTime)
               ->whereTime('end_time', '>=', $currentTime);
         });
+
+        // ⚡ FILTER 3: LOKASI PROVINSI
+        if ($request->filled('province')) {
+            $query->where('province', $request->province);
+        }
+
+        // ⚡ FILTER 4: LOKASI KOTA
+        if ($request->filled('city')) {
+            $query->where('city', $request->city);
+        }
 
         // Load data penilaian & transaksi selesai aktual
         $query->withCount('completedOrders') 
               ->withAvg('reviews', 'rating');
 
-        // Filter Kategori Bawaan (Tetap Aman)
+        // Filter Kategori Bawaan
         if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
 
-        // Fitur Search Bawaan (Tetap Aman)
+        // Fitur Search Bawaan
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%')
@@ -55,48 +64,79 @@ class TukangController extends Controller
 
         $tukangs = $query->paginate(6)->withQueryString();
 
-        return view('tukang.index', compact('tukangs'));
+        // ⚡ DATA DROPDOWN MASTER: Ambil data Provinsi resmi langsung dari tabel master provinces
+        $provinces = Province::orderBy('name', 'asc')->pluck('name');
+        
+        $cities = [];
+        if ($request->filled('province')) {
+            // Ambil Kota resmi langsung dari tabel master cities berdasarkan relasi provinsi
+            $provinceModel = Province::where('name', $request->province)->first();
+            if ($provinceModel) {
+                $cities = $provinceModel->cities()->orderBy('name', 'asc')->pluck('name');
+            }
+        }
+
+        return view('tukang.index', compact('tukangs', 'provinces', 'cities'));
     }
 
-    // 2. HALAMAN PILIH TUKANG SETELAH PILIH LAYANAN
-    public function pilihTukang($slug)
+    // 2. HALAMAN PILIH TUKANG SETELAH PILIH LAYANAN (DENGAN FILTER LOKASI MASTER)
+    public function pilihTukang(Request $request, $slug)
     {
         $service = Service::where('slug', $slug)->firstOrFail();
 
-        // ⚡ DETEKSI HARI INI (DINAMIS)
+        // Deteksi hari ini dinamis
         $todayNumber = Carbon::now('Asia/Jakarta')->dayOfWeekIso;
         $daysMap = [
             1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 
             5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
         ];
         $todayIndo = $daysMap[$todayNumber];
-
-        // Ambil waktu jam menit detik saat ini berdasarkan Zona Jakarta
         $currentTime = Carbon::now('Asia/Jakarta')->format('H:i:s');
 
-        $tukangs = User::where('role', 'tukang')
+        $query = User::where('role', 'tukang')
                        ->where('category', $service->category) 
                        ->where('is_available', true) 
-                       // ⚡ KUNCI UTAMA: Sinkronisasikan logika pencarian hari & jam operasional yang sama di sini
                        ->whereHas('schedules', function($q) use ($todayIndo, $currentTime) {
                            $q->where('day', $todayIndo)
                              ->where('is_active', true)
-                             // ⚡ SOLUSI: Gunakan whereTime di sini juga agar sinkron saat checkout!
                              ->whereTime('start_time', '<=', $currentTime)
                              ->whereTime('end_time', '>=', $currentTime);
-                       })
-                       ->withCount('completedOrders')
-                       ->withAvg('reviews', 'rating')
-                       ->orderBy('rating', 'desc') 
-                       ->paginate(6);
+                       });
 
-        return view('tukang.pilih', compact('service', 'tukangs'));
+        // ⚡ FILTER PROVINSI DI HALAMAN PENUGASAN LAYANAN
+        if ($request->filled('province')) {
+            $query->where('province', $request->province);
+        }
+
+        // ⚡ FILTER KOTA DI HALAMAN PENUGASAN LAYANAN
+        if ($request->filled('city')) {
+            $query->where('city', $request->city);
+        }
+
+        $tukangs = $query->withCount('completedOrders')
+                         ->withAvg('reviews', 'rating')
+                         ->orderBy('rating', 'desc') 
+                         ->paginate(6)
+                         ->withQueryString();
+
+        // ⚡ DATA DROPDOWN MASTER: Tarik langsung dari database master wilayah agar selalu terisi penuh
+        $provinces = Province::orderBy('name', 'asc')->pluck('name');
+        
+        $cities = [];
+        if ($request->filled('province')) {
+            $provinceModel = Province::where('name', $request->province)->first();
+            if ($provinceModel) {
+                $cities = $provinceModel->cities()->orderBy('name', 'asc')->pluck('name');
+            }
+        }
+
+        return view('tukang.pilih', compact('service', 'tukangs', 'provinces', 'cities'));
     }
 
-    // 3. HALAMAN DETAIL PROFIL TUKANG
+    // 3. HALAMAN DETAIL PROFIL TUKANG (Tetap Aman)
     public function show($id, Request $request)
     {
-        $tukang = \App\Models\User::where('role', 'tukang')
+        $tukang = User::where('role', 'tukang')
                     ->with([
                         'reviews' => function($query) {
                             $query->latest(); 
@@ -114,11 +154,31 @@ class TukangController extends Controller
         
         $service = null;
         if ($serviceId) {
-            $service = \App\Models\Service::where('id', $serviceId)
+            $service = Service::where('id', $serviceId)
                         ->where('category', $tukang->category)
                         ->first();
         }
         
         return view('tukang.show', compact('tukang', 'service', 'availableServices'));
+    }
+
+    // 4. API ENDPOINT KOTA (Ambil secara instan dari tabel master cities)
+    public function getCitiesApi(Request $request)
+    {
+        $provinceName = $request->query('province');
+
+        if (!$provinceName) {
+            return response()->json([]);
+        }
+
+        $province = Province::where('name', $provinceName)->first();
+        
+        if (!$province) {
+            return response()->json([]);
+        }
+
+        $cities = $province->cities()->orderBy('name', 'asc')->pluck('name');
+
+        return response()->json($cities);
     }
 }
