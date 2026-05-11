@@ -68,7 +68,7 @@ return [
             'bucket' => env('COMPLETION_SUPABASE_BUCKET', 'tukangin-completion'),
             'endpoint' => env('COMPLETION_SUPABASE_ENDPOINT'),
             'url' => env('COMPLETION_SUPABASE_PUBLIC_URL'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false), // Wajib bernilai true untuk Supabase Storage S3
+            'use_path_style_endpoint' => true,
             'throw' => true,
         ],
 
