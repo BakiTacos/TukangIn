@@ -64,20 +64,18 @@
                             Terima Pekerjaan <i class="fas fa-check ml-1"></i>
                         </button>
                     </form>
-                    <button type="button" @click="showCancelModal = true"
-                            class="w-full bg-white border-2 border-red-150 hover:bg-red-50 text-red-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition text-xs uppercase tracking-wider">
-                        <i class="fas fa-times-circle"></i> Tolak Pekerjaan (Batal)
-                    </button>
+                    
 
                 @elseif($order->status === 'pengerjaan')
                     <button type="button" @click="showCompleteModal = true"
                             class="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-green-500/25 transition transform hover:-translate-y-1 block text-center uppercase tracking-widest text-xs">
                         Selesaikan Pekerjaan <i class="fas fa-check-double ml-1"></i>
                     </button>
-                    <button type="button" @click="showCancelModal = true"
-                            class="w-full bg-white border-2 border-red-150 hover:bg-red-50 text-red-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition text-xs uppercase tracking-wider">
-                        <i class="fas fa-times-circle"></i> Batalkan Pekerjaan
-                    </button>
+                    <button type="button" 
+                        @click="cancelAction = '{{ route('tukang.orders.cancel', $order->id) }}'; showCancelModal = true"
+                        class="w-full bg-white border-2 border-red-150 hover:bg-red-50 text-red-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition text-xs uppercase tracking-wider">
+                    <i class="fas fa-times-circle"></i> Batalkan Pekerjaan
+                </button>
 
                 @elseif($order->status === 'selesai')
                     <button class="w-full bg-green-50 text-green-600 py-4 rounded-2xl font-bold cursor-default block text-center uppercase tracking-widest text-xs border border-green-150" disabled>
@@ -101,10 +99,11 @@
                        class="w-full bg-[#e67e22] hover:bg-[#d35400] text-white py-4 rounded-2xl font-bold shadow-lg shadow-orange-500/20 transition transform hover:-translate-y-1 block text-center uppercase tracking-widest text-xs">
                         Bayar Sekarang <i class="fas fa-arrow-right ml-1"></i>
                     </a>
-                    <button type="button" @click="showCancelModal = true"
-                            class="w-full bg-white border-2 border-red-150 hover:bg-red-50 text-red-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition text-xs uppercase tracking-wider">
-                        <i class="fas fa-times-circle"></i> Batalkan Pesanan
-                    </button>
+                    <button type="button" 
+                        @click="cancelAction = '{{ route('orders.cancel', $order->id) }}'; showCancelModal = true"
+                        class="w-full bg-white border-2 border-red-150 hover:bg-red-50 text-red-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition text-xs uppercase tracking-wider">
+                    <i class="fas fa-times-circle"></i> Batalkan Pesanan
+                </button>
                     
                 @elseif($order->status === 'pengerjaan')
                     <button class="w-full bg-blue-500 text-white py-4 rounded-2xl font-bold cursor-default block text-center uppercase tracking-widest text-xs" disabled>
@@ -118,10 +117,11 @@
                         </button>
                     @endif
                     
-                    <button type="button" @click="showComplainModal = true"
-                            class="w-full bg-white border-2 border-red-150 hover:bg-red-50 text-red-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition text-xs uppercase tracking-wider">
-                        <i class="fas fa-exclamation-triangle"></i> Ajukan Komplain Jasa
-                    </button>
+                    <button type="button" 
+        @click="complaintAction = '{{ route('orders.complain', $order->id) }}'; showComplainModal = true"
+        class="w-full bg-white border-2 border-red-150 hover:bg-red-50 text-red-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition text-xs uppercase tracking-wider">
+    <i class="fas fa-exclamation-triangle"></i> Ajukan Komplain Jasa
+</button>
                     
                 @elseif($order->status === 'selesai')
                     @if($order->review)
@@ -135,10 +135,11 @@
                         </a>
                         
                         @if($order->updated_at->gt(now()->subDays(7)))
-                            <button type="button" @click="showComplainModal = true"
-                                    class="w-full bg-white border-2 border-red-150 hover:bg-red-50 text-red-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition text-xs uppercase tracking-wider">
-                                <i class="fas fa-exclamation-triangle"></i> Ajukan Komplain Jasa
-                            </button>
+                           <button type="button" 
+        @click="complaintAction = '{{ route('orders.complain', $order->id) }}'; showComplainModal = true"
+        class="w-full bg-white border-2 border-red-150 hover:bg-red-50 text-red-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition text-xs uppercase tracking-wider">
+    <i class="fas fa-exclamation-triangle"></i> Ajukan Komplain Jasa
+</button>
                         @else
                             <div class="bg-gray-50 border border-gray-150 p-4 rounded-2xl text-center text-gray-400 text-[10px] font-bold uppercase tracking-wider">
                                 <i class="fas fa-info-circle mr-1"></i> Garansi Komplain 7 Hari Habis

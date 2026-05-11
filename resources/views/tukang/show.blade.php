@@ -1,5 +1,20 @@
 <x-app-layout>
-    <div class="container mx-auto px-6 py-12">
+    <div class="container mx-auto px-6 py-12"
+        x-data="{ 
+            showComplainModal: false,
+            showCancelModal: false,
+            showCompleteModal: false,
+            complaintReason: '',
+            complaintDescription: '',
+            cancelReason: '',
+            cancelDescription: '',
+            completePhoto: '',
+            
+            // ⚡ DAFTARKAN STATE KONTROL AKSI BARU DI SINI:
+            cancelAction: '',
+            completeAction: '',
+            complaintAction: ''
+         }">
         <div class="flex flex-col lg:flex-row gap-8">
             
             <div class="lg:w-2/3 space-y-8">

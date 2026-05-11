@@ -21,7 +21,7 @@
             </button>
         </div>
 
-        <form action="{{ Auth::user()->role === 'tukang' ? route('tukang.orders.cancel', $order->id) : route('orders.cancel', $order->id) }}" method="POST" class="space-y-6">
+        <form :action="cancelAction" method="POST" class="space-y-6">
             @csrf
             
             <div class="space-y-2">
@@ -105,9 +105,7 @@
             </button>
         </div>
 
-        <form action="{{ route('tukang.orders.complete', $order->id) }}" 
-            method="POST" 
-            enctype="multipart/form-data" class="space-y-6">
+        <form :action="completeAction" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             
             <div class="bg-green-50 border border-green-100 p-4 rounded-2xl text-green-700 text-xs flex gap-3">
@@ -173,7 +171,7 @@
             </button>
         </div>
 
-        <form action="{{ route('orders.complain', $order->id) }}" method="POST" class="space-y-6">
+        <form :action="complaintAction" method="POST" class="space-y-6">
             @csrf
             
             <div class="space-y-2">
