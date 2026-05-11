@@ -54,7 +54,7 @@
                             </div>
                             <div>
                                 <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Proyek Selesai</p>
-                                <p class="text-lg font-bold text-gray-800">{{ $tukang->total_order ?? '100' }}</p>
+                                <p class="text-lg font-bold text-gray-800">{{ $tukang->completed_orders_count ?? '100' }}</p>
                             </div>
                         </div>
 
