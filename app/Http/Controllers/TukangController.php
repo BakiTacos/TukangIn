@@ -15,6 +15,8 @@ class TukangController extends Controller
     {       
         $query = \App\Models\User::where('role', 'tukang');
 
+        $query->where('is_available', true);
+
         // Filter Kategori
         if ($request->filled('category')) {
             $query->where('category', $request->category);
