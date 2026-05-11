@@ -47,6 +47,7 @@ class TukangController extends Controller
         // Contoh: Layanan "Cuci Toren" kategorinya "Plumbing", maka yang muncul cuma tukang Plumbing
         $tukangs = User::where('role', 'tukang')
                        ->where('category', $service->category) 
+                       ->where('is_available', true) // ⚡ KUNCI UTAMA: Hanya ambil tukang yang aktif & siap menerima order!
                        ->orderBy('rating', 'desc') // Biar user dapet teknisi terbaik di urutan atas
                        ->paginate(6);
 
