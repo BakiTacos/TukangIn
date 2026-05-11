@@ -73,4 +73,9 @@ public function completedOrders()
         }
         return (int) $value;
     }
+
+    public function schedules()
+{
+    return $this->hasMany(\App\Models\TukangSchedule::class, 'user_id');
+}
 }

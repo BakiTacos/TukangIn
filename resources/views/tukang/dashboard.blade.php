@@ -225,6 +225,65 @@
             </div>
 
             <div class="lg:col-span-1 space-y-8">
+
+            <div class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
+        <div class="border-b border-gray-50 pb-4 mb-6">
+            <h4 class="text-base font-black text-[#0f2d50] uppercase tracking-wider flex items-center gap-2">
+                <i class="fas fa-calendar-alt text-orange-500 text-lg"></i> Jadwal Operasional
+            </h4>
+            <p class="text-[10px] text-gray-400 mt-1">Centang hari aktif kerja dan atur jam operasional Anda.</p>
+        </div>
+
+        <form action="{{ route('tukang.schedule.update') }}" method="POST" class="space-y-4">
+            @csrf
+            @method('PUT')
+
+            <div class="space-y-3">
+                @foreach($schedules as $sch)
+                    <div x-data="{ active: {{ $sch->is_active ? 'true' : 'false' }} }" 
+                         class="flex items-center justify-between p-3 rounded-2xl border transition-all duration-200"
+                         :class="active ? 'bg-orange-50/10 border-orange-100/60' : 'bg-gray-50/50 border-gray-150'">
+                        
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" 
+                                   name="schedules[{{ $sch->day }}][is_active]" 
+                                   value="1" 
+                                   x-model="active"
+                                   @if($sch->is_active) checked @endif
+                                   class="rounded-lg text-orange-500 focus:ring-orange-500 border-gray-300 w-4 h-4 cursor-pointer">
+                            <span class="text-xs font-black tracking-wide" 
+                                  :class="active ? 'text-[#0f2d50]' : 'text-gray-400'">
+                                {{ $sch->day }}
+                            </span>
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                            <input type="time" 
+                                   name="schedules[{{ $sch->day }}][start_time]" 
+                                   value="{{ \Carbon\Carbon::parse($sch->start_time)->format('H:i') }}"
+                                   :disabled="!active"
+                                   :class="!active ? 'opacity-40 bg-gray-100/60 border-gray-200 text-gray-400' : 'bg-white border-gray-200 text-gray-700 focus:ring-orange-500'"
+                                   class="text-[10px] font-bold px-2 py-1.5 rounded-xl border focus:outline-none transition w-[64px] text-center">
+                            
+                            <span class="text-gray-300 text-[9px] font-bold">-</span>
+                            
+                            <input type="time" 
+                                   name="schedules[{{ $sch->day }}][end_time]" 
+                                   value="{{ \Carbon\Carbon::parse($sch->end_time)->format('H:i') }}"
+                                   :disabled="!active"
+                                   :class="!active ? 'opacity-40 bg-gray-100/60 border-gray-200 text-gray-400' : 'bg-white border-gray-200 text-gray-700 focus:ring-orange-500'"
+                                   class="text-[10px] font-bold px-2 py-1.5 rounded-xl border focus:outline-none transition w-[64px] text-center">
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <button type="submit" 
+                    class="w-full bg-[#0f2d50] hover:bg-orange-500 text-white py-3.5 rounded-2xl font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-blue-100 transform hover:-translate-y-0.5 text-center block">
+                Simpan Jadwal Kerja <i class="fas fa-save ml-1"></i>
+            </button>
+        </form>
+    </div>
                 <div class="bg-gradient-to-br from-gray-800 to-black rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-lg">
                     <div class="relative z-10">
                         <h4 class="text-lg font-bold mb-2">Pusat Bantuan Mitra</h4>

@@ -60,33 +60,30 @@ class TukangController extends Controller
 
     // 3. HALAMAN DETAIL PROFIL TUKANG
     public function show($id, Request $request)
-    {
-        // Mengambil tukang, ulasan, serta layanan yang sesuai dengan kategori tukang tersebut
-        $tukang = \App\Models\User::where('role', 'tukang')
-                    ->with([
-                        'reviews' => function($query) {
-                            $query->latest(); // Urutkan ulasan terbaru (Tetap Aman)
-                        },
-                        'services' // Eager load layanan berdasarkan kesamaan kategori (Tetap Aman)
-                    ])
-                    // ⚡ AKTUALISASI DATA: Hitung total ulasan riil & total order selesai aktual secara bersamaan
-                    ->withCount(['reviews', 'completedOrders']) 
-                    ->withAvg('reviews', 'rating') // ⚡ Hitung rata-rata rating dari ulasan asli
-                    ->findOrFail($id);
+{
+    $tukang = \App\Models\User::where('role', 'tukang')
+                ->with([
+                    'reviews' => function($query) {
+                        $query->latest(); 
+                    },
+                    'services',
+                    'schedules' // ⚡ TAMBAHKAN INI: Ambil data jadwal kerja mitra
+                ])
+                ->withCount(['reviews', 'completedOrders']) 
+                ->withAvg('reviews', 'rating') 
+                ->findOrFail($id);
 
-        // KUNCI UTAMA: Dropdown hanya menampilkan layanan yang dikuasai tukang ini (Tetap Aman)
-        $availableServices = $tukang->services; 
+    $availableServices = $tukang->services; 
 
-        $serviceId = $request->query('service_id');
-        
-        // Cari layanan dari parameter, pastikan kategorinya cocok dengan si tukang (Tetap Aman)
-        $service = null;
-        if ($serviceId) {
-            $service = \App\Models\Service::where('id', $serviceId)
-                        ->where('category', $tukang->category)
-                        ->first();
-        }
-        
-        return view('tukang.show', compact('tukang', 'service', 'availableServices'));
+    $serviceId = $request->query('service_id');
+    
+    $service = null;
+    if ($serviceId) {
+        $service = \App\Models\Service::where('id', $serviceId)
+                    ->where('category', $tukang->category)
+                    ->first();
     }
+    
+    return view('tukang.show', compact('tukang', 'service', 'availableServices'));
+}
 }

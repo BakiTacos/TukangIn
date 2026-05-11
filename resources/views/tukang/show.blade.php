@@ -232,35 +232,36 @@
                         </div>
                     </div>
 
-                    <div class="bg-[#0f2d50] rounded-[2.5rem] p-8 text-white shadow-lg">
-                        <div class="flex items-center gap-3 mb-6">
-                            <i class="far fa-calendar-alt text-yellow-500 text-xl"></i>
-                            <h4 class="font-bold text-sm">Jadwal Tersedia</h4>
-                        </div>
-                        <div class="space-y-4 text-[11px]">
-                            @if($tukang->schedule && is_array($tukang->schedule))
-                                @foreach($tukang->schedule as $hari => $jam)
-                                    <div class="flex justify-between border-b border-white/10 pb-2">
-                                        <span class="text-gray-400">{{ $hari }}</span>
-                                        <span class="font-bold {{ strtolower($jam) == 'libur' ? 'text-red-400' : '' }}">{{ $jam }}</span>
-                                    </div>
-                                @endforeach
-                            @else
-                                <div class="flex justify-between border-b border-white/10 pb-2">
-                                    <span class="text-gray-400">Senin - Jumat</span>
-                                    <span class="font-bold">08:00 - 18:00</span>
-                                </div>
-                                <div class="flex justify-between border-b border-white/10 pb-2">
-                                    <span class="text-gray-400">Sabtu</span>
-                                    <span class="font-bold">09:00 - 15:00</span>
-                                </div>
-                                <div class="flex justify-between text-yellow-500">
-                                    <span>Minggu</span>
-                                    <span class="font-bold uppercase">Libur</span>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
+                    <div class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm mb-6">
+    <h4 class="text-sm font-black text-[#0f2d50] uppercase tracking-wider mb-4 flex items-center gap-2">
+        <i class="fas fa-clock text-orange-500"></i> Jadwal Kerja Aktif
+    </h4>
+
+    @php
+        // Urutkan jadwal secara kalender (Senin -> Minggu) dan filter hanya yang AKTIF
+        $dayOrder = ['Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4, 'Jumat' => 5, 'Sabtu' => 6, 'Minggu' => 7];
+        $activeSchedules = $tukang->schedules->where('is_active', true)->sortBy(function($sch) use ($dayOrder) {
+            return $dayOrder[$sch->day] ?? 8;
+        });
+    @endphp
+
+    <div class="space-y-3">
+        @forelse($activeSchedules as $schedule)
+            <div class="flex justify-between items-center py-2.5 px-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                <span class="text-xs font-bold text-gray-750">{{ $schedule->day }}</span>
+                <span class="text-xs font-extrabold text-blue-600 bg-blue-50 px-3 py-1 rounded-lg">
+                    {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - 
+                    {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}
+                </span>
+            </div>
+        @empty
+            <div class="text-center py-6">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Sedang Istirahat Panjang</p>
+                <p class="text-[9px] text-gray-450 mt-1 leading-relaxed">Mitra saat ini sedang tidak mengambil jadwal operasional aktif.</p>
+            </div>
+        @endforelse
+    </div>
+</div>
 
                 </div>
             </div>

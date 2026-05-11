@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\User;
+use App\Models\Service; // Impor model Service agar pemanggilan query di bawah lebih bersih
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,61 +15,84 @@ class DashboardController extends Controller
         $user = Auth::user();
         $userId = $user->id;
 
-        if ($user->role === 'tukang') {
-        $user->loadCount('completedOrders'); // menghasilkan completed_orders_count
-        $user->loadAvg('reviews', 'rating');  // menghasilkan reviews_avg_rating
-    }
-
         // =========================================================================
         // GERBANG 1: ALUR KERJA KHUSUS MITRA TEKNISI (TUKANG)
         // =========================================================================
-        // app/Http/Controllers/DashboardController.php
+        if ($user->role === 'tukang') {
+    $user->loadCount('completedOrders'); 
+    $user->loadAvg('reviews', 'rating');  
 
-if ($user->role === 'tukang') {
-    $totalEarnings = Order::where('tukang_id', $userId)
-        ->where('status', 'selesai')
-        ->sum('technician_fee');
+    // ⚡ OTO-INISIALISASI JADWAL: Sekarang default-nya langsung TRUE (Aktif)
+    $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+    foreach ($days as $day) {
+        $user->schedules()->firstOrCreate(
+            ['day' => $day],
+            [
+                'is_active' => true, // ⚡ UBAH MENJADI TRUE
+                'start_time' => '08:00', 
+                'end_time' => '17:00'
+            ]
+        );
+    }
 
-    $activeJobs = Order::where('tukang_id', $userId)
-        ->where('status', 'pengerjaan')
-        ->with(['service', 'user', 'address'])
-        ->latest()
-        ->get();
-    $activeJobsCount = $activeJobs->count();
+            // Total Pendapatan Aktual
+            $totalEarnings = Order::where('tukang_id', $userId)
+                ->where('status', 'selesai')
+                ->sum('technician_fee');
 
-    // SINKRONISASI TIMEZONE: Gabungkan filter agar kompatibel dengan local & server Supabase
-    $incomingOrders = Order::where('tukang_id', $userId)
-        ->where('status', 'pending')
-        ->where(function($q) {
-            $q->where('created_at', '>=', now('Asia/Jakarta')->subHours(24))
-              ->orWhere('created_at', '>=', now('UTC')->subHours(24))
-              ->orWhere('created_at', '>=', now()->subHours(24));
-        })
-        ->with(['service', 'user', 'address'])
-        ->latest()
-        ->get();
+            // Pekerjaan Berjalan Aktual
+            $activeJobs = Order::where('tukang_id', $userId)
+                ->where('status', 'pengerjaan')
+                ->with(['service', 'user', 'address'])
+                ->latest()
+                ->get();
+            $activeJobsCount = $activeJobs->count();
 
-    $jobHistory = Order::where('tukang_id', $userId)
-        ->whereIn('status', ['selesai', 'batal', 'dikomplain'])
-        ->with(['service', 'user', 'address', 'review'])
-        ->latest()
-        ->paginate(5)
-        ->withQueryString();
+            // SINKRONISASI TIMEZONE: Filter orderan masuk kompatibel dengan local & server Supabase
+            $incomingOrders = Order::where('tukang_id', $userId)
+                ->where('status', 'pending')
+                ->where(function($q) {
+                    $q->where('created_at', '>=', now('Asia/Jakarta')->subHours(24))
+                    ->orWhere('created_at', '>=', now('UTC')->subHours(24))
+                    ->orWhere('created_at', '>=', now()->subHours(24));
+                })
+                ->with(['service', 'user', 'address'])
+                ->latest()
+                ->get();
 
-    return view('tukang.dashboard', compact(
-        'totalEarnings', 
-        'activeJobs', 
-        'activeJobsCount', 
-        'incomingOrders', 
-        'jobHistory'
-    ));
-}
+            // Riwayat Pekerjaan Aktual dengan Pagination (Maksimal 5 item)
+            $jobHistory = Order::where('tukang_id', $userId)
+                ->whereIn('status', ['selesai', 'batal', 'dikomplain'])
+                ->with(['service', 'user', 'address', 'review'])
+                ->latest()
+                ->paginate(5)
+                ->withQueryString();
+
+            // Urutkan Jadwal Kerja secara logis (Senin -> Minggu)
+            $schedules = $user->schedules->sortBy(function($schedule) {
+                $dayOrder = [
+                    'Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4, 
+                    'Jumat' => 5, 'Sabtu' => 6, 'Minggu' => 7
+                ];
+                return $dayOrder[$schedule->day] ?? 8;
+            });
+
+            return view('tukang.dashboard', compact(
+                'totalEarnings', 
+                'activeJobs', 
+                'activeJobsCount', 
+                'incomingOrders', 
+                'jobHistory',
+                'schedules'
+            ));
+        }
 
         // =========================================================================
         // GERBANG 2: ALUR KERJA KHUSUS PELANGGAN REGULER (USER)
         // =========================================================================
         $currentTab = $request->query('tab', 'semua');
 
+        // Otomatis batalkan orderan pending yang melewati batas 24 jam pembayaran
         Order::where('user_id', $userId)
             ->where('status', 'pending')
             ->where('created_at', '<', now()->subHours(24))
@@ -105,14 +129,49 @@ if ($user->role === 'tukang') {
         return view('dashboard', compact('orders', 'totalPesananBulanIni', 'totalPengeluaran', 'currentTab'));
     }
 
-    // =========================================================================
-    // METHOD BARU: TOGGLE STATUS IS_AVAILABLE TUKANG (AJAX API)
-    // =========================================================================
+    public function updateSchedule(Request $request)
+{
+    // 1. Cukup validasi bahwa data schedules yang masuk harus berupa array
+    $request->validate([
+        'schedules' => 'required|array',
+    ]);
+
+    $user = Auth::user();
+
+    // 2. Kunci daftar 7 hari kerja secara statis agar looping tidak bocor
+    $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+    $submittedSchedules = $request->input('schedules', []);
+
+    foreach ($days as $day) {
+        // JIKA hari tersebut dicentang di browser, maka is_active = true.
+        // JIKA tidak dicentang (atau datanya tidak dikirim browser karena disabled), maka is_active = false.
+        $isActive = isset($submittedSchedules[$day]['is_active']);
+
+        $updateData = [
+            'is_active' => $isActive,
+        ];
+
+        // Hanya perbarui jam jika dikirim oleh browser (ketika hari berstatus aktif)
+        // Jika dinonaktifkan (disabled), kita pertahankan jam lama di DB agar tidak memicu error NULL/kosong
+        if (isset($submittedSchedules[$day]['start_time'])) {
+            $updateData['start_time'] = $submittedSchedules[$day]['start_time'];
+        }
+        if (isset($submittedSchedules[$day]['end_time'])) {
+            $updateData['end_time'] = $submittedSchedules[$day]['end_time'];
+        }
+
+        // Jalankan query update ke Supabase secara presisi berdasarkan nama hari
+        $user->schedules()->where('day', $day)->update($updateData);
+    }
+
+    return redirect()->back()->with('success', 'Jadwal kerja operasional Anda berhasil diperbarui!');
+}
+
     public function toggleAvailability(Request $request)
     {
         $user = Auth::user();
         
-        // Balikkan nilai boolean saat ini (True -> False / False -> True)
+        // Balikkan nilai boolean status aktif/istirahat
         $user->is_available = !$user->is_available;
         $user->save();
 

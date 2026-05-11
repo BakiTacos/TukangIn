@@ -117,7 +117,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/tukang/toggle-availability', [DashboardController::class, 'toggleAvailability'])
          ->name('tukang.toggle-availability');
-        
+
+    Route::put('/tukang/schedule', [DashboardController::class, 'updateSchedule'])->name('tukang.schedule.update');
 });
 
 
