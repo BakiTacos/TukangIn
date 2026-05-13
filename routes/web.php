@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrderController;
-
 use App\Http\Controllers\TukangController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ServiceController;
@@ -13,6 +12,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\TukangOrderController;
+use App\Http\Controllers\AdminController;
 
 // Rute untuk Login
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -154,7 +154,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     
     // Rute Manajemen Tambahan (Bisa lo kembangkan ke depan)
     Route::get('/users', [AdminController::class, 'manageUsers'])->name('users');
+    Route::post('/users/{id}/block', [AdminController::class, 'blockUser'])->name('users.block');
+    Route::post('/users/{id}/unblock', [AdminController::class, 'unblockUser'])->name('users.unblock');
+    
+    // 3. Dedicated Transaction Log Module (Log Finansial & Kasus)
+    Route::get('/orders', [AdminController::class, 'manageOrders'])->name('orders.index');
     Route::get('/orders/{id}/review', [AdminController::class, 'reviewOrder'])->name('orders.review');
+    Route::post('/orders/{id}/resolve', [AdminController::class, 'resolveOrder'])->name('orders.resolve');
 });
 
 require __DIR__.'/auth.php';

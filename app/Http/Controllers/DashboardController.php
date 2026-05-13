@@ -1,235 +1,79 @@
-<?php
-
-namespace App\Http\Controllers;
-
-use App\Models\Order;
-use App\Models\User;
-use App\Models\Service; // Impor model Service agar pemanggilan query di bawah lebih bersih
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Province;
-
-class DashboardController extends Controller
-{
-    public function index(Request $request)
-    {
-        $user = Auth::user();
-        $userId = $user->id;
-
-        // =========================================================================
-        // GERBANG 1: ALUR KERJA KHUSUS MITRA TEKNISI (TUKANG)
-        // =========================================================================
-        if ($user->role === 'tukang') {
-    $user->loadCount('completedOrders'); 
-    $user->loadAvg('reviews', 'rating');  
-
-    // ⚡ OTO-INISIALISASI JADWAL: Sekarang default-nya langsung TRUE (Aktif)
-    $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-    foreach ($days as $day) {
-        $user->schedules()->firstOrCreate(
-            ['day' => $day],
-            [
-                'is_active' => true, // ⚡ UBAH MENJADI TRUE
-                'start_time' => '08:00', 
-                'end_time' => '17:00'
-            ]
-        );
-    }
-
-    $allCities = [];
-    $dbProvinces = Province::with('cities')->get();
-    foreach ($dbProvinces as $prov) {
-        foreach ($prov->cities as $city) {
-            $allCities[] = [
-                'name' => $city->name,
-                'province' => $prov->name
-            ];
-        }
-    }
-
-    usort($allCities, function($a, $b) {
-        return strcmp($a['name'], $b['name']);
-    });
-
-            // Total Pendapatan Aktual
-            $totalEarnings = Order::where('tukang_id', $userId)
-                ->where('status', 'selesai')
-                ->sum('technician_fee');
-
-            // Pekerjaan Berjalan Aktual
-            $activeJobs = Order::where('tukang_id', $userId)
-                ->where('status', 'pengerjaan')
-                ->with(['service', 'user', 'address'])
-                ->latest()
-                ->get();
-            $activeJobsCount = $activeJobs->count();
-
-            // SINKRONISASI TIMEZONE: Filter orderan masuk kompatibel dengan local & server Supabase
-            $incomingOrders = Order::where('tukang_id', $userId)
-                ->where('status', 'pending')
-                ->where(function($q) {
-                    $q->where('created_at', '>=', now('Asia/Jakarta')->subHours(24))
-                    ->orWhere('created_at', '>=', now('UTC')->subHours(24))
-                    ->orWhere('created_at', '>=', now()->subHours(24));
-                })
-                ->with(['service', 'user', 'address'])
-                ->latest()
-                ->get();
-
-            // Riwayat Pekerjaan Aktual dengan Pagination (Maksimal 5 item)
-            $jobHistory = Order::where('tukang_id', $userId)
-                ->whereIn('status', ['selesai', 'batal', 'dikomplain'])
-                ->with(['service', 'user', 'address', 'review'])
-                ->latest()
-                ->paginate(5)
-                ->withQueryString();
-
-            // Urutkan Jadwal Kerja secara logis (Senin -> Minggu)
-            $schedules = $user->schedules->sortBy(function($schedule) {
-                $dayOrder = [
-                    'Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4, 
-                    'Jumat' => 5, 'Sabtu' => 6, 'Minggu' => 7
-                ];
-                return $dayOrder[$schedule->day] ?? 8;
-            });
-
-            return view('tukang.dashboard', compact(
-                'activeJobs', 'activeJobsCount', 'totalEarnings', 'jobHistory', 'schedules',
-                'allCities'
-            ));
-        }
-
-        // =========================================================================
-        // GERBANG 2: ALUR KERJA KHUSUS PELANGGAN REGULER (USER)
-        // =========================================================================
-        $currentTab = $request->query('tab', 'semua');
-
-        // Otomatis batalkan orderan pending yang melewati batas 24 jam pembayaran
-        Order::where('user_id', $userId)
-            ->where('status', 'pending')
-            ->where('created_at', '<', now()->subHours(24))
-            ->update([
-                'status' => 'batal',
-                'cancel_reason' => 'Waktu Pembayaran Habis',
-                'cancel_description' => 'Sistem otomatis membatalkan pesanan karena pembayaran tidak diselesaikan dalam batas waktu 24 jam.'
-            ]);
-
-        $query = Order::where('user_id', $userId);
-
-        if ($currentTab === 'pengerjaan') {
-            $query->whereIn('status', ['pending', 'pengerjaan']);
-        } elseif ($currentTab === 'dikomplain') {
-            $query->where('status', 'dikomplain');
-        } elseif ($currentTab === 'selesai') {
-            $query->where('status', 'selesai');
-        }
-
-        $orders = $query->with(['service', 'tukang', 'address', 'review'])
-            ->latest()
-            ->paginate(5)
-            ->withQueryString();
-
-        $totalPesananBulanIni = Order::where('user_id', $userId)
-            ->where('status', 'selesai')
-            ->whereMonth('created_at', now()->month)
-            ->count();
-
-        $totalPengeluaran = Order::where('user_id', $userId)
-            ->where('status', 'selesai')
-            ->sum('total_cost');
-
-        return view('dashboard', compact('orders', 'totalPesananBulanIni', 'totalPengeluaran', 'currentTab'));
-    }
-
-    public function updateSchedule(Request $request)
-{
-    // 1. Cukup validasi bahwa data schedules yang masuk harus berupa array
-    $request->validate([
-        'schedules' => 'required|array',
-    ]);
-
-    $user = Auth::user();
-
-    // 2. Kunci daftar 7 hari kerja secara statis agar looping tidak bocor
-    $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-    $submittedSchedules = $request->input('schedules', []);
-
-    foreach ($days as $day) {
-        // JIKA hari tersebut dicentang di browser, maka is_active = true.
-        // JIKA tidak dicentang (atau datanya tidak dikirim browser karena disabled), maka is_active = false.
-        $isActive = isset($submittedSchedules[$day]['is_active']);
-
-        $updateData = [
-            'is_active' => $isActive,
-        ];
-
-        // Hanya perbarui jam jika dikirim oleh browser (ketika hari berstatus aktif)
-        // Jika dinonaktifkan (disabled), kita pertahankan jam lama di DB agar tidak memicu error NULL/kosong
-        if (isset($submittedSchedules[$day]['start_time'])) {
-            $updateData['start_time'] = $submittedSchedules[$day]['start_time'];
-        }
-        if (isset($submittedSchedules[$day]['end_time'])) {
-            $updateData['end_time'] = $submittedSchedules[$day]['end_time'];
-        }
-
-        // Jalankan query update ke Supabase secara presisi berdasarkan nama hari
-        $user->schedules()->where('day', $day)->update($updateData);
-    }
-
-    return redirect()->back()->with('success', 'Jadwal kerja operasional Anda berhasil diperbarui!');
-} #tes
-
-    public function toggleAvailability(Request $request)
-    {
-        $user = Auth::user();
+<x-app-layout>
+    <div class="min-h-screen bg-gray-50 pb-20">
         
-        // Balikkan nilai boolean status aktif/istirahat
-        $user->is_available = !$user->is_available;
-        $user->save();
+        <div class="bg-[#0f2d50] pb-32 pt-12">
+            <div class="container mx-auto px-6 text-white">
+                <span class="bg-orange-500 text-white text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest">HQ Pusat Visualisasi</span>
+                <h1 class="text-4xl font-black mt-3">Metrik Kontrol Real-Time</h1>
+                <p class="text-xs text-gray-300 mt-1">Ringkasan pertumbuhan pendapatan platform dan konversi aktivitas jaringan kerja TUKANG.IN.</p>
+            </div>
+        </div>
 
-        return response()->json([
-            'success' => true,
-            'is_available' => $user->is_available
-        ]);
-    }
+        <div class="container mx-auto px-6 -mt-16">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
+                    <div class="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-lg"><i class="fas fa-chart-line"></i></div>
+                    <div>
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Gross Merchandise Value</p>
+                        <h3 class="text-xl font-black text-[#0f2d50] mt-1">Rp {{ number_format($totalGmv, 0, ',', '.') }}</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-lg"><i class="fas fa-shopping-basket"></i></div>
+                    <div>
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Volume Transaksi</p>
+                        <h3 class="text-xl font-black text-[#0f2d50] mt-1">{{ $totalTransactions }} Orderan</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
+                    <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center text-sm"><i class="fas fa-calculator"></i></div>
+                    <div>
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Tingkat Penggunaan (Avg)</p>
+                        <h3 class="text-sm font-black text-[#0f2d50] mt-1">Rp {{ number_format($avgPurchaseValue, 0, ',', '.') }}</h3>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
+                    <div class="w-12 h-12 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center text-lg"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div>
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Kasus Sengketa Aktif</p>
+                        <h3 class="text-xl font-black text-[#0f2d50] mt-1">{{ $criticalOrdersCount }} Kasus</h3>
+                    </div>
+                </div>
+            </div>
 
-    public function editProfile()
-{
-    $user = auth()->user();
+            <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-6 px-2">Akses Cepat Pengelolaan Modul</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <a href="{{ route('admin.users') }}" class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:border-orange-500 transition group flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl mb-6 group-hover:bg-[#0f2d50] group-hover:text-white transition"><i class="fas fa-user-shield"></i></div>
+                        <h4 class="font-black text-lg text-[#0f2d50] uppercase tracking-wide">Otoritas Akun</h4>
+                        <p class="text-xs text-gray-400 mt-2 leading-relaxed">Kelola batasan hak akses, lakukan pencarian data pengguna, serta eksekusi moderasi blokir & unblock akun pelanggar.</p>
+                    </div>
+                    <span class="inline-flex items-center gap-2 text-xs font-bold text-orange-500 mt-8 group-hover:translate-x-2 transition-transform">Masuk Manajemen Akun <i class="fas fa-arrow-right text-[10px]"></i></span>
+                </a>
 
-    // 1. Ambil semua data provinsi master
-    $provinces = \App\Models\Province::orderBy('name', 'asc')->pluck('name');
+                <a href="{{ route('admin.orders.index') }}" class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:border-orange-500 transition group flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-xl mb-6 group-hover:bg-[#0f2d50] group-hover:text-white transition"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <h4 class="font-black text-lg text-[#0f2d50] uppercase tracking-wide">Arus Log Transaksi</h4>
+                        <p class="text-xs text-gray-400 mt-2 leading-relaxed">Audit menyeluruh alur perputaran kontrak kerja finansial, penanganan berkas sengketa komplain, dan keputusan penahanan dana.</p>
+                    </div>
+                    <span class="inline-flex items-center gap-2 text-xs font-bold text-orange-500 mt-8 group-hover:translate-x-2 transition-transform">Buka Log Transaksi <i class="fas fa-arrow-right text-[10px]"></i></span>
+                </a>
 
-    // 2. ⚡ AMAN VERCEL: Petakan kota berdasarkan provinsi dalam bentuk array PHP murni
-    $citiesMap = [];
-    $dbProvinces = \App\Models\Province::with('cities')->get();
-    foreach ($dbProvinces as $prov) {
-        $citiesMap[$prov->name] = $prov->cities->sortBy('name')->pluck('name')->toArray();
-    }
+                <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 pb-3 mb-4">Sensus Database Supabase</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center"><span class="text-xs text-gray-500">Pelanggan Terdaftar:</span><strong class="text-sm font-black text-[#0f2d50]">{{ $totalPelanggan }} Akun</strong></div>
+                            <div class="flex justify-between items-center"><span class="text-xs text-gray-500">Mitra Teknisi Kerja:</span><strong class="text-sm font-black text-[#0f2d50]">{{ $totalMitraTeknisi }} Teknisi</strong></div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center"><p class="text-[10px] font-bold text-green-600 uppercase tracking-wider">● Database Node: Connected Postgres</p></div>
+                </div>
 
-    return view('dashboard.profile', compact('user', 'provinces', 'citiesMap'));
-}
-
-// app/Http/Controllers/DashboardController.php
-
-public function updateLocation(Request $request)
-{
-    $request->validate([
-        'city_data' => 'required|string',
-    ]);
-
-    // Memecah string "Nama Kota|Nama Provinsi" yang dikirim oleh Form
-    $locationParts = explode('|', $request->city_data);
-    
-    if (count($locationParts) === 2) {
-        auth()->user()->update([
-            'city' => $locationParts[0],
-            'province' => $locationParts[1],
-        ]);
-        
-        return redirect()->back()->with('success', 'Wilayah operasional kota Anda berhasil diperbarui!');
-    }
-
-    return redirect()->back()->with('error', 'Format pilihan lokasi tidak valid.');
-}
-}
+            </div>
+        </div>
+    </div>
+</x-app-layout>

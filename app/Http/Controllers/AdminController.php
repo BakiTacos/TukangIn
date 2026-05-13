@@ -1,5 +1,4 @@
 <?php
-// 📂 app/Http/Controllers/AdminController.php
 
 namespace App\Http\Controllers;
 
@@ -9,34 +8,151 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
+    // 📊 MENU 1: DASBOR VISUALISASI UTAMA
     public function dashboard()
     {
-        // ⚡ GATING PATROL: Tendang jika yang masuk bukan admin resmi
-        if (auth()->user()->role !== 'admin') {
-            abort(403, 'Maaf, halaman ini hanya bisa diakses oleh Direksi TUKANG.IN.');
+        // ⚡ GATING INLINE (Foolproof & Pasti Berhasil)
+        if (auth()->user()->role !== 'admin') { 
+            abort(403, 'Akses HQ Terkunci.'); 
         }
 
-        // 1. Hitung Keuangan (Total GMV dari orderan berstatus selesai)
-        $totalGmv = Order::where('status', 'selesai')->sum('total_price');
+        $totalGmv = Order::where('status', 'selesai')->sum('total_cost');
+        $totalTransactions = Order::count();
+        $avgPurchaseValue = $totalTransactions > 0 ? ($totalGmv / Order::where('status', 'selesai')->count()) : 0;
 
-        // 2. Hitung Sensus Pengguna di Database
         $totalPelanggan = User::where('role', 'user')->count();
         $totalMitraTeknisi = User::where('role', 'tukang')->count();
-
-        // 3. Hitung Pekerjaan Kritis (Menunggu, Proses pengerjaan, atau sedang Dikomplain)
         $criticalOrdersCount = Order::whereIn('status', ['menunggu', 'proses', 'dikomplain'])->count();
 
-        // 4. Ambil 6 Transaksi Terbaru untuk Tabel Monitoring Live
-        $recentOrders = Order::with(['user', 'tukang', 'service'])
-            ->latest()
-            ->paginate(6);
-
         return view('admin.dashboard', compact(
-            'totalGmv', 
-            'totalPelanggan', 
-            'totalMitraTeknisi', 
-            'criticalOrdersCount', 
-            'recentOrders'
+            'totalGmv', 'totalTransactions', 'avgPurchaseValue', 
+            'totalPelanggan', 'totalMitraTeknisi', 'criticalOrdersCount'
         ));
     }
+
+    // 🛡️ MENU 2: HALAMAN KHUSUS MANAJEMEN AKUN
+    public function manageUsers(Request $request)
+    {
+        // ⚡ GATING INLINE
+        if (auth()->user()->role !== 'admin') { 
+            abort(403, 'Akses HQ Terkunci.'); 
+        }
+
+        $searchUser = $request->query('search_user');
+        $userQuery = User::where('id', '!=', auth()->id());
+
+        if ($searchUser) {
+            $userQuery->where('name', 'ilike', '%' . $searchUser . '%');
+        }
+
+        $users = $userQuery->latest()->paginate(10)->withQueryString();
+        return view('admin.users', compact('users'));
+    }
+
+    // 📋 MENU 3: HALAMAN KHUSUS LOG TRANSAKSI & SENGKETA
+    // 📂 app/Http/Controllers/AdminController.php
+
+public function manageOrders(Request $request)
+{
+    // Gating Keamanan Hak Akses HQ
+    if (auth()->user()->role !== 'admin') { 
+        abort(403, 'Akses HQ Terkunci.'); 
+    }
+
+    $statusFilter = $request->query('status', 'semua');
+    $orderQuery = Order::with(['user', 'tukang', 'service']);
+
+    // ⚡ PERLUASAN FITUR FILTERING DATA (SUPABASE POSTGRES COMPATIBLE)
+    if ($statusFilter === 'selesai') {
+        $orderQuery->where('status', 'selesai');
+    } elseif ($statusFilter === 'batal') {
+        $orderQuery->where('status', 'batal');
+    } elseif ($statusFilter === 'pengerjaan') {
+        // Mengamankan jika di DB lo menggunakan istilah 'proses' atau 'pengerjaan'
+        $orderQuery->whereIn('status', ['proses', 'pengerjaan']);
+    } elseif ($statusFilter === 'dikomplain') {
+        $orderQuery->where('status', 'dikomplain');
+    }
+
+    // Eksekusi data dengan Pagination 10 item per halaman
+    $recentOrders = $orderQuery->latest()->paginate(10)->withQueryString();
+    
+    return view('admin.orders', compact('recentOrders', 'statusFilter'));
+}
+
+    // ⚡ PROSES BLOCK AKUN
+    public function blockUser(Request $request, $id)
+    {
+        if (auth()->user()->role !== 'admin') { abort(403); }
+
+        $request->validate(['blocked_reason' => 'required|string|max:500']);
+        $user = User::findOrFail($id);
+        $user->update([
+            'is_blocked' => true,
+            'blocked_reason' => $request->blocked_reason
+        ]);
+
+        return redirect()->back()->with('success', "Akun {$user->name} berhasil diblokir.");
+    }
+
+    // ⚡ PROSES UNBLOCK AKUN
+    public function unblockUser($id)
+    {
+        if (auth()->user()->role !== 'admin') { abort(403); }
+
+        $user = User::findOrFail($id);
+        $user->update([
+            'is_blocked' => false,
+            'blocked_reason' => null
+        ]);
+
+        return redirect()->back()->with('success', "Blokir akun {$user->name} telah dibuka.");
+    }
+
+    // ⚖️ PUSAT AUDIT SENGKETA
+    public function reviewOrder($id)
+    {
+        if (auth()->user()->role !== 'admin') { abort(403); }
+
+        $order = Order::with(['user', 'tukang', 'service', 'address'])->findOrFail($id);
+        return view('admin.review', compact('order'));
+    }
+
+    // ⚖️ EKSEKUSI RESOLUSI KEPUTUSAN SENGKETA
+    // 📂 app/Http/Controllers/AdminController.php
+
+// 📂 app/Http/Controllers/AdminController.php
+
+public function resolveOrder(Request $request, $id)
+{
+    if (auth()->user()->role !== 'admin') { abort(403); }
+
+    $request->validate([
+        'status' => 'required|in:selesai,batal,dikomplain,proses',
+        'admin_note' => 'required|string|max:1000'
+    ]);
+
+    $order = Order::findOrFail($id);
+    
+    // ⚡ BERSIH & AMAN: Simpan notes admin murni ke kolom admin_note tanpa menimpa keluhan user
+    $updateData = [
+        'status' => $request->status,
+        'admin_note' => $request->admin_note
+    ];
+
+    // Tentukan sub_status berdasarkan keputusan sidang admin
+    if ($request->status === 'selesai') {
+        $updateData['sub_status'] = 'komplain_ditolak';
+    } elseif ($request->status === 'batal') {
+        $updateData['sub_status'] = 'komplain_diterima';
+    } elseif ($request->status === 'dikomplain') {
+        $updateData['sub_status'] = 'proses_banding';
+    } elseif ($request->status === 'proses') {
+        $updateData['sub_status'] = 'garansi_perbaikan';
+    }
+
+    $order->update($updateData);
+
+    return redirect()->route('admin.orders.index')->with('success', 'Berita acara arbitrase berhasil disimpan ke Supabase!');
+}
 }

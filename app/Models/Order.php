@@ -31,6 +31,9 @@ class Order extends Model
     'cancel_description',
     'complaint_reason',
     'complaint_description',
+
+    'sub_status',
+    'admin_note',
 ];
 
     protected $casts = [

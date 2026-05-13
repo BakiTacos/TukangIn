@@ -3,129 +3,78 @@
         
         <div class="bg-[#0f2d50] pb-32 pt-12">
             <div class="container mx-auto px-6 text-white">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <span class="bg-orange-500 text-white text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest">
-                            HQ Pusat Kontrol Admin
-                        </span>
-                        <h1 class="text-4xl font-black mt-3">Selamat Datang, {{ auth()->user()->name }}</h1>
-                        <p class="text-xs text-gray-300 mt-1">Pantau grafik transaksi, audit aktivitas mitra teknisi, dan tangani komplain pelanggan.</p>
-                    </div>
-                    <div class="bg-white/5 border border-white/10 px-5 py-3 rounded-2xl backdrop-blur-sm text-right hidden sm:block">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase">Sistem Node</p>
-                        <p class="text-xs font-black text-green-400 mt-0.5 animate-pulse">● Production Online</p>
-                    </div>
-                </div>
+                <span class="bg-orange-500 text-white text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest">HQ Pusat Visualisasi</span>
+                <h1 class="text-4xl font-black mt-3">Metrik Kontrol Real-Time</h1>
+                <p class="text-xs text-gray-300 mt-1">Ringkasan pertumbuhan pendapatan platform dan konversi aktivitas jaringan kerja TUKANG.IN.</p>
             </div>
         </div>
 
         <div class="container mx-auto px-6 -mt-16">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                 <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
-                    <div class="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-lg shrink-0">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
+                    <div class="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-lg"><i class="fas fa-chart-line"></i></div>
                     <div>
-                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Total GMV Transaksi</p>
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Gross Merchandise Value</p>
                         <h3 class="text-xl font-black text-[#0f2d50] mt-1">Rp {{ number_format($totalGmv, 0, ',', '.') }}</h3>
                     </div>
                 </div>
-
                 <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
-                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-lg shrink-0">
-                        <i class="fas fa-users"></i>
-                    </div>
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-lg"><i class="fas fa-shopping-basket"></i></div>
                     <div>
-                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Pelanggan Reguler</p>
-                        <h3 class="text-xl font-black text-[#0f2d50] mt-1">{{ $totalPelanggan }} Akun</h3>
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Volume Transaksi</p>
+                        <h3 class="text-xl font-black text-[#0f2d50] mt-1">{{ $totalTransactions }} Orderan</h3>
                     </div>
                 </div>
-
                 <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
-                    <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center text-lg shrink-0">
-                        <i class="fas fa-tools"></i>
-                    </div>
+                    <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-sm"><i class="fas fa-calculator"></i></div>
                     <div>
-                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Mitra Terdaftar</p>
-                        <h3 class="text-xl font-black text-[#0f2d50] mt-1">{{ $totalMitraTeknisi }} Teknisi</h3>
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Tingkat Penggunaan (Avg)</p>
+                        <h3 class="text-sm font-black text-[#0f2d50] mt-1">Rp {{ number_format($avgPurchaseValue, 0, ',', '.') }}</h3>
                     </div>
                 </div>
-
                 <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5">
-                    <div class="w-12 h-12 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center text-lg shrink-0">
-                        <i class="fas fa-exclamation-triangle animate-bounce"></i>
-                    </div>
+                    <div class="w-12 h-12 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center text-lg"><i class="fas fa-exclamation-triangle"></i></div>
                     <div>
-                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Pekerjaan Dipantau</p>
-                        <h3 class="text-xl font-black text-[#0f2d50] mt-1">{{ $criticalOrdersCount }} Antrean</h3>
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Kasus Sengketa Aktif</p>
+                        <h3 class="text-xl font-black text-[#0f2d50] mt-1">{{ $criticalOrdersCount }} Kasus</h3>
                     </div>
                 </div>
-
             </div>
 
-            <div class="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-sm border border-gray-100">
-                <div class="flex justify-between items-center border-b border-gray-50 pb-5 mb-6">
+            <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-6 px-2">Akses Cepat Pengelolaan Modul</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <a href="{{ route('admin.users') }}" class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:border-orange-500 transition group flex flex-col justify-between">
                     <div>
-                        <h3 class="text-lg font-black text-[#0f2d50] uppercase tracking-wider">📋 Arus Log Transaksi Terbaru</h3>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Pantau status pengerjaan yang sedang terjadi di seluruh wilayah jangkauan.</p>
+                        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl mb-6 group-hover:bg-[#0f2d50] group-hover:text-white transition"><i class="fas fa-user-shield"></i></div>
+                        <h4 class="font-black text-lg text-[#0f2d50] uppercase tracking-wide">Otoritas Akun</h4>
+                        <p class="text-xs text-gray-400 mt-2 leading-relaxed">Kelola batasan hak akses, lakukan pencarian data pengguna, serta eksekusi moderasi blokir & unblock akun pelanggar.</p>
                     </div>
+                    <span class="inline-flex items-center gap-2 text-xs font-bold text-orange-500 mt-8 group-hover:translate-x-2 transition-transform">Masuk Manajemen Akun <i class="fas fa-arrow-right text-[10px]"></i></span>
+                </a>
+
+                <a href="{{ route('admin.orders.index') }}" class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl hover:border-orange-500 transition group flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-xl mb-6 group-hover:bg-[#0f2d50] group-hover:text-white transition"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <h4 class="font-black text-lg text-[#0f2d50] uppercase tracking-wide">Arus Log Transaksi</h4>
+                        <p class="text-xs text-gray-400 mt-2 leading-relaxed">Audit menyeluruh alur perputaran kontrak kerja finansial, penanganan berkas sengketa komplain, dan keputusan penahanan dana.</p>
+                    </div>
+                    <span class="inline-flex items-center gap-2 text-xs font-bold text-orange-500 mt-8 group-hover:translate-x-2 transition-transform">Buka Log Transaksi <i class="fas fa-arrow-right text-[10px]"></i></span>
+                </a>
+
+                <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 pb-3 mb-4">Sensus Database Supabase</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center"><span class="text-xs text-gray-500">Pelanggan Terdaftar:</span><strong class="text-sm font-black text-[#0f2d50]">{{ $totalPelanggan }} Akun</strong></div>
+                            <div class="flex justify-between items-center"><span class="text-xs text-gray-500">Mitra Teknisi Kerja:</span><strong class="text-sm font-black text-[#0f2d50]">{{ $totalMitraTeknisi }} Teknisi</strong></div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-center"><p class="text-[10px] font-bold text-green-600 uppercase tracking-wider">● Database Node: Connected Postgres</p></div>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-gray-100 text-gray-400 text-[10px] font-black uppercase tracking-widest bg-gray-50/50 rounded-xl">
-                                <th class="py-4 px-4">Invoice ID</th>
-                                <th class="py-4 px-4">Pelanggan</th>
-                                <th class="py-4 px-4">Teknisi Ahli</th>
-                                <th class="py-4 px-4">Layanan / Kategori</th>
-                                <th class="py-4 px-4">Nilai Kontrak</th>
-                                <th class="py-4 px-4 text-center">Status Global</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50 text-xs font-medium text-gray-700">
-                            @forelse($recentOrders as $order)
-                                <tr class="hover:bg-gray-50/80 transition-colors">
-                                    <td class="py-4 px-4 font-black text-blue-600">#{{ $order->order_number }}</td>
-                                    <td class="py-4 px-4 font-bold text-gray-800">{{ $order->user->name ?? 'User Terhapus' }}</td>
-                                    <td class="py-4 px-4">
-                                        <span class="font-bold text-gray-800">{{ $order->tukang->name ?? 'Belum Ditunjuk' }}</span>
-                                        <p class="text-[9px] text-gray-400 font-bold uppercase mt-0.5">{{ $order->tukang->city ?? '' }}</p>
-                                    </td>
-                                    <td class="py-4 px-4">
-                                        <span class="font-extrabold text-[#0f2d50]">{{ $order->service->title ?? 'Custom Layanan' }}</span>
-                                        <p class="text-[9px] text-orange-500 font-bold uppercase mt-0.5">{{ $order->service->category ?? '' }}</p>
-                                    </td>
-                                    <td class="py-4 px-4 font-extrabold text-gray-900">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
-                                    <td class="py-4 px-4 text-center">
-                                        @if($order->status === 'selesai')
-                                            <span class="inline-block bg-green-50 text-green-600 text-[9px] font-black px-3 py-1.5 rounded-lg border border-green-100 uppercase tracking-wide">Selesai</span>
-                                        @elseif($order->status === 'proses')
-                                            <span class="inline-block bg-blue-50 text-blue-600 text-[9px] font-black px-3 py-1.5 rounded-lg border border-blue-100 uppercase tracking-wide animate-pulse">Pengerjaan</span>
-                                        @elseif($order->status === 'menunggu')
-                                            <span class="inline-block bg-amber-50 text-amber-600 text-[9px] font-black px-3 py-1.5 rounded-lg border border-amber-100 uppercase tracking-wide">Mencari Mitra</span>
-                                        @elseif($order->status === 'batal')
-                                            <span class="inline-block bg-gray-100 text-gray-400 text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-wide">Dibatalkan</span>
-                                        @elseif($order->status === 'dikomplain')
-                                            <span class="inline-block bg-purple-50 text-purple-600 text-[9px] font-black px-3 py-1.5 rounded-lg border border-purple-100 uppercase tracking-wide">⚠️ Sengketa</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="text-center py-12 text-gray-400 font-bold uppercase tracking-wider">Belum Ada Transaksi Log Masuk di Platform</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="mt-8 border-t border-gray-50 pt-6">
-                    {{ $recentOrders->links() }}
-                </div>
             </div>
         </div>
-
     </div>
 </x-app-layout>
