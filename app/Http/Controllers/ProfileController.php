@@ -21,18 +21,30 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function index()
-    {
-        $user = auth()->user();
-        
-        // Contoh pengambilan data pesanan terakhir (jika sudah ada tabel orders)
-        // $lastOrder = \App\Models\Order::where('user_id', $user->id)->latest()->first();
-        $user = auth()->user()->load(['orders' => function($query) {
-        $query->with('service')->latest()->limit(1);
-    }]);
+    public function index() // ⚡ Sesuaikan dengan nama method rute /my-profile lo
+{
+    $user = auth()->user();
+    $userId = $user->id;
 
-        return view('profile.index', compact('user'));
-    }
+    // ⚡ AMBIL METRIK BIAR BANNER PROFIL TIDAK UNDEFINED VARIABLE
+    $totalOrders = \App\Models\Order::where('user_id', $userId)->count();
+    $loyaltyPoints = $user->loyalty_points ?? $user->points ?? 0;
+    
+    // Ambil juga recent orders jika template profile/index lo membutuhkannya
+    $recentOrders = \App\Models\Order::where('user_id', $userId)
+        ->with(['service', 'tukang'])
+        ->latest()
+        ->take(3)
+        ->get();
+
+    // ⚡ PASTIKAN DATA METRIK INI DI-COMPACT KE VIEW profile.index
+    return view('profile.index', compact(
+        'user', 
+        'totalOrders', 
+        'loyaltyPoints', 
+        'recentOrders'
+    ));
+}
 
     public function address()
     {

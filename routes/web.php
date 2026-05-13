@@ -148,4 +148,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/orders/{order}/review', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    // Rute Utama Dashboard Utama Admin POV
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    
+    // Rute Manajemen Tambahan (Bisa lo kembangkan ke depan)
+    Route::get('/users', [AdminController::class, 'manageUsers'])->name('users');
+    Route::get('/orders/{id}/review', [AdminController::class, 'reviewOrder'])->name('orders.review');
+});
+
 require __DIR__.'/auth.php';
