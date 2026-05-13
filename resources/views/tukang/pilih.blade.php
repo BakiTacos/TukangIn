@@ -65,8 +65,8 @@
                     </div>
                 </div>
 
-                <x-location-picker :provinces="$provinces" :citiesJson="$citiesJson" />
-
+                <x-location-picker :provinces="$provinces" :citiesMap="$citiesMap" />
+                
                 <div class="grid md:grid-cols-2 gap-6">
                     @forelse($tukangs as $tukang)
                     <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
