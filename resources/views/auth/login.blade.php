@@ -1,3 +1,36 @@
+@if(session('account_blocked'))
+    <div x-data="{ openModal: true }" 
+         x-show="openModal" 
+         x-transition 
+         x-cloak 
+         class="fixed inset-0 bg-gray-900/70 backdrop-blur-md z-55 flex items-center justify-center p-4">
+        
+        <div class="bg-white w-full max-w-md p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 text-center relative"
+             @click.away="openModal = false">
+            
+            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center text-2xl mx-auto mb-5 border border-red-100 shadow-sm animate-bounce">
+                <i class="fas fa-user-slash"></i>
+            </div>
+            
+            <h3 class="text-lg font-black text-[#0f2d50] uppercase tracking-wider mb-2">Akses Masuk Ditangguhkan</h3>
+            <p class="text-xs text-gray-400 mb-6 leading-relaxed">Maaf, kredensial akun Anda telah dinonaktifkan oleh sistem manajemen TUKANG.IN karena terindikasi melakukan pelanggaran.</p>
+            
+            <div class="bg-gray-50 border border-gray-200 p-5 rounded-2xl mb-6 text-left shadow-inner">
+                <span class="block text-[9px] font-black text-red-500 uppercase tracking-widest mb-1.5">Alasan Resmi Penangguhan:</span>
+                <p class="text-xs font-bold text-gray-700 italic leading-relaxed">
+                    "{{ session('account_blocked') }}"
+                </p>
+            </div>
+
+            <button type="button" 
+                    @click="openModal = false" 
+                    class="w-full bg-[#0f2d50] hover:bg-orange-500 text-white py-4 rounded-2xl font-bold text-xs uppercase tracking-widest transition shadow-lg shadow-blue-100 flex items-center justify-center gap-2">
+                Saya Mengerti Kontrol Sistem
+            </button>
+        </div>
+    </div>
+@endif
+
 <x-app-layout>
     <div class="flex flex-col md:flex-row min-h-screen">
         <div class="hidden md:flex md:w-1/2 bg-[#f0f4f8] flex-col items-center justify-center p-10">
