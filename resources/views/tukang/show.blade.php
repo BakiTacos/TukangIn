@@ -78,24 +78,31 @@
 
         // 1. FITUR BERBAGI SMART (NATIVE MOBILE SHARE + CLIPBOARD FALLBACK)
         async shareProfile() {
-            let shareData = {
-                title: 'Profil {{ $tukang->name }} - TUKANG.IN',
-                text: 'Cek profil {{ $tukang->name }}, teknisi spesialis {{ $tukang->category }} terbaik di TUKANG.IN!',
-                url: window.location.href
-            };
+    // ⚡ MENGUNCI URL AGAR MENGGUNAKAN ROOT DOMAIN AKURAT SESUAI KONFIGURASI APP_URL
+    let secureUrl = '{{ route('tukang.show', $tukang->id) }}';
+    
+    // Opsional: Jika lo mau paksa hardcode domain vercel khusus untuk fitur share ini saja, aktifkan baris di bawah:
+    // secureUrl = secureUrl.replace('http://127.0.0.1:8000', 'https://tukang-in.vercel.app');
+    // secureUrl = secureUrl.replace('http://localhost:8000', 'https://tukang-in.vercel.app');
 
-            if (navigator.share) {
-                try {
-                    await navigator.share(shareData);
-                } catch (err) {
-                    console.log('Batal berbagi:', err);
-                }
-            } else {
-                // Fallback: Salin Link Otomatis ke Clipboard jika di Browser Desktop
-                navigator.clipboard.writeText(window.location.href);
-                this.triggerToast('🔗 Link profil berhasil disalin ke clipboard!');
-            }
-        },
+    let shareData = {
+        title: 'Profil {{ $tukang->name }} - TUKANG.IN',
+        text: 'Cek profil {{ $tukang->name }}, teknisi spesialis {{ $tukang->category }} terbaik di TUKANG.IN!',
+        url: secureUrl
+    };
+
+    if (navigator.share) {
+        try {
+            await navigator.share(shareData);
+        } catch (err) {
+            console.log('Batal berbagi:', err);
+        }
+    } else {
+        // Fallback: Salin tautan ke clipboard otomatis
+        navigator.clipboard.writeText(secureUrl);
+        this.triggerToast('🔗 Link profil verifikasi berhasil disalin ke clipboard!');
+    }
+},
 
         // 2. FITUR TOGGLE FAVORIT ASINKRONUS
         async toggleFavorite() {

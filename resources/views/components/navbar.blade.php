@@ -54,6 +54,10 @@
                                     <i class="far fa-user-circle mr-3 w-4"></i> Profil Saya
                                 </a>
 
+                                <a href="{{ route('tukang.favorites') }}" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition {{ request()->routeIs('tukang.favorites') ? 'text-[#e67e22] bg-gray-50/50' : '' }}">
+                                    <i class="fas fa-heart mr-3 w-4 text-red-500"></i> Teknisi Favorit
+                                </a>
+
                                 <a href="/dashboard" class="flex items-center px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#e67e22] transition">
                                     <i class="fas fa-history mr-3 w-4"></i> Pesanan
                                 </a>
@@ -144,6 +148,10 @@
                     @else
                         <a href="/my-profile" class="flex items-center text-xs font-bold text-gray-300 hover:text-orange-400 transition py-1">
                             <i class="far fa-user-circle mr-3.5 w-4 text-center"></i> Profil Saya
+                        </a>
+
+                        <a href="{{ route('tukang.favorites') }}" class="flex items-center text-xs font-bold transition py-1 {{ request()->routeIs('tukang.favorites') ? 'text-orange-400' : 'text-gray-300 hover:text-orange-400' }}">
+                            <i class="fas fa-heart mr-3.5 w-4 text-center text-red-400"></i> Teknisi Favorit
                         </a>
 
                         <a href="/dashboard" class="flex items-center text-xs font-bold text-gray-300 hover:text-orange-400 transition py-1">

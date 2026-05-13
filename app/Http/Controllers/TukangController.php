@@ -215,4 +215,36 @@ public function toggleFavorite($id)
         return response()->json(['success' => true, 'status' => 'added']);
     }
 }
+
+// 📂 app/Http/Controllers/TukangController.php
+
+public function favorites(Request $request)
+{
+    $user = auth()->user();
+
+    // Deteksi hari ini dinamis (Jakarta) untuk indikator status operasional jam kerja
+    $todayNumber = Carbon::now('Asia/Jakarta')->dayOfWeekIso;
+    $daysMap = [
+        1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 
+        5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
+    ];
+    $todayIndo = $daysMap[$todayNumber];
+
+    // ⚡ AMBIL TEKNISI YANG DI-FAVORITKAN SAJA
+    $tukangs = User::where('role', 'tukang')
+        ->whereIn('id', function($query) use ($user) {
+            $query->select('tukang_id')
+                  ->from('tukang_favorites')
+                  ->where('user_id', $user->id);
+        })
+        ->with(['schedules' => function($q) use ($todayIndo) {
+            $q->where('day', $todayIndo);
+        }])
+        ->withCount('completedOrders') 
+        ->withAvg('reviews', 'rating')
+        ->paginate(6)
+        ->withQueryString();
+
+    return view('tukang.favorites', compact('tukangs'));
+}
 }

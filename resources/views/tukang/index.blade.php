@@ -13,15 +13,7 @@
             <div class="container mx-auto px-6 text-white">
                 <nav class="text-xs text-gray-400 mb-4 uppercase tracking-widest">Home > Teknisi > Semua</nav>
                 
-                <div class="flex items-center gap-2.5 mb-6 bg-white/10 border border-white/10 p-4 rounded-2xl w-fit backdrop-blur-sm">
-                    <input type="checkbox" id="show_inactive_toggle" 
-                           onchange="let url = new URL(window.location.href); if(this.checked) { url.searchParams.set('show_inactive', '1'); } else { url.searchParams.delete('show_inactive'); } window.location.href = url.toString();"
-                           {{ request('show_inactive') ? 'checked' : '' }}
-                           class="rounded-lg text-orange-500 focus:ring-orange-500 border-white/20 bg-white/5 w-4 h-4 cursor-pointer">
-                    <label for="show_inactive_toggle" class="text-xs font-bold text-gray-200 cursor-pointer select-none">
-                        Tampilkan Semua Mitra (Termasuk yang Di Luar Jam Kerja)
-                    </label>
-                </div>
+                
 
                 <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
                     <div>
