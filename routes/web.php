@@ -106,6 +106,9 @@ Route::middleware('auth')->group(function () {
          ->name('tukang.toggle-availability');
 
     Route::put('/tukang/schedule', [DashboardController::class, 'updateSchedule'])->name('tukang.schedule.update');
+
+    Route::put('/dashboard/update-location', [DashboardController::class, 'updateLocation'])
+         ->name('tukang.profile.update-location');
 });
 
 

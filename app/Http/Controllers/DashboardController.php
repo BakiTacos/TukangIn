@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Service; // Impor model Service agar pemanggilan query di bawah lebih bersih
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Province;
 
 class DashboardController extends Controller
 {
@@ -34,6 +35,21 @@ class DashboardController extends Controller
             ]
         );
     }
+
+    $allCities = [];
+    $dbProvinces = Province::with('cities')->get();
+    foreach ($dbProvinces as $prov) {
+        foreach ($prov->cities as $city) {
+            $allCities[] = [
+                'name' => $city->name,
+                'province' => $prov->name
+            ];
+        }
+    }
+
+    usort($allCities, function($a, $b) {
+        return strcmp($a['name'], $b['name']);
+    });
 
             // Total Pendapatan Aktual
             $totalEarnings = Order::where('tukang_id', $userId)
@@ -78,12 +94,8 @@ class DashboardController extends Controller
             });
 
             return view('tukang.dashboard', compact(
-                'totalEarnings', 
-                'activeJobs', 
-                'activeJobsCount', 
-                'incomingOrders', 
-                'jobHistory',
-                'schedules'
+                'activeJobs', 'activeJobsCount', 'totalEarnings', 'jobHistory', 'schedules',
+                'allCities'
             ));
         }
 
@@ -180,4 +192,44 @@ class DashboardController extends Controller
             'is_available' => $user->is_available
         ]);
     }
+
+    public function editProfile()
+{
+    $user = auth()->user();
+
+    // 1. Ambil semua data provinsi master
+    $provinces = \App\Models\Province::orderBy('name', 'asc')->pluck('name');
+
+    // 2. ⚡ AMAN VERCEL: Petakan kota berdasarkan provinsi dalam bentuk array PHP murni
+    $citiesMap = [];
+    $dbProvinces = \App\Models\Province::with('cities')->get();
+    foreach ($dbProvinces as $prov) {
+        $citiesMap[$prov->name] = $prov->cities->sortBy('name')->pluck('name')->toArray();
+    }
+
+    return view('dashboard.profile', compact('user', 'provinces', 'citiesMap'));
+}
+
+// app/Http/Controllers/DashboardController.php
+
+public function updateLocation(Request $request)
+{
+    $request->validate([
+        'city_data' => 'required|string',
+    ]);
+
+    // Memecah string "Nama Kota|Nama Provinsi" yang dikirim oleh Form
+    $locationParts = explode('|', $request->city_data);
+    
+    if (count($locationParts) === 2) {
+        auth()->user()->update([
+            'city' => $locationParts[0],
+            'province' => $locationParts[1],
+        ]);
+        
+        return redirect()->back()->with('success', 'Wilayah operasional kota Anda berhasil diperbarui!');
+    }
+
+    return redirect()->back()->with('error', 'Format pilihan lokasi tidak valid.');
+}
 }
