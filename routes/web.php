@@ -26,21 +26,6 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::get('/api/cities', [TukangController::class, 'getCitiesApi'])->name('api.cities');
 
 // Rute Sementara untuk Login Instan sebagai Dian (Hapus jika sudah masuk tahap production!)
-Route::get('/bypass-wawan', function () {
-    $user = \App\Models\User::where('email', 'wawan@tukangin.com')->first();
-    
-    if ($user) {
-        // Pastikan rolenya sudah diset ke 'tukang'
-        $user->update(['role' => 'tukang']);
-        
-        // bypass login langsung ke session browser
-        Auth::login($user);
-        
-        return redirect('/dashboard')->with('success', 'Bypass Login Sukses! Halo Wawan!');
-    }
-    
-    return 'Gagal bypass: Akun dian@tukangin.com tidak ditemukan di database!';
-});
 
 // HANYA ADA SATU RUTE UNTUK '/'
 Route::get('/', [HomeController::class, 'index'])->name('home');

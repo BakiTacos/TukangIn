@@ -11,7 +11,7 @@ use Carbon\Carbon;
 
 class TukangController extends Controller
 {
-    // 1. HALAMAN DAFTAR TUKANG UMUM (DENGAN TOGGLE OFFLINE)
+    // 1. HALAMAN DAFTAR TUKANG UMUM (DENGAN TOGGLE OFFLINE & ANTI-CRASH VERCEL)
     public function index(Request $request)
     {       
         $query = User::where('role', 'tukang');
@@ -43,50 +43,46 @@ class TukangController extends Controller
                   });
         }
 
-        // Filter Lokasi
+        // ⚡ FILTER LOKASI PROVINSI & KOTA (Menggunakan ilike agar aman dari sensitivitas huruf di Supabase)
         if ($request->filled('province')) {
-            $query->where('province', $request->province);
+            $query->where('province', 'ilike', $request->province);
         }
         if ($request->filled('city')) {
-            $query->where('city', $request->city);
+            $query->where('city', 'ilike', $request->city);
         }
 
         // Load data penilaian & transaksi selesai aktual
         $query->withCount('completedOrders') 
               ->withAvg('reviews', 'rating');
 
-        // Filter Kategori Bawaan
+        // ⚡ FILTER KATEGORI (Menggunakan ilike)
         if ($request->filled('category')) {
-            $query->where('category', $request->category);
+            $query->where('category', 'ilike', $request->category);
         }
 
-        // Fitur Search Bawaan
+        // ⚡ FITUR SEARCH BAWAAN (Menggunakan ilike agar 'wawan' tetap mendeteksi 'Wawan')
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('specialty', 'like', '%' . $request->search . '%');
+                $q->where('name', 'ilike', '%' . $request->search . '%')
+                  ->orWhere('specialty', 'ilike', '%' . $request->search . '%');
             });
         }
 
         $tukangs = $query->paginate(6)->withQueryString();
 
-        // Data dropdown lokasi master
-        $provinces = \App\Models\Province::orderBy('name', 'asc')->pluck('name');
-
-        // ⚡ SOLUSI VERCEL: Kumpulkan seluruh kota berdasarkan provinsinya langsung ke array PHP
-        $rawCitiesMap = [];
-        $dbProvinces = \App\Models\Province::with('cities')->get();
+        // ⚡ PROSES DATA LOKASI MASTER SECARA AMAN (Array PHP Murni untuk Komponen)
+        $provinces = Province::orderBy('name', 'asc')->pluck('name');
+        
+        $citiesMap = [];
+        $dbProvinces = Province::with('cities')->get();
         foreach ($dbProvinces as $prov) {
-            $rawCitiesMap[$prov->name] = $prov->cities->sortBy('name')->pluck('name')->toArray();
+            $citiesMap[$prov->name] = $prov->cities->sortBy('name')->pluck('name')->toArray();
         }
 
-        // Ubah menjadi format JSON yang aman dimasukkan ke dalam atribut Alpine.js
-        $citiesJson = json_encode($rawCitiesMap);
-
-        return view('tukang.index', compact('tukangs', 'provinces', 'citiesJson'));
+        return view('tukang.index', compact('tukangs', 'provinces', 'citiesMap'));
     }
 
-    // 2. HALAMAN PILIH TUKANG SETELAH PILIH LAYANAN (DENGAN TOGGLE OFFLINE)
+    // 2. HALAMAN PILIH TUKANG SETELAH PILIH LAYANAN (DENGAN TOGGLE OFFLINE & ANTI-CRASH VERCEL)
     public function pilihTukang(Request $request, $slug)
     {
         $service = Service::where('slug', $slug)->firstOrFail();
@@ -100,8 +96,9 @@ class TukangController extends Controller
         $todayIndo = $daysMap[$todayNumber];
         $currentTime = Carbon::now('Asia/Jakarta')->format('H:i:s');
 
+        // ⚡ FILTER KATEGORI SENSITIF (Menggunakan ilike agar 'Interior' cocok dengan 'interior')
         $query = User::where('role', 'tukang')
-                       ->where('category', $service->category);
+                       ->where('category', 'ilike', $service->category);
 
         // ⚡ OPTIMASI N+1: Ambil jadwal hari ini saja untuk kalkulasi status di Blade
         $query->with(['schedules' => function($q) use ($todayIndo) {
@@ -121,12 +118,12 @@ class TukangController extends Controller
                   });
         }
 
-        // Filter Lokasi
+        // ⚡ FILTER LOKASI PROVINSI & KOTA (Menggunakan ilike)
         if ($request->filled('province')) {
-            $query->where('province', $request->province);
+            $query->where('province', 'ilike', $request->province);
         }
         if ($request->filled('city')) {
-            $query->where('city', $request->city);
+            $query->where('city', 'ilike', $request->city);
         }
 
         $tukangs = $query->withCount('completedOrders')
@@ -135,19 +132,16 @@ class TukangController extends Controller
                          ->paginate(6)
                          ->withQueryString();
 
-        $provinces = \App\Models\Province::orderBy('name', 'asc')->pluck('name');
+        // ⚡ PROSES DATA LOKASI MASTER SECARA AMAN (Array PHP Murni untuk Komponen)
+        $provinces = Province::orderBy('name', 'asc')->pluck('name');
 
-        // ⚡ SOLUSI VERCEL: Kumpulkan seluruh kota berdasarkan provinsinya langsung ke array PHP
-        $rawCitiesMap = [];
-        $dbProvinces = \App\Models\Province::with('cities')->get();
+        $citiesMap = [];
+        $dbProvinces = Province::with('cities')->get();
         foreach ($dbProvinces as $prov) {
-            $rawCitiesMap[$prov->name] = $prov->cities->sortBy('name')->pluck('name')->toArray();
+            $citiesMap[$prov->name] = $prov->cities->sortBy('name')->pluck('name')->toArray();
         }
 
-        // Ubah menjadi format JSON yang aman dimasukkan ke dalam atribut Alpine.js
-        $citiesJson = json_encode($rawCitiesMap);
-
-        return view('tukang.pilih', compact('service', 'tukangs', 'provinces', 'citiesJson'));
+        return view('tukang.pilih', compact('service', 'tukangs', 'provinces', 'citiesMap'));
     }
 
     // 3. HALAMAN DETAIL PROFIL TUKANG (Tetap Aman)
@@ -179,7 +173,7 @@ class TukangController extends Controller
         return view('tukang.show', compact('tukang', 'service', 'availableServices'));
     }
 
-    // 4. API KOTA
+    // 4. API KOTA (Tetap dipertahankan untuk kebutuhan eksternal jika ada)
     public function getCitiesApi(Request $request)
     {
         $provinceName = $request->query('province');

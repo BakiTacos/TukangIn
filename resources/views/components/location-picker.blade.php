@@ -1,7 +1,7 @@
-@props(['provinces', 'citiesJson'])
+@props(['provinces', 'citiesMap'])
 
 <script>
-    window.citiesMap = {!! $citiesJson !!};
+    window.tukangCitiesMap = @json($citiesMap);
 </script>
 
 <div class="relative w-full mb-8" 
@@ -11,7 +11,8 @@
         selectedCity: '{{ request('city', '') }}',
         hoveredProvince: '{{ request('province', '') }}',
         
-        citiesMap: window.citiesMap || {}, 
+        // Mengambil data dari window object yang dijamin anti-crash di Vercel
+        citiesMap: window.tukangCitiesMap || {}, 
         cities: [],
 
         init() {
