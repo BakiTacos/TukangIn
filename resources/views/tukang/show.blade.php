@@ -1,6 +1,6 @@
 <x-app-layout>
-    <div class="container mx-auto px-6 py-12"
-        x-data="{ 
+    <div class="container mx-auto px-6 py-12 max-w-6xl"
+         x-data="{ 
             showComplainModal: false,
             showCancelModal: false,
             showCompleteModal: false,
@@ -9,12 +9,11 @@
             cancelReason: '',
             cancelDescription: '',
             completePhoto: '',
-            
-            // ⚡ DAFTARKAN STATE KONTROL AKSI BARU DI SINI:
             cancelAction: '',
             completeAction: '',
             complaintAction: ''
          }">
+        
         <div class="flex flex-col lg:flex-row gap-8">
             
             <div class="lg:w-2/3 space-y-8">
@@ -32,9 +31,18 @@
                         <div class="flex flex-wrap items-center gap-3 mb-2 text-center md:text-left">
                             <h1 class="text-3xl font-extrabold text-[#0f2d50] w-full md:w-auto">{{ $tukang->name }}</h1>
                             <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Tersedia</span>
-                            <span class="bg-gray-50 text-gray-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Jabodetabek</span>
+                            
+                            @if($tukang->city && $tukang->province)
+                                <span class="bg-orange-50/60 text-orange-600 border border-orange-100 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+                                    <i class="fas fa-map-marker-alt text-[9px]"></i> {{ $tukang->city }}
+                                </span>
+                            @else
+                                <span class="bg-gray-50 text-gray-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Jabodetabek</span>
+                            @endif
                         </div>
-                        <p class="text-gray-400 font-medium mb-6 uppercase text-xs tracking-widest text-center md:text-left">{{ $tukang->specialty ?? 'Spesialis ' . $tukang->category }}</p>
+                        <p class="text-gray-400 font-medium mb-6 uppercase text-xs tracking-widest text-center md:text-left">
+                            {{ $tukang->specialty ?? 'Spesialis ' . $tukang->category }}
+                        </p>
                         
                         <div class="grid grid-cols-3 gap-4 border-t pt-6 text-center">
                             <div>
@@ -42,10 +50,7 @@
                                 <p class="text-[11px] font-bold text-yellow-500">
                                     <i class="fas fa-star mr-1"></i> 
                                     {{ $tukang->reviews_avg_rating ? number_format($tukang->reviews_avg_rating, 1) : '5.0' }} 
-                                    
-                                    <span class="text-gray-400 font-normal ml-1">
-                                        ({{ $tukang->completed_orders_count }} Order Selesai)
-                                    </span>
+                                    <span class="text-gray-400 font-normal ml-1">({{ $tukang->completed_orders_count }} Order)</span>
                                 </p>
                             </div>
                             <div>
@@ -114,23 +119,7 @@
                     
                     <div class="space-y-8">
                         @forelse($tukang->reviews ?? [] as $review)
-                            <div class="border-b border-gray-50 pb-8 last:border-0">
-                                <div class="flex justify-between mb-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-[10px] font-bold text-gray-400 uppercase">
-                                            {{ substr($review->user_name, 0, 2) }}
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-bold text-gray-800">{{ $review->user_name }}</p>
-                                            <p class="text-[10px] text-gray-400">{{ $review->created_at->diffForHumans() }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-yellow-400 text-[10px]">
-                                        @for($i=0; $i<$review->rating; $i++) <i class="fas fa-star"></i> @endfor
-                                    </div>
-                                </div>
-                                <p class="text-xs text-gray-500 leading-relaxed italic">"{{ $review->comment }}"</p>
-                            </div>
+                            <x-review-card :review="$review" />
                         @empty
                             <div class="text-center py-10">
                                 <i class="fas fa-comment-slash text-gray-200 text-4xl mb-4 block"></i>
@@ -225,43 +214,14 @@
                                 </button>
                                 
                                 <a href="{{ route('chats.show', $tukang->id) }}" 
-                                class="border border-gray-200 hover:bg-orange-50 hover:border-orange-200 text-gray-600 hover:text-orange-500 p-4 rounded-2xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
+                                   class="border border-gray-200 hover:bg-orange-50 hover:border-orange-200 text-gray-600 hover:text-orange-500 p-4 rounded-2xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
                                     <i class="far fa-comment-dots"></i> Tanya Dulu
                                 </a>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm mb-6">
-    <h4 class="text-sm font-black text-[#0f2d50] uppercase tracking-wider mb-4 flex items-center gap-2">
-        <i class="fas fa-clock text-orange-500"></i> Jadwal Kerja Aktif
-    </h4>
-
-    @php
-        // Urutkan jadwal secara kalender (Senin -> Minggu) dan filter hanya yang AKTIF
-        $dayOrder = ['Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4, 'Jumat' => 5, 'Sabtu' => 6, 'Minggu' => 7];
-        $activeSchedules = $tukang->schedules->where('is_active', true)->sortBy(function($sch) use ($dayOrder) {
-            return $dayOrder[$sch->day] ?? 8;
-        });
-    @endphp
-
-    <div class="space-y-3">
-        @forelse($activeSchedules as $schedule)
-            <div class="flex justify-between items-center py-2.5 px-4 bg-gray-50/50 rounded-2xl border border-gray-100">
-                <span class="text-xs font-bold text-gray-750">{{ $schedule->day }}</span>
-                <span class="text-xs font-extrabold text-blue-600 bg-blue-50 px-3 py-1 rounded-lg">
-                    {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - 
-                    {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}
-                </span>
-            </div>
-        @empty
-            <div class="text-center py-6">
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Sedang Istirahat Panjang</p>
-                <p class="text-[9px] text-gray-450 mt-1 leading-relaxed">Mitra saat ini sedang tidak mengambil jadwal operasional aktif.</p>
-            </div>
-        @endforelse
-    </div>
-</div>
+                    <x-tukang-schedule-widget :schedules="$tukang->schedules" />
 
                 </div>
             </div>
@@ -269,3 +229,7 @@
         </div>
     </div>
 </x-app-layout>
+
+<style>
+    [x-cloak] { display: none !important; }
+</style>

@@ -11,7 +11,7 @@ use Carbon\Carbon;
 
 class TukangController extends Controller
 {
-    // 1. HALAMAN DAFTAR TUKANG UMUM (DENGAN TOGGLE OFFLINE & ANTI-CRASH VERCEL)
+    // 1. HALAMAN DAFTAR TUKANG UMUM (MITRA OFFLINE TETAP TAMPIL DI CARD)
     public function index(Request $request)
     {       
         $query = User::where('role', 'tukang');
@@ -23,27 +23,19 @@ class TukangController extends Controller
             5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
         ];
         $todayIndo = $daysMap[$todayNumber];
-        $currentTime = Carbon::now('Asia/Jakarta')->format('H:i:s');
 
-        // ⚡ OPTIMASI N+1: Ambil jadwal hari ini saja untuk kalkulasi visual status di Blade
+        // ⚡ OPTIMASI N+1: Tetap ambil jadwal hari ini saja untuk kalkulasi visual status di dalam Blade
         $query->with(['schedules' => function($q) use ($todayIndo) {
             $q->where('day', $todayIndo);
         }]);
 
-        // ⚡ KONTROL JADWAL OPERASIONAL (DEFAULT: HANYA YANG AKTIF)
-        $showInactive = $request->boolean('show_inactive');
+        // =====================================================================
+        // ⚡ LOGIKA PEMANGKASAN DATA DIHAPUS (SEKARANG ALL MITRA TETAP TAMPIL)
+        // Kueri ketat `whereHas('schedules')` dilepas agar teknisi yang sedang 
+        // istirahat atau di luar jam kerja tidak dibuang dari hasil database.
+        // =====================================================================
 
-        if (!$showInactive) {
-            $query->where('is_available', true)
-                  ->whereHas('schedules', function($q) use ($todayIndo, $currentTime) {
-                      $q->where('day', $todayIndo)
-                        ->where('is_active', true)
-                        ->whereTime('start_time', '<=', $currentTime)
-                        ->whereTime('end_time', '>=', $currentTime);
-                  });
-        }
-
-        // ⚡ FILTER LOKASI PROVINSI & KOTA (Menggunakan ilike agar aman dari sensitivitas huruf di Supabase)
+        // ⚡ FILTER LOKASI PROVINSI & KOTA (Menggunakan ilike agar aman di Supabase)
         if ($request->filled('province')) {
             $query->where('province', 'ilike', $request->province);
         }
@@ -60,7 +52,7 @@ class TukangController extends Controller
             $query->where('category', 'ilike', $request->category);
         }
 
-        // ⚡ FITUR SEARCH BAWAAN (Menggunakan ilike agar 'wawan' tetap mendeteksi 'Wawan')
+        // ⚡ FITUR SEARCH BAWAAN (Menggunakan ilike)
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
                 $q->where('name', 'ilike', '%' . $request->search . '%')
@@ -70,7 +62,7 @@ class TukangController extends Controller
 
         $tukangs = $query->paginate(6)->withQueryString();
 
-        // ⚡ PROSES DATA LOKASI MASTER SECARA AMAN (Array PHP Murni untuk Komponen)
+        // Data lokasi master untuk komponen Dropdown Wilayah
         $provinces = Province::orderBy('name', 'asc')->pluck('name');
         
         $citiesMap = [];
@@ -82,7 +74,7 @@ class TukangController extends Controller
         return view('tukang.index', compact('tukangs', 'provinces', 'citiesMap'));
     }
 
-    // 2. HALAMAN PILIH TUKANG SETELAH PILIH LAYANAN (DENGAN TOGGLE OFFLINE & ANTI-CRASH VERCEL)
+    // 2. HALAMAN PILIH TUKANG SETELAH PILIH LAYANAN (MITRA OFFLINE TETAP TAMPIL DI CARD)
     public function pilihTukang(Request $request, $slug)
     {
         $service = Service::where('slug', $slug)->firstOrFail();
@@ -94,29 +86,19 @@ class TukangController extends Controller
             5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
         ];
         $todayIndo = $daysMap[$todayNumber];
-        $currentTime = Carbon::now('Asia/Jakarta')->format('H:i:s');
 
-        // ⚡ FILTER KATEGORI SENSITIF (Menggunakan ilike agar 'Interior' cocok dengan 'interior')
+        // Filter Kategori Bawaan Layanan
         $query = User::where('role', 'tukang')
                        ->where('category', 'ilike', $service->category);
 
-        // ⚡ OPTIMASI N+1: Ambil jadwal hari ini saja untuk kalkulasi status di Blade
+        // ⚡ OPTIMASI N+1: Ambil jadwal hari ini saja untuk kalkulasi status di dalam Blade
         $query->with(['schedules' => function($q) use ($todayIndo) {
             $q->where('day', $todayIndo);
         }]);
 
-        // ⚡ KONTROL JADWAL OPERASIONAL (DEFAULT: HANYA YANG AKTIF)
-        $showInactive = $request->boolean('show_inactive');
-
-        if (!$showInactive) {
-            $query->where('is_available', true)
-                  ->whereHas('schedules', function($q) use ($todayIndo, $currentTime) {
-                      $q->where('day', $todayIndo)
-                        ->where('is_active', true)
-                        ->whereTime('start_time', '<=', $currentTime)
-                        ->whereTime('end_time', '>=', $currentTime);
-                  });
-        }
+        // =====================================================================
+        // ⚡ LOGIKA PEMANGKASAN DATA DIHAPUS (SEKARANG ALL MITRA TETAP TAMPIL)
+        // =====================================================================
 
         // ⚡ FILTER LOKASI PROVINSI & KOTA (Menggunakan ilike)
         if ($request->filled('province')) {
@@ -132,7 +114,7 @@ class TukangController extends Controller
                          ->paginate(6)
                          ->withQueryString();
 
-        // ⚡ PROSES DATA LOKASI MASTER SECARA AMAN (Array PHP Murni untuk Komponen)
+        // Data lokasi master untuk komponen Dropdown Wilayah
         $provinces = Province::orderBy('name', 'asc')->pluck('name');
 
         $citiesMap = [];
@@ -173,7 +155,7 @@ class TukangController extends Controller
         return view('tukang.show', compact('tukang', 'service', 'availableServices'));
     }
 
-    // 4. API KOTA (Tetap dipertahankan untuk kebutuhan eksternal jika ada)
+    // 4. API KOTA
     public function getCitiesApi(Request $request)
     {
         $provinceName = $request->query('province');

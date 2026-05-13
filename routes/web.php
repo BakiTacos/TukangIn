@@ -109,6 +109,9 @@ Route::middleware('auth')->group(function () {
 
     Route::put('/dashboard/update-location', [DashboardController::class, 'updateLocation'])
          ->name('tukang.profile.update-location');
+    
+    Route::post('/tukang/{id}/favorite', [App\Http\Controllers\TukangController::class, 'toggleFavorite'])
+         ->name('tukang.favorite');
 });
 
 

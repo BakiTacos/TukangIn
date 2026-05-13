@@ -19,7 +19,7 @@
                            {{ request('show_inactive') ? 'checked' : '' }}
                            class="rounded-lg text-orange-500 focus:ring-orange-500 border-white/20 bg-white/5 w-4 h-4 cursor-pointer">
                     <label for="show_inactive_toggle" class="text-xs font-bold text-gray-200 cursor-pointer select-none">
-                        Tampilkan Mitra yang Sedang Istirahat / Di Luar Jam Kerja
+                        Tampilkan Semua Mitra (Termasuk yang Di Luar Jam Kerja)
                     </label>
                 </div>
 
@@ -73,20 +73,6 @@
                             </div>
                         </form>
                     </div>
-
-                    <div class="bg-[#0f2d50] p-6 rounded-[2rem] text-white relative overflow-hidden shadow-xl">
-                        <div class="absolute -right-4 -top-4 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl"></div>
-                        <span class="inline-block bg-orange-500 text-[9px] font-bold px-3 py-1 rounded-full uppercase mb-4 tracking-wider">Top Partner</span>
-                        <div class="flex items-center gap-4 mb-4">
-                            <img src="https://i.pravatar.cc/150?u=kevin" class="w-12 h-12 rounded-xl border-2 border-white/20 object-cover">
-                            <div>
-                                <h4 class="font-bold text-sm">Kevin Setiawan</h4>
-                                <p class="text-[10px] text-orange-400 font-bold">★ 5.0 (Smart Home)</p>
-                            </div>
-                        </div>
-                        <p class="text-[10px] text-gray-400 mb-4 leading-relaxed">Spesialis instalasi teknologi pintar untuk rumah modern di Tangerang.</p>
-                        <button class="w-full bg-orange-500 hover:bg-orange-600 py-3 rounded-xl font-bold text-[10px] transition shadow-lg shadow-orange-500/20 uppercase tracking-wider">Lihat Portofolio</button>
-                    </div>
                 </aside>
 
                 <main class="w-full lg:w-3/4">
@@ -104,15 +90,17 @@
                                 $todaySchedule = $tukang->schedules->first();
                                 $currentTime = \Carbon\Carbon::now('Asia/Jakarta')->format('H:i:s');
                                 
+                                // Apakah masuk dalam jam kerja kalender hari ini?
                                 $isOperating = $todaySchedule && 
                                                $todaySchedule->is_active && 
                                                $todaySchedule->start_time <= $currentTime && 
                                                $todaySchedule->end_time >= $currentTime;
                                 
+                                // Teknisi benar-benar aktif jika tombol menyala DAN jam operasional cocok
                                 $isAvailable = $tukang->is_available && $isOperating;
                             @endphp
 
-                            <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 {{ !$isAvailable ? 'opacity-65 grayscale-[30%] bg-gray-50/30' : '' }}">
+                            <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 {{ !$isAvailable ? 'opacity-75 bg-gray-50/60' : '' }}">
                                 <div class="flex items-start justify-between">
                                     <div class="flex items-center space-x-4">
                                         <img src="https://ui-avatars.com/api/?name={{ urlencode($tukang->name) }}&background=0f2d50&color=fff" 
@@ -148,27 +136,44 @@
                                     @if($isAvailable)
                                         <div>
                                             <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Status Mitra</p>
-                                            <div class="flex items-center gap-1">
+                                            <div class="flex items-center gap-1 mt-0.5">
                                                 <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                                                <p class="text-xs font-bold text-gray-700">Tersedia Sekarang</p>
+                                                <p class="text-xs font-bold text-green-600">Tersedia Sekarang</p>
                                             </div>
                                         </div>
                                         <a href="{{ route('tukang.show', $tukang->id) }}" 
                                            class="bg-[#0f2d50] text-white px-6 py-2.5 rounded-2xl font-bold text-xs hover:bg-orange-500 transition shadow-lg shadow-blue-100 whitespace-nowrap">
                                                 Lihat Profil
                                         </a>
+                                    @elseif($tukang->is_available && !$isOperating)
+                                        <div>
+                                            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Status Mitra</p>
+                                            <div class="flex items-center gap-1 mt-0.5">
+                                                <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
+                                                <p class="text-xs font-bold text-amber-600">Di Luar Jam Kerja</p>
+                                            </div>
+                                            @if($todaySchedule)
+                                                <p class="text-[9px] text-gray-400 font-bold mt-0.5">
+                                                    Jadwal: {{ \Carbon\Carbon::parse($todaySchedule->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($todaySchedule->end_time)->format('H:i') }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                        <a href="{{ route('tukang.show', $tukang->id) }}" 
+                                           class="bg-gray-150 border border-gray-200 text-gray-500 px-6 py-2.5 rounded-2xl font-bold text-xs hover:bg-gray-200 transition whitespace-nowrap">
+                                                Lihat Jadwal
+                                        </a>
                                     @else
                                         <div>
                                             <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Status Mitra</p>
-                                            <div class="flex items-center gap-1">
+                                            <div class="flex items-center gap-1 mt-0.5">
                                                 <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-                                                <p class="text-xs font-bold text-red-500">Sedang Istirahat / Tutup</p>
+                                                <p class="text-xs font-bold text-red-500">Sedang Istirahat</p>
                                             </div>
                                         </div>
-                                        <button disabled 
-                                                class="bg-gray-150 text-gray-400 px-6 py-2.5 rounded-2xl font-bold text-xs cursor-not-allowed whitespace-nowrap">
-                                                Tidak Tersedia
-                                        </button>
+                                        <a href="{{ route('tukang.show', $tukang->id) }}" 
+                                           class="bg-gray-150 border border-gray-200 text-gray-500 px-6 py-2.5 rounded-2xl font-bold text-xs hover:bg-gray-200 transition whitespace-nowrap">
+                                                Lihat Profil
+                                        </a>
                                     @endif
                                 </div>
                             </div>
