@@ -112,6 +112,9 @@ Route::middleware('auth')->group(function () {
     
     Route::post('/tukang/{id}/favorite', [App\Http\Controllers\TukangController::class, 'toggleFavorite'])
          ->name('tukang.favorite');
+
+    Route::get('/favorites', [App\Http\Controllers\TukangController::class, 'favorites'])
+         ->name('tukang.favorites');
 });
 
 

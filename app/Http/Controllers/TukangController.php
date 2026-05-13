@@ -151,8 +151,13 @@ class TukangController extends Controller
                         ->where('category', $tukang->category)
                         ->first();
         }
+
+        // Jika user sudah login, cek apakah relasi favoritnya ada di tabel pivot
+    $isFavorited = auth()->check() 
+        ? \DB::table('tukang_favorites')->where('user_id', auth()->id())->where('tukang_id', $id)->exists() 
+        : false;
         
-        return view('tukang.show', compact('tukang', 'service', 'availableServices'));
+        return view('tukang.show', compact('tukang', 'service', 'availableServices','isFavorited'));
     }
 
     // 4. API KOTA
@@ -173,4 +178,41 @@ class TukangController extends Controller
 
         return response()->json($cities);
     }
+
+    // 📂 app/Http/Controllers/TukangController.php
+
+public function toggleFavorite($id)
+{
+    $user = auth()->user();
+    
+    // Pastikan teknisi yang difavoritkan benar-benar ada
+    $tukang = User::where('role', 'tukang')->findOrFail($id);
+
+    // Contoh menggunakan DB structural check (jika lo pakai tabel pivot 'tukang_favorites')
+    // Kolom: user_id (pelanggan), tukang_id (teknisi)
+    $favoriteCheck = \DB::table('tukang_favorites')
+        ->where('user_id', $user->id)
+        ->where('tukang_id', $tukang->id)
+        ->first();
+
+    if ($favoriteCheck) {
+        // Jika sudah ada, hapus (Unfavorite)
+        \DB::table('tukang_favorites')
+            ->where('user_id', $user->id)
+            ->where('tukang_id', $tukang->id)
+            ->delete();
+            
+        return response()->json(['success' => true, 'status' => 'removed']);
+    } else {
+        // Jika belum ada, masukkan data baru (Favorite)
+        \DB::table('tukang_favorites')->insert([
+            'user_id' => $user->id,
+            'tukang_id' => $tukang->id,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+        
+        return response()->json(['success' => true, 'status' => 'added']);
+    }
+}
 }

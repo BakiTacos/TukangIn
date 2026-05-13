@@ -63,14 +63,90 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-center md:justify-start gap-6 mt-8">
-                            <button class="text-xs font-bold text-gray-400 hover:text-[#0f2d50] transition flex items-center gap-2">
-                                <i class="fas fa-share-alt"></i> Bagikan
-                            </button>
-                            <button class="text-xs font-bold text-gray-400 hover:text-red-500 transition flex items-center gap-2">
-                                <i class="far fa-heart"></i> Simpan
-                            </button>
-                        </div>
+                        <div class="flex justify-center md:justify-start gap-6 mt-8"
+     x-data="{
+        isFavorited: {{ $isFavorited ? 'true' : 'false' }},
+        isLoggedIn: {{ auth()->check() ? 'true' : 'false' }},
+        toastMessage: '',
+        showToast: false,
+
+        triggerToast(msg) {
+            this.toastMessage = msg;
+            this.showToast = true;
+            setTimeout(() => { this.showToast = false; }, 3000);
+        },
+
+        // 1. FITUR BERBAGI SMART (NATIVE MOBILE SHARE + CLIPBOARD FALLBACK)
+        async shareProfile() {
+            let shareData = {
+                title: 'Profil {{ $tukang->name }} - TUKANG.IN',
+                text: 'Cek profil {{ $tukang->name }}, teknisi spesialis {{ $tukang->category }} terbaik di TUKANG.IN!',
+                url: window.location.href
+            };
+
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    console.log('Batal berbagi:', err);
+                }
+            } else {
+                // Fallback: Salin Link Otomatis ke Clipboard jika di Browser Desktop
+                navigator.clipboard.writeText(window.location.href);
+                this.triggerToast('🔗 Link profil berhasil disalin ke clipboard!');
+            }
+        },
+
+        // 2. FITUR TOGGLE FAVORIT ASINKRONUS
+        async toggleFavorite() {
+            if (!this.isLoggedIn) {
+                this.triggerToast('🔒 Silakan login terlebih dahulu untuk menyimpan favorit!');
+                return;
+            }
+            try {
+                let response = await fetch('{{ route('tukang.favorite', $tukang->id) }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSR-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+                let data = await response.json();
+                if (data.success) {
+                    this.isFavorited = (data.status === 'added');
+                    this.triggerToast(this.isFavorited ? '❤️ Berhasil ditambahkan ke daftar favorit!' : '💔 Dihapus dari daftar favorit.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+     }">
+
+    <button @click="shareProfile()" 
+            class="text-xs font-bold text-gray-500 hover:text-[#0f2d50] transition flex items-center gap-2 bg-gray-50 hover:bg-gray-100 py-2.5 px-4 rounded-xl border border-gray-100">
+        <i class="fas fa-share-alt text-blue-500"></i> Bagikan Profil
+    </button>
+
+    <button @click="toggleFavorite()" 
+            class="text-xs font-bold transition flex items-center gap-2 py-2.5 px-4 rounded-xl border"
+            :class="isFavorited ? 'bg-red-50 border-red-150 text-red-500' : 'bg-gray-50 border-gray-100 text-gray-500 hover:text-red-500'">
+        <i :class="isFavorited ? 'fas fa-heart' : 'far fa-heart'"></i> 
+        <span x-text="isFavorited ? 'Tersimpan' : 'Simpan Ahli'"></span>
+    </button>
+
+    <div x-show="showToast" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-4"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-4"
+         class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs font-bold px-5 py-3 rounded-2xl shadow-xl z-50 flex items-center gap-2"
+         x-cloak>
+        <i class="fas fa-info-circle text-orange-400"></i>
+        <span x-text="toastMessage"></span>
+    </div>
+</div>
                     </div>
                 </div>
 

@@ -123,6 +123,46 @@
                                     </div>
                                 </div>
                             </div>
+                            @php
+        $favCheck = auth()->check() ? \DB::table('tukang_favorites')->where('user_id', auth()->id())->where('tukang_id', $tukang->id)->exists() : false;
+    @endphp
+
+    <div x-data="{ 
+            fav: {{ $favCheck ? 'true' : 'false' }},
+            isLoggedIn: {{ auth()->check() ? 'true' : 'false' }},
+            loading: false
+         }" 
+         class="relative z-20">
+        <button type="button" 
+                @click="
+                    if(!isLoggedIn) { alert('Silakan login terlebih dahulu untuk menyimpan favorit!'); return; }
+                    if(loading) return;
+                    loading = true;
+                    
+                    fetch('{{ route('tukang.favorite', $tukang->id) }}', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json', 
+                            'X-CSR-TOKEN': '{{ csrf_token() }}' 
+                        },
+                        body: JSON.stringify({}) // ⚡ AMAN VERCEL: Wajib menyertakan objek body kosong
+                    })
+                    .then(res => {
+                        if(!res.ok) throw new Error('HTTP Error');
+                        return res.json();
+                    })
+                    .then(data => { 
+                        if(data.success) { fav = (data.status === 'added'); } 
+                    })
+                    .catch(err => console.error('Gagal:', err))
+                    .finally(() => loading = false);
+                "
+                class="transition-all duration-200 p-2 rounded-xl transform active:scale-95"
+                :class="fav ? 'text-red-500 bg-red-50' : 'text-gray-200 hover:text-red-500 hover:bg-gray-50'"
+                :disabled="loading">
+            <i class="fas fa-heart text-sm transition-transform duration-200" :class="fav ? 'scale-110' : ''"></i>
+        </button>
+    </div>
 
                             <div class="mt-4">
                                 <p class="text-xs text-gray-500 italic">"{{ $tukang->specialty }}"</p>
