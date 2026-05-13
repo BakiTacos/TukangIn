@@ -11,21 +11,30 @@ class CheckIfBlocked
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // ⚡ CEK APAKAH USER AUTHENTICATED & STATUSNYA TERBLOKIR DI SUPABASE
         if (Auth::check() && Auth::user()->is_blocked) {
             
-            // Ambil alasan penangguhan dari database
             $reason = Auth::user()->blocked_reason ?? 'Melanggar ketentuan standard komunitas platform TUKANG.IN.';
             
-            // Eksekusi Kick / Auto-Logout Paksa
+            // 1. Eksekusi Pencabutan Hak Sesi Akun
             Auth::logout();
-            
-            // Hancurkan Sesi Komputer & Regenerate Token CSRF biar gak disalahgunakan
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            // Alihkan setir ke halaman login bawa pesan flash data sengketa akun
-            return redirect()->route('login')->with('account_blocked', $reason);
+            // 2. AMANKAN KONDISI AJAX / LIVEWIRE REQUEST (Biar gak bocor masuk ke komponen aktif)
+            if ($request->ajax() || $request->wantsJson() || $request->hasHeader('X-Livewire')) {
+                return response()->json(['redirect' => route('login')], 401)
+                    ->header('X-Livewire-Redirect', route('login'))
+                    ->header('X-Redirect', route('login'));
+            }
+
+            // 3. AMANKAN GET REQUEST (Paksa matikan cache browser agar tidak mengedipkan halaman admin)
+            $response = redirect()->route('login')->with('account_blocked', $reason);
+            
+            $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', '0');
+
+            return $response;
         }
 
         return $next($request);
