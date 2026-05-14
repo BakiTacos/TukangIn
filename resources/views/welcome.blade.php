@@ -65,46 +65,55 @@
         </section>
 
         <section class="py-16 container mx-auto px-6">
-            <div class="flex justify-between items-end mb-10">
-                <div>
-                    <h2 class="text-2xl font-black text-[#0f2d50]">Top Rated Partners</h2>
-                    <p class="text-xs text-gray-400 font-semibold mt-1">Tukang pilihan dengan rating tertinggi di kota Anda</p>
-                </div>
-                <a href="/tukang" class="text-orange-500 font-bold text-xs uppercase tracking-wider hover:underline">
-                    View All Partners
-                </a>
-            </div>
+    <div class="flex justify-between items-end mb-10">
+        <div>
+            <h2 class="text-2xl font-black text-[#0f2d50]">Top Rated Partners</h2>
+            <p class="text-xs text-gray-400 font-semibold mt-1">Tukang pilihan dengan rating tertinggi di kota Anda</p>
+        </div>
+        <a href="/tukang" class="text-orange-500 font-bold text-xs uppercase tracking-wider hover:underline">
+            View All Partners
+        </a>
+    </div>
 
-            <div class="grid md:grid-cols-3 gap-6">
-                @forelse($tukangs as $t)
-                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center space-x-5 hover:shadow-md transition duration-200">
-                        <img src="{{ $t->avatar ? asset('storage/' . $t->avatar) : 'https://i.pravatar.cc/150?u=' . $t->id }}" 
-                             class="w-16 h-16 rounded-2xl object-cover border border-gray-100">
-                        
-                        <div class="flex-1">
-                            <div class="flex justify-between items-start">
-                                <h4 class="font-black text-[#0f2d50] text-sm leading-none">{{ $t->name }}</h4>
-                                <span class="text-xs font-black text-yellow-500 flex items-center gap-1 shrink-0">
-                                    <i class="fas fa-star text-[10px]"></i> {{ number_format($t->rating, 1) }}
-                                </span>
-                            </div>
-                            <p class="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-wider">
-                                {{ $t->specialty ?? 'Teknisi Terverifikasi' }}
-                            </p>
-                            <div class="flex space-x-2 mt-2">
-                                <span class="text-[8px] bg-blue-50 text-blue-600 px-2 py-1 rounded-lg font-bold uppercase tracking-wider">
-                                    Verified Partner
-                                </span>
-                            </div>
+    <div class="grid md:grid-cols-3 gap-6">
+        @forelse($tukangs as $t)
+            {{-- ⚡ Link Aktif ke Profil Tukang --}}
+            <a href="{{ route('tukang.show', $t->id) }}" class="group block">
+                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center space-x-5 group-hover:shadow-xl group-hover:border-orange-500 transition duration-300 transform group-hover:-translate-y-1">
+                    
+                    {{-- 👤 Pengganti Gambar: Inisial Avatar --}}
+                    <div class="w-16 h-16 rounded-2xl bg-[#0f2d50] text-white flex items-center justify-center font-black text-xl shadow-inner shrink-0 group-hover:bg-orange-500 transition-colors">
+                        {{ substr($t->name, 0, 1) }}
+                    </div>
+                    
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-black text-[#0f2d50] text-sm leading-none group-hover:text-orange-600 transition-colors">{{ $t->name }}</h4>
+                            <span class="text-xs font-black text-yellow-500 flex items-center gap-1 shrink-0">
+                                <i class="fas fa-star text-[10px]"></i> {{ number_format($t->rating, 1) }}
+                            </span>
+                        </div>
+                        <p class="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-wider">
+                            {{ $t->category ?? 'Spesialis' }} • {{ $t->city ?? 'Indonesia' }}
+                        </p>
+                        <div class="flex space-x-2 mt-2">
+                            <span class="text-[8px] bg-blue-50 text-blue-600 px-2 py-1 rounded-lg font-bold uppercase tracking-wider">
+                                Verified Partner
+                            </span>
                         </div>
                     </div>
-                @empty
-                    <div class="col-span-3 text-center py-20 bg-white rounded-[2.5rem] border-2 border-dashed border-gray-100">
-                        <p class="text-xs text-gray-450 font-bold">Belum ada mitra teknisi yang tersedia.</p>
-                    </div>
-                @endforelse
+                </div>
+            </a>
+        @empty
+            <div class="col-span-3 text-center py-20 bg-white rounded-[2.5rem] border-2 border-dashed border-gray-100">
+                <div class="w-16 h-16 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-slash text-xl"></i>
+                </div>
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Belum ada mitra teknisi tersedia</p>
             </div>
-        </section>
+        @endforelse
+    </div>
+</section>
 
     </div>
 </x-app-layout>
