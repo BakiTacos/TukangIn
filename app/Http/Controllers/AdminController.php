@@ -32,23 +32,35 @@ class AdminController extends Controller
 
     // 🛡️ MENU 2: HALAMAN KHUSUS MANAJEMEN AKUN
     public function manageUsers(Request $request)
-    {
-        // ⚡ GATING INLINE
-        if (auth()->user()->role !== 'admin') { 
-            abort(403, 'Akses HQ Terkunci.'); 
-        }
-
-        $searchUser = $request->query('search_user');
-        $userQuery = User::where('id', '!=', auth()->id());
-
-        if ($searchUser) {
-            $userQuery->where('name', 'ilike', '%' . $searchUser . '%');
-        }
-
-        $users = $userQuery->latest()->paginate(10)->withQueryString();
-        return view('admin.users', compact('users'));
+{
+    // Gating Keamanan Hak Akses HQ Admin
+    if (auth()->user()->role !== 'admin') { 
+        abort(403, 'Akses HQ Terkunci.'); 
     }
 
+    // ⚡ AMBIL PARAMETER FILTER STATUS DAN PENCARIAN
+    $searchUser = $request->query('search_user');
+    $statusFilter = $request->query('status', 'semua');
+
+    $userQuery = User::where('id', '!=', auth()->id()); // Proteksi: Jangan tampilkan diri sendiri
+
+    // ⚡ EKSEKUSI FILTERING STATUS MODERASI BLOKIR
+    if ($statusFilter === 'terblokir') {
+        $userQuery->where('is_blocked', true);
+    } elseif ($statusFilter === 'aktif') {
+        $userQuery->where('is_blocked', false);
+    }
+
+    // Eksekusi Kondisi Pencarian Nama
+    if ($searchUser) {
+        $userQuery->where('name', 'ilike', '%' . $searchUser . '%');
+    }
+
+    // Ambil data dengan pagination 10 item per halaman
+    $users = $userQuery->latest()->paginate(10)->withQueryString();
+    
+    return view('admin.users', compact('users', 'statusFilter'));
+}
     // 📋 MENU 3: HALAMAN KHUSUS LOG TRANSAKSI & SENGKETA
     // 📂 app/Http/Controllers/AdminController.php
 

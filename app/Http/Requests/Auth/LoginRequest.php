@@ -42,11 +42,27 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        // 1. Cek apakah email dan password cocok
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => __('auth.failed'),
+            ]);
+        }
+
+        // =========================================================================
+        // ⚡ GERBANG UTAMA: CEK BLOKIR LANGSUNG DI SINI (ANTI BOCOR DATA ADMIN)
+        // =========================================================================
+        if (Auth::user()->is_blocked) {
+            $reason = Auth::user()->blocked_reason ?? 'Melanggar ketentuan komunitas.';
+            
+            // Hancurkan autentikasi secara instan sebelum token redirect terbentuk
+            Auth::logout();
+
+            // Lempar kembali sebagai error validasi merah di halaman login tanpa pindah halaman
+            throw ValidationException::withMessages([
+                'email' => 'Akses ditangguhkan: ' . $reason,
             ]);
         }
 

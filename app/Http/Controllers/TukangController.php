@@ -14,7 +14,7 @@ class TukangController extends Controller
     // 1. HALAMAN DAFTAR TUKANG UMUM (MITRA OFFLINE TETAP TAMPIL DI CARD)
     public function index(Request $request)
     {       
-        $query = User::where('role', 'tukang');
+        $query = User::where('role', 'tukang')->where('is_blocked', false);
 
         // Deteksi hari ini dinamis (Jakarta)
         $todayNumber = Carbon::now('Asia/Jakarta')->dayOfWeekIso;
@@ -89,7 +89,8 @@ class TukangController extends Controller
 
         // Filter Kategori Bawaan Layanan
         $query = User::where('role', 'tukang')
-                       ->where('category', 'ilike', $service->category);
+                       ->where('category', 'ilike', $service->category)
+                       ->where('is_blocked', false);
 
         // ⚡ OPTIMASI N+1: Ambil jadwal hari ini saja untuk kalkulasi status di dalam Blade
         $query->with(['schedules' => function($q) use ($todayIndo) {

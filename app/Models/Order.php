@@ -34,6 +34,7 @@ class Order extends Model
 
     'sub_status',
     'admin_note',
+    'complaint_image',
 ];
 
     protected $casts = [

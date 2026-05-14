@@ -3,8 +3,8 @@
         
         <div class="bg-[#0f2d50] pb-32 pt-12">
             <div class="container mx-auto px-6 text-white">
-                <span class="bg-orange-500 text-white text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest">HQ Pusat Visualisasi</span>
-                <h1 class="text-4xl font-black mt-3">Metrik Kontrol Real-Time</h1>
+                <span class="bg-orange-500 text-white text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest">Dashboard</span>
+                <h1 class="text-4xl font-black mt-3">Metrik Kontrol</h1>
                 <p class="text-xs text-gray-300 mt-1">Ringkasan pertumbuhan pendapatan platform dan konversi aktivitas jaringan kerja TUKANG.IN.</p>
             </div>
         </div>
