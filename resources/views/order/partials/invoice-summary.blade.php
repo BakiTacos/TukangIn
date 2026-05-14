@@ -155,6 +155,34 @@
                     <button class="w-full bg-purple-100 text-purple-600 py-4 rounded-2xl font-bold cursor-default block text-center uppercase tracking-widest text-xs" disabled>
                         <i class="fas fa-clock mr-1 animate-pulse"></i> Komplain Ditinjau
                     </button>
+
+                    <div class="mt-6 p-6 bg-purple-50 rounded-3xl border border-purple-100 space-y-4">
+    <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-purple-600 text-white rounded-xl flex items-center justify-center text-xs shadow-sm">
+            <i class="fas fa-gavel"></i>
+        </div>
+        <div>
+            <h5 class="text-xs font-black text-[#0f2d50] uppercase tracking-wide">Berkas Laporan Sengketa Anda</h5>
+            <p class="text-[10px] text-gray-400">Sedang dalam proses peninjauan objektivitas oleh Admin HQ TUKANG.IN</p>
+        </div>
+    </div>
+
+    <div class="text-xs space-y-1">
+        <p class="text-gray-500"><strong>Alasan Klaim:</strong> "{{ $order->cancel_reason }}"</p>
+        <p class="text-gray-400 italic">"{{ $order->cancel_description }}"</p>
+    </div>
+
+    @if($order->complaint_image)
+        <div class="pt-2 border-t border-purple-200/60">
+            <p class="text-[9px] font-black text-purple-600 uppercase tracking-widest mb-2">Foto Bukti Terlampir:</p>
+            <a href="{{ Storage::disk('supabase_complain')->url($order->complaint_image) }}" target="_blank" class="inline-block relative overflow-hidden rounded-xl border border-purple-200 bg-white p-1.5 shadow-sm hover:shadow-md transition">
+                <img src="{{ Storage::disk('supabase_complain')->url($order->complaint_image) }}" 
+                     alt="Bukti Unggahan Konsumen" 
+                     class="w-32 h-24 object-cover rounded-lg">
+            </a>
+        </div>
+    @endif
+</div>
                     
                 @elseif($order->status === 'batal')
                     <button class="w-full bg-red-100 text-red-500 py-4 rounded-2xl font-bold cursor-not-allowed block text-center uppercase tracking-widest text-xs" disabled>
