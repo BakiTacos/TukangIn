@@ -76,7 +76,8 @@
                         Selesaikan Pekerjaan <i class="fas fa-check-double ml-1"></i>
                     </button>
                     <button type="button" 
-                            @click="cancelAction = '{{ route('tukang.orders.cancel', $order->id) }}'; showCancelModal = true"
+                            data-action="{{ route('tukang.orders.cancel', $order->id) }}"
+                            @click="cancelAction = $el.getAttribute('data-action'); showCancelModal = true"
                             class="w-full bg-white border-2 border-red-150 hover:bg-red-50 text-red-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition text-xs uppercase tracking-wider">
                         <i class="fas fa-times-circle"></i> Batalkan Pekerjaan
                     </button>
@@ -104,7 +105,8 @@
                         Bayar Sekarang <i class="fas fa-arrow-right ml-1"></i>
                     </a>
                     <button type="button" 
-                            @click="cancelAction = '{{ route('orders.cancel', $order->id) }}'; showCancelModal = true"
+                            data-action="{{ route('orders.cancel', $order->id) }}"
+                            @click="cancelAction = $el.getAttribute('data-action'); showCancelModal = true"
                             class="w-full bg-white border-2 border-red-150 hover:bg-red-50 text-red-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition text-xs uppercase tracking-wider">
                         <i class="fas fa-times-circle"></i> Batalkan Pesanan
                     </button>
@@ -115,14 +117,17 @@
                     </button>
                     
                     @if($order->created_at->gt(now()->subHours(12)))
-                        <button type="button" @click="cancelAction = '{{ route('orders.cancel', $order->id) }}'; showCancelModal = true"
+                        <button type="button" 
+                                data-action="{{ route('orders.cancel', $order->id) }}"
+                                @click="cancelAction = $el.getAttribute('data-action'); showCancelModal = true"
                                 class="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl font-bold transition transform hover:-translate-y-1 block text-center uppercase tracking-widest text-xs mb-2">
                             <i class="fas fa-times-circle mr-1"></i> Batalkan Pesanan
                         </button>
                     @endif
                     
                     <button type="button" 
-                            @click="complaintAction = '{{ route('orders.complain', $order->id) }}'; showComplainModal = true"
+                            data-action="{{ route('orders.complain', $order->id) }}"
+                            @click="complaintAction = $el.getAttribute('data-action'); showComplainModal = true"
                             class="w-full bg-white border-2 border-red-150 hover:bg-red-50 text-red-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition text-xs uppercase tracking-wider">
                         <i class="fas fa-exclamation-triangle"></i> Ajukan Komplain Jasa
                     </button>
@@ -140,7 +145,8 @@
                         
                         @if($order->updated_at->gt(now()->subDays(7)))
                            <button type="button" 
-                                   @click="complaintAction = '{{ route('orders.complain', $order->id) }}'; showComplainModal = true"
+                                   data-action="{{ route('orders.complain', $order->id) }}"
+                                   @click="complaintAction = $el.getAttribute('data-action'); showComplainModal = true"
                                    class="w-full bg-white border-2 border-red-150 hover:bg-red-50 text-red-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition text-xs uppercase tracking-wider">
                                 <i class="fas fa-exclamation-triangle"></i> Ajukan Komplain Jasa
                             </button>
@@ -157,32 +163,43 @@
                     </button>
 
                     <div class="mt-6 p-6 bg-purple-50 rounded-3xl border border-purple-100 space-y-4">
-    <div class="flex items-center gap-3">
-        <div class="w-8 h-8 bg-purple-600 text-white rounded-xl flex items-center justify-center text-xs shadow-sm">
-            <i class="fas fa-gavel"></i>
-        </div>
-        <div>
-            <h5 class="text-xs font-black text-[#0f2d50] uppercase tracking-wide">Berkas Laporan Sengketa Anda</h5>
-            <p class="text-[10px] text-gray-400">Sedang dalam proses peninjauan objektivitas oleh Admin HQ TUKANG.IN</p>
-        </div>
-    </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-purple-600 text-white rounded-xl flex items-center justify-center text-xs shadow-sm">
+                                <i class="fas fa-gavel"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-black text-[#0f2d50] uppercase tracking-wide">Berkas Laporan Sengketa Anda</h5>
+                                <p class="text-[10px] text-gray-400">Sedang dalam proses peninjauan objektivitas oleh Admin HQ TUKANG.IN</p>
+                            </div>
+                        </div>
 
-    <div class="text-xs space-y-1">
-        <p class="text-gray-500"><strong>Alasan Klaim:</strong> "{{ $order->cancel_reason }}"</p>
-        <p class="text-gray-400 italic">"{{ $order->cancel_description }}"</p>
-    </div>
+                        <div class="text-xs space-y-1">
+                            <p class="text-gray-500"><strong>Alasan Klaim:</strong> "{{ $order->cancel_reason }}"</p>
+                            <p class="text-gray-400 italic">"{{ $order->cancel_description }}"</p>
+                        </div>
 
-    @if($order->complaint_image)
-        <div class="pt-2 border-t border-purple-200/60">
-            <p class="text-[9px] font-black text-purple-600 uppercase tracking-widest mb-2">Foto Bukti Terlampir:</p>
-            <a href="{{ Storage::disk('supabase_complain')->url($order->complaint_image) }}" target="_blank" class="inline-block relative overflow-hidden rounded-xl border border-purple-200 bg-white p-1.5 shadow-sm hover:shadow-md transition">
-                <img src="{{ Storage::disk('supabase_complain')->url($order->complaint_image) }}" 
-                     alt="Bukti Unggahan Konsumen" 
-                     class="w-32 h-24 object-cover rounded-lg">
-            </a>
-        </div>
-    @endif
-</div>
+                        @if($order->complaint_image)
+                            @php
+                                $supabaseEndpoint = getenv('SUPABASE_STORAGE_ENDPOINT') ?: ($_ENV['SUPABASE_STORAGE_ENDPOINT'] ?? '');
+                                $supabaseBucket = getenv('SUPABASE_STORAGE_BUCKET') ?: 'tukangin-complain';
+
+                                if (!empty($supabaseEndpoint)) {
+                                    $supabasePublicBase = str_replace('/storage/v1/s3', '/storage/v1/object/public/' . $supabaseBucket, $supabaseEndpoint);
+                                    $fullComplaintUrl = rtrim($supabasePublicBase, '/') . '/' . ltrim($order->complaint_image, '/');
+                                } else {
+                                    $fullComplaintUrl = asset('storage/' . $order->complaint_image);
+                                }
+                            @endphp
+                            <div class="pt-2 border-t border-purple-200/60">
+                                <p class="text-[9px] font-black text-purple-600 uppercase tracking-widest mb-2">Foto Bukti Terlampir:</p>
+                                <a href="{{ $fullComplaintUrl }}" target="_blank" class="inline-block relative overflow-hidden rounded-xl border border-purple-200 bg-white p-1.5 shadow-sm hover:shadow-md transition">
+                                    <img src="{{ $fullComplaintUrl }}" 
+                                         alt="Bukti Unggahan Konsumen" 
+                                         class="w-32 h-24 object-cover rounded-lg">
+                                </a>
+                            </div>
+                        @endif
+                    </div>
                     
                 @elseif($order->status === 'batal')
                     <button class="w-full bg-red-100 text-red-500 py-4 rounded-2xl font-bold cursor-not-allowed block text-center uppercase tracking-widest text-xs" disabled>
