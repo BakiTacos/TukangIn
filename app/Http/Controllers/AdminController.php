@@ -135,36 +135,38 @@ public function manageOrders(Request $request)
 
 // 📂 app/Http/Controllers/AdminController.php
 
+// 📂 app/Http/Controllers/AdminController.php
+
 public function resolveOrder(Request $request, $id)
 {
     if (auth()->user()->role !== 'admin') { abort(403); }
 
     $request->validate([
-        'status' => 'required|in:selesai,batal,dikomplain,proses',
+        'status' => 'required|in:selesai,batal,dikomplain,pengerjaan', // ⚡ Pastikan 'pengerjaan' masuk daftar whitelist
         'admin_note' => 'required|string|max:1000'
     ]);
 
     $order = Order::findOrFail($id);
     
-    // ⚡ BERSIH & AMAN: Simpan notes admin murni ke kolom admin_note tanpa menimpa keluhan user
     $updateData = [
         'status' => $request->status,
         'admin_note' => $request->admin_note
     ];
 
-    // Tentukan sub_status berdasarkan keputusan sidang admin
+    // Tentukan sub_status berdasarkan keputusan sidang resmi admin
     if ($request->status === 'selesai') {
         $updateData['sub_status'] = 'komplain_ditolak';
     } elseif ($request->status === 'batal') {
         $updateData['sub_status'] = 'komplain_diterima';
     } elseif ($request->status === 'dikomplain') {
         $updateData['sub_status'] = 'proses_banding';
-    } elseif ($request->status === 'proses') {
+    } elseif ($request->status === 'pengerjaan') { 
+        // ⚡ Jika dikembalikan ke lapangan, sub_status dicatat sebagai garansi_perbaikan
         $updateData['sub_status'] = 'garansi_perbaikan';
     }
 
     $order->update($updateData);
 
-    return redirect()->route('admin.orders.index')->with('success', 'Berita acara arbitrase berhasil disimpan ke Supabase!');
+    return redirect()->route('admin.orders.index')->with('success', 'Putusan sidang arbitrase berhasil dieksekusi!');
 }
 }

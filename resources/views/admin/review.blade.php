@@ -13,6 +13,7 @@
                         <span class="inline-block text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest border
                             {{ $order->status === 'dikomplain' ? 'bg-purple-100 text-purple-600 border-purple-200 animate-pulse' : '' }}
                             {{ $order->status === 'selesai' ? 'bg-green-50 text-green-600 border-green-100' : '' }}
+                            {{ $order->status === 'pengerjaan' ? 'bg-blue-50 text-blue-600 border-blue-150' : '' }}
                             {{ $order->status === 'batal' ? 'bg-red-50 text-red-500 border-red-100' : '' }}
                         ">
                             Status Utama: {{ strtoupper($order->status) }}
@@ -68,29 +69,18 @@
 
                     @if($order->complaint_image)
                         @php
-                            // 1. Ambil payload endpoint dari runtime environment Vercel
                             $rawEndpoint = getenv('SUPABASE_STORAGE_ENDPOINT') ?: ($_ENV['SUPABASE_STORAGE_ENDPOINT'] ?? '');
-                            
-                            // Anti-Typo: Potong jika ada string kunci yang ikut ter-paste di Vercel Settings
                             if (str_contains($rawEndpoint, 'SUPABASE_STORAGE_ENDPOINT=')) {
                                 $rawEndpoint = str_replace('SUPABASE_STORAGE_ENDPOINT=', '', $rawEndpoint);
                             }
-                            
                             $rawEndpoint = trim($rawEndpoint);
                             $supabaseBucket = getenv('SUPABASE_STORAGE_BUCKET') ?: 'tukangin-complain';
 
                             if (!empty($rawEndpoint)) {
-                                // 2. Ubah pipa S3 API menjadi URL Web Objek Publik Supabase
                                 $supabasePublicBase = str_replace('/storage/v1/s3', '/storage/v1/object/public/' . $supabaseBucket, $rawEndpoint);
-                                
-                                // Perbaikan otomatis jika ada kendala double slash protokol https
                                 if (str_contains($supabasePublicBase, 'https:/') && !str_contains($supabasePublicBase, 'https://')) {
                                     $supabasePublicBase = str_replace('https:/', 'https://', $supabasePublicBase);
-                                } elseif (str_contains($supabasePublicBase, 'http:/') && !str_contains($supabasePublicBase, 'http://')) {
-                                    $supabasePublicBase = str_replace('http:/', 'http://', $supabasePublicBase);
                                 }
-                                
-                                // 3. Satukan domain dengan path file gambar
                                 $fullComplaintUrl = rtrim($supabasePublicBase, '/') . '/' . ltrim($order->complaint_image, '/');
                             } else {
                                 $fullComplaintUrl = asset('storage/' . $order->complaint_image);
@@ -112,8 +102,7 @@
                 </div>
 
                 <div class="border-t border-gray-50 pt-8">
-                    @if($order->status === 'dikomplain' || $order->sub_status === 'proses_banding' || $order->sub_status === 'garansi_perbaikan')
-                        
+                    @if($order->status === 'dikomplain')
                         <h3 class="text-base font-black text-[#0f2d50] uppercase tracking-wider mb-2">⚖️ Ambil Keputusan Arbitrase & Sub-Status</h3>
                         <p class="text-xs text-gray-400 mb-6">Pilih putusan final untuk mencairkan/refund dana, atau pindahkan ke sub-fase banding mediasi lanjutan.</p>
                         
@@ -132,7 +121,7 @@
                                     
                                     <optgroup label="⏳ TAHAP MEDIASI / BANDING BERJALAN">
                                         <option value="dikomplain" {{ $order->sub_status === 'proses_banding' ? 'selected' : '' }}>⚠️ PROSES BANDING (Tahan Dana - Evaluasi Bukti Tambahan)</option>
-                                        <option value="proses" {{ $order->sub_status === 'garansi_perbaikan' ? 'selected' : '' }}>🛠️ KEMBALIKAN KE PENGERJAAN (Perintahkan Garansi Perbaikan Ulang)</option>
+                                        <option value="pengerjaan" {{ $order->sub_status === 'garansi_perbaikan' ? 'selected' : '' }}>🛠️ KEMBALIKAN KE PENGERJAAN (Perintahkan Garansi Perbaikan Ulang)</option>
                                     </optgroup>
                                 </select>
                             </div>
@@ -149,44 +138,47 @@
                             </button>
                         </form>
                     @else
-                        
-                        <div class="bg-gray-50 border border-gray-200 p-8 rounded-[2rem] space-y-6 animate-fade-in">
-                            <div class="flex items-center gap-4 border-b border-gray-200 pb-4">
-                                <div class="w-12 h-12 bg-[#0f2d50] text-white rounded-2xl flex items-center justify-center text-lg shadow-md">
-                                    <i class="fas fa-archive"></i>
+                        @if($order->sub_status)
+                            <div class="bg-gray-50 border border-gray-200 p-8 rounded-[2rem] space-y-6 animate-fade-in">
+                                <div class="flex items-center gap-4 border-b border-gray-200 pb-4">
+                                    <div class="w-12 h-12 bg-[#0f2d50] text-white rounded-2xl flex items-center justify-center text-lg shadow-md">
+                                        <i class="fas fa-archive"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-black text-[#0f2d50] uppercase tracking-wider">Berkas Arsip Keputusan Perkara</h4>
+                                        <p class="text-[11px] text-gray-400">Sengketa sengketa ini telah selesai disidangkan dan dikunci oleh Direksi TUKANG.IN.</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 class="text-sm font-black text-[#0f2d50] uppercase tracking-wider">Berkas Arsip Keputusan Perkara</h4>
-                                    <p class="text-[11px] text-gray-400">Sengketa sengketa ini telah selesai disidangkan dan dikunci oleh Direksi TUKANG.IN.</p>
-                                </div>
-                            </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                                <div class="p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                                    <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Amar Putusan Utama</p>
-                                    <p class="font-black text-gray-800 mt-1 uppercase text-sm">
-                                        @if($order->status === 'selesai')
-                                            🟢 Selesai (Komplain Ditolak)
-                                        @else
-                                            🔴 Batal (Komplain Diterima)
-                                        @endif
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                                    <div class="p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Amar Putusan Utama</p>
+                                        <p class="font-black text-gray-800 mt-1 uppercase text-sm">
+                                            @if($order->status === 'selesai')
+                                                🟢 Selesai (Komplain Ditolak)
+                                            @elseif($order->status === 'batal')
+                                                🔴 Batal (Komplain Diterima)
+                                            @elseif($order->status === 'pengerjaan')
+                                                🛠️ Dikembalikan (Garansi Perbaikan Kerja)
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div class="p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Sub-Status Validasi</p>
+                                        <p class="font-extrabold text-blue-600 mt-1 uppercase text-sm">
+                                            {{ str_replace('_', ' ', $order->sub_status ?? 'Final Inkrah') }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                                    <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-2">Risalah & Catatan Pertimbangan Resmi Admin</p>
+                                    <p class="text-xs text-gray-700 leading-relaxed italic bg-gray-50/70 p-4 rounded-xl border border-gray-100 font-semibold text-justify">
+                                        "{{ $order->admin_note ?? 'Tidak ada catatan kesimpulan tertulis dari admin.' }}"
                                     </p>
                                 </div>
-                                <div class="p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                                    <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Sub-Status Validasi</p>
-                                    <p class="font-extrabold text-blue-600 mt-1 uppercase text-sm">
-                                        {{ str_replace('_', ' ', $order->sub_status ?? 'Final Inkrah') }}
-                                    </p>
-                                </div>
                             </div>
-
-                            <div class="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-2">Risalah & Catatan Pertimbangan Resmi Admin</p>
-                                <p class="text-xs text-gray-700 leading-relaxed italic bg-gray-50/70 p-4 rounded-xl border border-gray-100 font-semibold text-justify">
-                                    "{{ $order->admin_note ?? 'Tidak ada catatan kesimpulan tertulis dari admin.' }}"
-                                </p>
-                            </div>
-                        </div>
+                        @endif
                     @endif
                 </div>
 
