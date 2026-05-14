@@ -179,17 +179,35 @@
                         </div>
 
                         @if($order->complaint_image)
-                            @php
-                                $supabaseEndpoint = getenv('SUPABASE_STORAGE_ENDPOINT') ?: ($_ENV['SUPABASE_STORAGE_ENDPOINT'] ?? '');
-                                $supabaseBucket = getenv('SUPABASE_STORAGE_BUCKET') ?: 'tukangin-complain';
+    @php
+        // 1. Ambil data mentah dari runtime environment Vercel
+        $rawEndpoint = getenv('SUPABASE_STORAGE_ENDPOINT') ?: ($_ENV['SUPABASE_STORAGE_ENDPOINT'] ?? '');
+        
+        // ⚡ ANTI-TYPO FILTER: Jika tumpangan teks variabel bawaan, kita potong paksa di sini
+        if (str_contains($rawEndpoint, 'SUPABASE_STORAGE_ENDPOINT=')) {
+            $rawEndpoint = str_replace('SUPABASE_STORAGE_ENDPOINT=', '', $rawEndpoint);
+        }
+        
+        $rawEndpoint = trim($rawEndpoint);
+        $supabaseBucket = getenv('SUPABASE_STORAGE_BUCKET') ?: 'tukangin-complain';
 
-                                if (!empty($supabaseEndpoint)) {
-                                    $supabasePublicBase = str_replace('/storage/v1/s3', '/storage/v1/object/public/' . $supabaseBucket, $supabaseEndpoint);
-                                    $fullComplaintUrl = rtrim($supabasePublicBase, '/') . '/' . ltrim($order->complaint_image, '/');
-                                } else {
-                                    $fullComplaintUrl = asset('storage/' . $order->complaint_image);
-                                }
-                            @endphp
+        if (!empty($rawEndpoint)) {
+            // 2. Konversi rute pipa S3 API menjadi rute publik render objek Supabase
+            $supabasePublicBase = str_replace('/storage/v1/s3', '/storage/v1/object/public/' . $supabaseBucket, $rawEndpoint);
+            
+            // ⚡ REPAIR PROTOCOL SLASHES: Amankan kondisi jika https:/ terpotong hanya memiliki 1 slash
+            if (str_contains($supabasePublicBase, 'https:/') && !str_contains($supabasePublicBase, 'https://')) {
+                $supabasePublicBase = str_replace('https:/', 'https://', $supabasePublicBase);
+            } elseif (str_contains($supabasePublicBase, 'http:/') && !str_contains($supabasePublicBase, 'http://')) {
+                $supabasePublicBase = str_replace('http:/', 'http://', $supabasePublicBase);
+            }
+            
+            // 3. Gabungkan base URL publik cloud dengan path relative berkas gambar
+            $fullComplaintUrl = rtrim($supabasePublicBase, '/') . '/' . ltrim($order->complaint_image, '/');
+        } else {
+            $fullComplaintUrl = asset('storage/' . $order->complaint_image);
+        }
+    @endphp
                             <div class="pt-2 border-t border-purple-200/60">
                                 <p class="text-[9px] font-black text-purple-600 uppercase tracking-widest mb-2">Foto Bukti Terlampir:</p>
                                 <a href="{{ $fullComplaintUrl }}" target="_blank" class="inline-block relative overflow-hidden rounded-xl border border-purple-200 bg-white p-1.5 shadow-sm hover:shadow-md transition">
