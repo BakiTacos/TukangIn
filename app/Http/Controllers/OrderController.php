@@ -42,27 +42,44 @@ class OrderController extends Controller
 
     // app/Http/Controllers/OrderController.php
 
-    public function complain(Request $request, Order $order)
+    public function complain(Request $request, $id)
     {
-        if ($order->user_id !== Auth::id()) {
-            abort(403);
+        }
+        // 1. Validasi Input Ketat (Maksimal Gambar 2MB)
+        $request->validate([
+            'cancel_reason' => 'required|string|max:255',
+            'cancel_description' => 'required|string|max:1000',
+            'complaint_image' => 'required|image|mimes:jpeg,png,jpg|max:2048', // Batasi 2MB biar hemat bandwith bucket
+        ]);
+
+        $order = Order::where('id', $id)
+            ->where('user_id', Auth::id()) // Proteksi: Memastikan yang komplain beneran pemilik invoice
+            ->firstOrFail();
+
+        // 2. Siapkan Payload Mutasi Status Utama & Sub-Status Sengketa
+        $updateData = [
+            'status' => 'dikomplain',
+            'sub_status' => 'proses_banding', // Mengunci sub-status ke fase mediasi awal
+            'cancel_reason' => $request->cancel_reason,
+            'cancel_description' => $request->cancel_description,
+        ];
+
+        // 3. PROSES EKSEKUSI UNGGAH FOTO KE SUPABASE BUCKET `tukangin-complain`
+        if ($request->hasFile('complaint_image')) {
+            
+            // File otomatis dilempar ke cloud Supabase Cloud melalui driver s3 disk kita
+            $filePath = $request->file('complaint_image')->store('complaints', 'supabase_complain');
+            
+            // Simpan path unik file-nya ke kolom database orders
+            $updateData['complaint_image'] = $filePath;
         }
 
-        // Validasi ketat: Alasan wajib diisi, deskripsi maksimal 256 karakter
-        $request->validate([
-            'complaint_reason' => 'required|string|max:255',
-            'complaint_description' => 'required|string|max:256',
-        ]);
+        // 4. Jalankan Query Update Mass-Assignment ke Supabase Postgres
+        $order->update($updateData);
 
-        // Update status dan simpan detail komplain ke database Supabase
-        $order->update([
-            'status' => 'dikomplain',
-            'complaint_reason' => $request->complaint_reason,
-            'complaint_description' => $request->complaint_description,
-        ]);
-
-        return redirect()->back()->with('warning', 'Komplain Anda telah terdaftar. Laporan sedang ditinjau oleh tim kami.');
+        return redirect()->back()->with('success', 'Berkas sengketa resmi diajukan! Dana pengerjaan ditahan sementara untuk proses audit HQ Admin TUKANG.IN.');
     }
+    
     public function checkout(Service $service, User $tukang)
     {
         $user = Auth::user();

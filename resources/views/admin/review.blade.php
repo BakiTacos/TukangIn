@@ -55,15 +55,31 @@
                     </div>
                 </div>
 
-                <div class="bg-purple-50/50 border border-purple-100 p-6 rounded-2xl">
-                    <h4 class="text-[10px] font-bold text-purple-600 uppercase tracking-wider mb-2 flex items-center gap-1">
-                        <i class="fas fa-exclamation-circle"></i> Berita Acara Keluhan Pelanggan (Awal):
-                    </h4>
-                    <p class="text-xs font-bold text-gray-800 mb-1">"{{ $order->cancel_reason ?? 'Tidak ada judul keluhan' }}"</p>
-                    <p class="text-xs text-gray-600 leading-relaxed italic">
-                        {{ $order->cancel_description ?? 'Tidak ada deskripsi keluhan tambahan' }}
-                    </p>
+                <div class="bg-purple-50/50 border border-purple-100 p-6 rounded-2xl space-y-4">
+    <div>
+        <h4 class="text-[10px] font-bold text-purple-600 uppercase tracking-wider mb-2 flex items-center gap-1">
+            <i class="fas fa-exclamation-circle"></i> Berita Acara Keluhan Pelanggan (Awal):
+        </h4>
+        <p class="text-xs font-bold text-gray-800 mb-1">"{{ $order->cancel_reason ?? 'Tidak disebutkan judul alasan secara spesifik' }}"</p>
+        <p class="text-xs text-gray-600 leading-relaxed italic">
+            {{ $order->cancel_description ?? 'Pelanggan mengajukan sengketa tanpa menyertakan deskripsi teks tambahan.' }}
+        </p>
+    </div>
+
+    @if($order->complaint_image)
+        <div class="pt-2 border-t border-purple-100">
+            <span class="block text-[9px] font-black text-purple-500 uppercase tracking-widest mb-2">Lampiran Dokumen Bukti Fisik:</span>
+            <a href="{{ asset('storage/' . $order->complaint_image) }}" target="_blank" class="inline-block group relative overflow-hidden rounded-2xl border border-purple-200 bg-white p-2 hover:shadow-lg transition duration-300">
+                <img src="{{ asset('storage/' . $order->complaint_image) }}" 
+                     alt="Bukti Sengketa TUKANG.IN" 
+                     class="w-full max-w-sm h-48 object-cover rounded-xl group-hover:scale-[1.02] transition duration-300">
+                <div class="absolute inset-0 bg-gray-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center rounded-xl">
+                    <span class="text-white font-bold text-[10px] uppercase bg-[#0f2d50] py-2 px-4 rounded-xl shadow-md"><i class="fas fa-search-plus mr-1"></i> Perbesar Foto</span>
                 </div>
+            </a>
+        </div>
+    @endif
+</div>
 
                 <div class="border-t border-gray-50 pt-8">
                     @if($order->status === 'dikomplain' || $order->sub_status === 'proses_banding' || $order->sub_status === 'garansi_perbaikan')

@@ -72,6 +72,19 @@ return [
             'throw' => true,
         ],
 
+        'supabase_complain' => [
+            'driver' => 's3',
+            'key' => env('SUPABASE_STORAGE_ACCESS_KEY_ID'),
+            'secret' => env('SUPABASE_STORAGE_SECRET_ACCESS_KEY'),
+            'region' => env('SUPABASE_STORAGE_REGION', 'ap-southeast-1'), // Sesuaikan region project Supabase lo
+            'bucket' => env('SUPABASE_STORAGE_BUCKET', 'tukangin-complain'),
+            'endpoint' => env('SUPABASE_STORAGE_ENDPOINT'),
+            'use_path_style_endpoint' => true,
+            'visibility' => 'public', // Set public jika bucket di Supabase disetting Public
+            'url' => env('SUPABASE_STORAGE_PUBLIC_URL'), // Custom URL generator untuk pemanggilan gambar di Blade
+            'throw' => true,
+        ],
+
         'supabase' => [
             'driver' => 's3',
             'key' => env('SUPABASE_ACCESS_KEY_ID'),
