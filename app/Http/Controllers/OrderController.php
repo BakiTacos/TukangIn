@@ -44,7 +44,6 @@ class OrderController extends Controller
 
     public function complain(Request $request, $id)
     {
-        }
         // 1. Validasi Input Ketat (Maksimal Gambar 2MB)
         $request->validate([
             'cancel_reason' => 'required|string|max:255',
