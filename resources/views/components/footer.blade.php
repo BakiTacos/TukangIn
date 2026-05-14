@@ -31,7 +31,11 @@
                     <li><a href="/tentang-kami" class="hover:text-orange-400">Tentang Tukang.in</a></li>
                     <li><a href="/pusat-bantuan" class="hover:text-orange-400">Pusat Bantuan</a></li>
                     <li><a href="/layanan" class="hover:text-orange-400">Layanan Kami</a></li>
-                    <li><a href="#" class="hover:text-orange-400">Jadi Mitra Kami</a></li>
+                    <li>
+                        <a href="{{ route('register.tukang') }}" class="text-gray-400 hover:text-orange-500 transition duration-200">
+                            Jadi Mitra Kami
+                        </a>
+                    </li>
                 </ul>
             </div>
             <div>

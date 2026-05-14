@@ -13,9 +13,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         
-        // ⚡ SISIPKAN DI SINI: Daftarkan secara global ke dalam middleware group 'web'
+        // ⚡ GLOBAL CHECK: Jalankan untuk semua rute web
         $middleware->web(append: [
-            CheckIfBlocked::class,
+            \App\Http\Middleware\CheckIfBlocked::class,
+            \App\Http\Middleware\CheckTukangVerification::class, // Tambahkan di sini
+        ]);
+
+        $middleware->alias([
+            'tukang.verified' => \App\Http\Middleware\CheckTukangVerification::class,
         ]);
 
     })

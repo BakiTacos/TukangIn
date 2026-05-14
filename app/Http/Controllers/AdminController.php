@@ -24,9 +24,13 @@ class AdminController extends Controller
         $totalMitraTeknisi = User::where('role', 'tukang')->count();
         $criticalOrdersCount = Order::whereIn('status', ['menunggu', 'proses', 'dikomplain'])->count();
 
+        $pendingMitraCount = User::where('role', 'tukang')
+                             ->where('status_verifikasi', 'menunggu')
+                             ->count();
+
         return view('admin.dashboard', compact(
             'totalGmv', 'totalTransactions', 'avgPurchaseValue', 
-            'totalPelanggan', 'totalMitraTeknisi', 'criticalOrdersCount'
+            'totalPelanggan', 'totalMitraTeknisi', 'criticalOrdersCount', 'pendingMitraCount'
         ));
     }
 
@@ -168,5 +172,53 @@ public function resolveOrder(Request $request, $id)
     $order->update($updateData);
 
     return redirect()->route('admin.orders.index')->with('success', 'Putusan sidang arbitrase berhasil dieksekusi!');
+}
+
+public function verificationQueue()
+{
+    // Cek keamanan role admin
+    if (auth()->user()->role !== 'admin') { abort(403); }
+
+    // Ambil data user dengan role 'tukang' dan status 'menunggu'
+    // Diurutkan dari yang paling lama menunggu (oldest) ke yang paling baru
+    $pendingMitras = User::where('role', 'tukang')
+                         ->where('status_verifikasi', 'menunggu')
+                         ->oldest()
+                         ->paginate(10);
+
+    return view('admin.verifications', compact('pendingMitras'));
+}
+
+// 2. Fungsi untuk Menerima (Approve) Mitra
+public function approveMitra($id)
+{
+    if (auth()->user()->role !== 'admin') { abort(403); }
+
+    $mitra = User::findOrFail($id);
+
+    // Buka akses penuh untuk tukang ini
+    $mitra->update([
+        'status_verifikasi' => 'disetujui',
+        'is_blocked' => false, // Buka gembok blokir
+        // is_available dibiarkan false, biarkan tukang yang menyalakannya sendiri nanti di dashboard mereka
+    ]);
+
+    return redirect()->back()->with('success', 'Mitra ' . $mitra->name . ' berhasil disetujui dan akunnya kini aktif!');
+}
+
+// 3. Fungsi untuk Menolak (Reject) Mitra
+public function rejectMitra($id)
+{
+    if (auth()->user()->role !== 'admin') { abort(403); }
+
+    $mitra = User::findOrFail($id);
+
+    // Kunci permanen atau minta daftar ulang (Tolak)
+    $mitra->update([
+        'status_verifikasi' => 'ditolak',
+        'is_blocked' => false, // Kunci rapat
+    ]);
+
+    return redirect()->back()->with('success', 'Aplikasi mitra atas nama ' . $mitra->name . ' telah ditolak.');
 }
 }
